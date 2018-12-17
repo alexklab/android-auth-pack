@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = rootProject.groupName
+version = rootProject.versionName
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
