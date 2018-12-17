@@ -4,6 +4,7 @@ buildscript {
     // Define versions in a single place
     ext {
         // App version
+        groupName = 'com.github.alexklab'
         versionName = '0.0.1' // X.Y.Z; X = Major, Y = minor, Z = Patch level
         versionCode = 1 // XYZZ
 
@@ -18,6 +19,7 @@ buildscript {
         espresso_version = '3.1.1'
         junit_version = '4.12'
         gradle_version = '3.2.1'
+        gradle_plugin_version = '2.1'
         kluent_version = '1.38'
         kotlin_version = '1.3.11'
         kotlinx_coroutines_version = '1.0.1'
@@ -33,6 +35,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.github.dcendents:android-maven-gradle-plugin:$gradle_plugin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
