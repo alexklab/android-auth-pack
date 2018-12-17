@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">android-auth-pack</string>
+    <string name="app_name">Demo Login with Firebase</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
@@ -9,7 +9,13 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_email_not_found">This email not found</string>
+    <string name="error_email_not_activated">This email not verified</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="back">Back</string>
+    <string name="retry">Retry</string>
+    <string name="error_response_title">Connection error</string>
+    <string name="error_response_message">Check network connection and try again</string>
 </resources>
