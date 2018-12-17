@@ -4,7 +4,7 @@ buildscript {
     // Define versions in a single place
     ext {
         // App version
-        groupName = 'com.github.alexklab'
+        group_name = 'com.github.alexklab'
         versionName = '0.0.1' // X.Y.Z; X = Major, Y = minor, Z = Patch level
         versionCode = 1 // XYZZ
 
