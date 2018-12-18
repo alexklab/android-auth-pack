@@ -1,1 +1,1 @@
-include ':demo', ':auth-core'
+include ':demo-firebase', ':auth-core'
