@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:padding="@dimen/material_design_margin_long"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/current_email">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/emailText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/signInWithEmailButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_design_margin_short"
+                android:text="@string/sign_in_action"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/forgotPasswordButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/forgot_password_button_name"/>
+
+
+        <TextView
+                android:id="@+id/signInWithLabelText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_design_margin_long"
+                android:gravity="center"
+                android:text="@string/sign_in_with_label"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/material_design_margin_short"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+            <ImageButton
+                    android:id="@+id/googleSignInButton"
+                    style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
+                    android:layout_width="@dimen/social_buttons_size"
+                    android:layout_height="@dimen/social_buttons_size"
+                    android:layout_marginEnd="@dimen/material_design_margin_long"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_google_plus"/>
+
+            <ImageButton
+                    android:id="@+id/facebookSignInButton"
+                    style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
+                    android:layout_width="@dimen/social_buttons_size"
+                    android:layout_marginEnd="@dimen/material_design_margin_long"
+                    android:layout_height="@dimen/social_buttons_size"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_facebook"/>
+
+            <ImageButton
+                    android:id="@+id/twitterSignInButton"
+                    style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
+                    android:layout_width="@dimen/social_buttons_size"
+                    android:layout_height="@dimen/social_buttons_size"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_twitter"/>
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/signUpLabelText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/material_design_margin_long"
+                android:text="@string/sign_up_label_text"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/signUpButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_design_margin_short"
+                android:text="@string/sign_up_action"/>
+    </LinearLayout>
+
+    <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_height="wrap_content"/>
+
+</FrameLayout>

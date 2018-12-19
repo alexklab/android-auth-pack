@@ -18,4 +18,11 @@
     <string name="retry">Retry</string>
     <string name="error_response_title">Connection error</string>
     <string name="error_response_message">Check network connection and try again</string>
+    <string name="password">Password</string>
+    <string name="current_email">Email</string>
+    <string name="sign_in_action">Sign In</string>
+    <string name="sign_up_action">Sign Up</string>
+    <string name="sign_up_label_text">Don\'t registered yet?</string>
+    <string name="sign_in_with_label">or with social networks</string>
+    <string name="forgot_password_button_name">Forgot password?</string>
 </resources>
