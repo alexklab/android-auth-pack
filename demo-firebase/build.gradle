@@ -37,7 +37,9 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-androidx-viewmodel:$koin_version"
+
     implementation "com.google.firebase:firebase-auth:16.1.0"
+    implementation "com.google.android.gms:play-services-auth:16.0.1"
     implementation project(':auth-core')
 
     testImplementation "junit:junit:$junit_version"

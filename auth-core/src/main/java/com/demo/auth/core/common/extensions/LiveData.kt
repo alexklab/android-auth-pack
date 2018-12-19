@@ -13,8 +13,11 @@ import com.demo.auth.core.entity.Event
  * Created by alexk on 12/13/18.
  * Project android-auth-pack
  */
-fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postError(errorType: AuthResponseErrorType) {
-    postEvent(AuthResponse(FAILED, errorType = errorType))
+fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postError(
+    errorType: AuthResponseErrorType,
+    errorMessage: String? = null
+) {
+    postEvent(AuthResponse(FAILED, errorType = errorType, errorMessage = errorMessage))
 }
 
 fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postOnProgress() {
@@ -22,15 +25,18 @@ fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postOnProgress() {
 }
 
 fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.isOnProgress(): Boolean =
-        value?.peekContent()?.status == ON_PROGRESS
+    value?.peekContent()?.status == ON_PROGRESS
 
 fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postEvent(response: AuthResponse<DataType>) {
     postValue(Event(response))
 }
 
 @MainThread
-fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.setError(errorType: AuthResponseErrorType) {
-    setEvent(AuthResponse(FAILED, errorType = errorType))
+fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.setError(
+    errorType: AuthResponseErrorType,
+    errorMessage: String? = null
+) {
+    setEvent(AuthResponse(FAILED, errorType = errorType, errorMessage = errorMessage))
 }
 
 @MainThread
@@ -47,8 +53,8 @@ fun <DataType> Event<AuthResponse<DataType>>.applyOnSuccess(action: (DataType) -
     val response = peekContent()
     if (response.isSuccess()) {
         response.data
-                ?.let { action(it) }
-                ?: Log.w("applyOnSuccess:", "Undefined profile")
+            ?.let { action(it) }
+            ?: Log.w("applyOnSuccess:", "Undefined profile")
     }
     return this
 }

@@ -8,6 +8,7 @@ import com.demo.auth.core.model.SignInWithEmailViewModel
 import com.demo.auth.core.model.SignInWithSocialNetworksViewModel
 import com.demo.auth.firebase.data.database.DatabaseProvider
 import com.demo.auth.firebase.data.entity.UserProfile
+import com.demo.auth.firebase.data.network.GoogleSignInServiceImpl
 import com.demo.auth.firebase.data.repository.FirebaseAuthRepository
 import com.demo.auth.firebase.data.repository.FirebaseUserProfileFactory
 import org.koin.android.ext.android.startKoin
@@ -27,7 +28,8 @@ class MainApplication : Application() {
 
     private val mainModuleModule = module {
         single { FirebaseUserProfileFactory() }
-        single { FirebaseAuthRepository(get<FirebaseUserProfileFactory>()) }
+        single { GoogleSignInServiceImpl(getString(R.string.google_web_client_id)) }
+        single { FirebaseAuthRepository(get<FirebaseUserProfileFactory>(), get<GoogleSignInServiceImpl>()) }
         single { DatabaseProvider() }
     }
 
