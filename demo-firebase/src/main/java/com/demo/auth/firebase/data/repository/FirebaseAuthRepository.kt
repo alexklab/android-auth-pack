@@ -34,27 +34,8 @@ class FirebaseAuthRepository<UserProfileDataType>(
     ) {
         auth.currentUser
             ?.updatePassword(newPassword)
-            ?.addOnCompleteListener {
-                response.postEvent(
-                    AuthResponse(
-                        status = it.authRequestStatus,
-                        errorType = if (it.isSuccessful) {
-                            null
-                        } else {
-                            when (it.exception) {
-                                // thrown if the password is not strong enough
-                                is FirebaseAuthWeakPasswordException,
-                                    // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
-                                is FirebaseAuthInvalidUserException,
-                                    // thrown if the user's last sign-in time does not meet the security threshold.
-                                is FirebaseAuthRecentLoginRequiredException -> INVALID_CONFIRM_PASSWORD
-                                else -> AUTH_SERVICE_ERROR
-                            }
-                        }
-                    )
-                )
-            }
-            ?: response.postError(AUTH_SERVICE_ERROR)
+            ?.addOnCompleteListener { response.postResult(it, ::updatePasswordErrors) }
+            ?: response.postError(AUTH_SERVICE_ERROR, "Fail updatePassword: user is logged out")
     }
 
     override fun recoverPassword(
@@ -118,7 +99,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
                     response.postResult(task, ::updateProfileErrors)
                 }
             }
-        } ?: response.postError(AUTH_SERVICE_ERROR, "updateProfile: user is logged out")
+        } ?: response.postError(AUTH_SERVICE_ERROR, "Fail updateProfile: user is logged out")
     }
 
     override fun sendVerifiedEmailKeyUseCase(
@@ -145,11 +126,11 @@ class FirebaseAuthRepository<UserProfileDataType>(
 
         // thrown if the user account you are trying to sign in to has been disabled.
         // Also thrown if credential is an EmailAuthCredential with an email address that does not correspond to an existing user.
-        is FirebaseAuthInvalidUserException -> AUTH_SERVICE_ERROR
+        is FirebaseAuthInvalidUserException,
 
         // thrown if the credential is malformed or has expired.
         // If credential instanceof EmailAuthCredential it will be thrown if the password is incorrect.
-        is FirebaseAuthInvalidCredentialsException -> AUTH_SERVICE_ERROR
+        is FirebaseAuthInvalidCredentialsException,
 
         // thrown if there already exists an account with the email address asserted by the credential.
         // Resolve this case by calling fetchProvidersForEmail(String) and then asking the user to sign in using one of them.
@@ -187,6 +168,16 @@ class FirebaseAuthRepository<UserProfileDataType>(
     private fun updateProfileErrors(exception: Exception?): AuthResponseErrorType? = when (exception) {
         // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
         is FirebaseAuthInvalidUserException -> AUTH_SERVICE_ERROR
+        else -> AUTH_SERVICE_ERROR
+    }
+
+    private fun updatePasswordErrors(exception: Exception?): AuthResponseErrorType? = when (exception) {
+        // thrown if the password is not strong enough
+        is FirebaseAuthWeakPasswordException,
+            // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
+        is FirebaseAuthInvalidUserException,
+            // thrown if the user's last sign-in time does not meet the security threshold.
+        is FirebaseAuthRecentLoginRequiredException -> INVALID_CONFIRM_PASSWORD
         else -> AUTH_SERVICE_ERROR
     }
 

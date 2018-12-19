@@ -42,3 +42,4 @@ captures/
 
 # Google services config
 google-services.json
+./src/main/res/values/auth_config.xml
