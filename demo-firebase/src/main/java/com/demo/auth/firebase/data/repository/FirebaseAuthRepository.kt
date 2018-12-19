@@ -9,13 +9,14 @@ import com.demo.auth.core.entity.AuthRequestStatus.SUCCESS
 import com.demo.auth.core.entity.AuthResponseErrorType.*
 import com.demo.auth.core.entity.SocialNetworkType.*
 import com.demo.auth.core.repos.AuthRepository
-import com.demo.auth.firebase.data.network.GoogleSignInService
+import com.demo.auth.firebase.data.network.NetworkSignInService
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 
 class FirebaseAuthRepository<UserProfileDataType>(
     private val userDataFactory: Factory<UserProfileDataType>,
-    private val googleSignInService: GoogleSignInService
+    private val googleSignInService: NetworkSignInService,
+    private val facebookSignInService: NetworkSignInService
 ) : AuthRepository<UserProfileDataType> {
 
     interface Factory<UserProfileDataType> {
@@ -91,7 +92,8 @@ class FirebaseAuthRepository<UserProfileDataType>(
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
         when (socialNetwork) {
-            GOOGLE -> signInWithGoogle(response)
+            GOOGLE -> googleSignInService.signIn { c, e -> response.signInWithCredential(c, e) }
+            FACEBOOK -> facebookSignInService.signIn { c, e -> response.signInWithCredential(c, e) }
             else -> response.postError(AUTH_CANCELED, "$socialNetwork signInService not implemented")
         }
     }
@@ -127,22 +129,16 @@ class FirebaseAuthRepository<UserProfileDataType>(
         response.postError(AUTH_SERVICE_ERROR)
     }
 
-    private fun signInWithGoogle(response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>) {
-        googleSignInService.signIn { account, exception ->
-            if (account != null) {
-                signInWithCredentials(GoogleAuthProvider.getCredential(account.idToken, null), response)
-            } else {
-                response.postError(AUTH_CANCELED, exception?.message)
-            }
-        }
-    }
-
-    private fun signInWithCredentials(
-        credential: AuthCredential,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
+    private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.signInWithCredential(
+        credential: AuthCredential?,
+        exception: Exception?
     ) {
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener { response.postResult(it, ::signInWithCredentialsErrors) }
+        if (credential != null) {
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { postResult(it, ::signInWithCredentialsErrors) }
+        } else {
+            postError(AUTH_CANCELED, exception?.message)
+        }
     }
 
     private fun signInWithCredentialsErrors(exception: Exception?): AuthResponseErrorType? = when (exception) {

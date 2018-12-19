@@ -6,7 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.demo.auth.firebase.common.applyTransaction
 import com.demo.auth.firebase.data.database.DatabaseProvider
-import com.demo.auth.firebase.data.network.GoogleSignInServiceImpl
+import com.demo.auth.firebase.data.network.FacebookSignInService
+import com.demo.auth.firebase.data.network.GoogleSignInService
 import com.demo.auth.firebase.data.ui.SignInFragment
 import org.koin.android.ext.android.inject
 
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         dbProvider.openDb(this)
         googleSignInService.onCreate(this)
+        facebookSignInService.onCreate(this)
         supportFragmentManager.applyTransaction {
             replace(R.id.fragments_container, SignInFragment(), TAG)
         }
@@ -30,12 +32,14 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         dbProvider.closeDb()
         googleSignInService.onDestroy()
+        facebookSignInService.onDestroy()
         super.onDestroy()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         googleSignInService.onActivityResult(requestCode, resultCode, data)
+        facebookSignInService.onActivityResult(requestCode, resultCode, data)
     }
 
     fun addFragment(fragment: Fragment) {
@@ -47,7 +51,8 @@ class MainActivity : AppCompatActivity() {
 
     // lazy init dependency
     private val dbProvider: DatabaseProvider by inject()
-    private val googleSignInService: GoogleSignInServiceImpl by inject()
+    private val googleSignInService: GoogleSignInService by inject()
+    private val facebookSignInService: FacebookSignInService by inject()
 
     companion object {
         const val TAG = "main_activity"

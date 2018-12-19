@@ -1,5 +1,75 @@
 package com.demo.auth.firebase.data.network
 
-interface GoogleSignInService {
-    fun signIn(callback: GoogleSignInCallBack)
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
+
+/**
+ * Created by alexk on 12/19/18.
+ * Project android-auth-pack
+ */
+class GoogleSignInService(
+    private val webClientId: String,
+    private val signInRequestCode: Int = RC_SIGN_IN
+) : NetworkSignInService() {
+
+    private var googleSignInClient: GoogleSignInClient? = null
+
+    /**
+     * Should be called in Activity.onCreate method
+     */
+    override fun onCreate(activity: Activity) {
+        super.onCreate(activity)
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(webClientId)
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(activity, gso)
+    }
+
+    /**
+     * Should be called in Activity.onDestroy method
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        googleSignInClient = null
+    }
+
+    override fun signIn(activity: Activity) {
+        googleSignInClient
+            ?.let { activity.startActivityForResult(it.signInIntent, signInRequestCode) }
+            ?: Log.w("signIn", "not attached. googleSignInClient = null")
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode != signInRequestCode) {
+            Log.w("onActivityResult", "wrong request code: $requestCode")
+            return
+        }
+
+        if (resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                postResult(account?.toAuthCredential())
+            } catch (e: ApiException) {
+                Log.w("onActivityResult", "Google sign in failed", e)
+                postResult(exception = e)
+            }
+        } else {
+            postResult()
+        }
+    }
+
+    private fun GoogleSignInAccount.toAuthCredential() = GoogleAuthProvider.getCredential(idToken, null)
+
+    companion object {
+        private const val RC_SIGN_IN = 2040
+    }
 }
