@@ -16,11 +16,11 @@ class ChangePasswordViewModel<UserProfileDataType>(
 ) : AuthBaseViewModel<UserProfileDataType>() {
 
     fun changePassword(oldPassword: String, newPassword: String, newConfirmPassword: String): Unit = when {
-        oldPassword.isEmpty() -> postError(EMPTY_PASSWORD)
-        newPassword.isEmpty() -> postError(EMPTY_NEW_PASSWORD)
-        !passwordValidator.validate(newPassword) -> postError(INVALID_PASSWORD)
-        newConfirmPassword.isEmpty() -> postError(EMPTY_CONFIRM_PASSWORD)
-        newPassword != newConfirmPassword -> postError(INVALID_CONFIRM_PASSWORD)
+        oldPassword.isEmpty() -> setError(EMPTY_PASSWORD)
+        newPassword.isEmpty() -> setError(EMPTY_NEW_PASSWORD)
+        !passwordValidator.validate(newPassword) -> setError(INVALID_PASSWORD)
+        newConfirmPassword.isEmpty() -> setError(EMPTY_CONFIRM_PASSWORD)
+        newPassword != newConfirmPassword -> setError(INVALID_CONFIRM_PASSWORD)
         else -> launchAuthTask {
             getProfileUidUseCase()?.let { uid ->
                 changePasswordUseCase(uid, oldPassword, newPassword, it)

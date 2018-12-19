@@ -13,14 +13,12 @@ import com.demo.auth.core.entity.Event
  * Created by alexk on 12/13/18.
  * Project android-auth-pack
  */
-@MainThread
 fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postError(errorType: AuthResponseErrorType) {
-    value = Event(AuthResponse(FAILED, errorType = errorType))
+    postEvent(AuthResponse(FAILED, errorType = errorType))
 }
 
-@MainThread
 fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postOnProgress() {
-    value = Event(AuthResponse(ON_PROGRESS))
+    postEvent(AuthResponse(ON_PROGRESS))
 }
 
 fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.isOnProgress(): Boolean =
@@ -28,6 +26,21 @@ fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.isOnProgress(): Bo
 
 fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postEvent(response: AuthResponse<DataType>) {
     postValue(Event(response))
+}
+
+@MainThread
+fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.setError(errorType: AuthResponseErrorType) {
+    setEvent(AuthResponse(FAILED, errorType = errorType))
+}
+
+@MainThread
+fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.setOnProgress() {
+    setEvent(AuthResponse(ON_PROGRESS))
+}
+
+@MainThread
+fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.setEvent(response: AuthResponse<DataType>) {
+    value = Event(response)
 }
 
 fun <DataType> Event<AuthResponse<DataType>>.applyOnSuccess(action: (DataType) -> Unit): Event<AuthResponse<DataType>> {

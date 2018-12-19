@@ -92,7 +92,8 @@ class FirebaseAuthRepository<UserProfileDataType>(
         socialNetwork: SocialNetworkType,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        response.postError(AUTH_CANCELED)
+        // TODO: "not implemented"
     }
 
     /**

@@ -32,7 +32,7 @@ class SignInFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         signInWithEmailViewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignInResponse))
-//        signInWithSocialNetworksViewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignInResponse))
+        signInWithSocialNetworksViewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignInResponse))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,7 +45,7 @@ class SignInFragment : Fragment() {
         twitterSignInButton.setOnClickListener { sendSignInWithSocialNetwork(TWITTER) }
 
         //signUpButton.setOnClickListener { mainActivity?.addFragment(SignUpFragment()) }
-       // forgotPasswordButton.setOnClickListener { mainActivity?.addFragment(RecoveryPasswordFragment()) }
+        // forgotPasswordButton.setOnClickListener { mainActivity?.addFragment(RecoveryPasswordFragment()) }
     }
 
     override fun onResume() {
@@ -89,8 +89,8 @@ class SignInFragment : Fragment() {
         }
 
         fun dismissProgressAndHandleError() {
-            Log.w("Fail AuthResponse:", "$errorType. Cause: $errorMessage")
-            Toast.makeText(context, "$errorType. Cause: $errorMessage", Toast.LENGTH_LONG).show()
+            Log.w("Fail AuthResponse:", "$errorType. Cause: '$errorMessage'")
+            Toast.makeText(context, "$errorType. $errorMessage", Toast.LENGTH_LONG).show()
             progressBar.visibility = View.GONE
             setButtonsClickable(isClickable = true)
             handleErrors(errorType)

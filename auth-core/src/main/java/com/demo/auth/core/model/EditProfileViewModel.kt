@@ -13,10 +13,10 @@ class EditProfileViewModel<UserProfileDataType>(
 ) : AuthBaseViewModel<UserProfileDataType>() {
 
     fun updateProfile(login: String = "", email: String = "") = when {
-        login.isEmpty() -> postError(EMPTY_LOGIN)
-        !loginValidator.validate(login) -> postError(INVALID_LOGIN)
-        email.isEmpty() -> postError(EMPTY_EMAIL)
-        !emailValidator.validate(email) -> postError(INVALID_EMAIL)
+        login.isEmpty() -> setError(EMPTY_LOGIN)
+        !loginValidator.validate(login) -> setError(INVALID_LOGIN)
+        email.isEmpty() -> setError(EMPTY_EMAIL)
+        !emailValidator.validate(email) -> setError(INVALID_EMAIL)
         else -> launchAuthTask {
             getProfileUidUseCase()?.let { uid ->
                 sendUpdateProfileRequestUseCase(uid, login, email, it)

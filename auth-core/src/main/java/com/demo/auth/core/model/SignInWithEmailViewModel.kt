@@ -24,8 +24,8 @@ class SignInWithEmailViewModel<UserProfileDataType>(
     }
 
     fun signInWithEmail(email: String, password: String): Unit = when {
-        email.isEmpty() -> postError(EMPTY_EMAIL)
-        password.isEmpty() -> postError(EMPTY_PASSWORD)
+        email.isEmpty() -> setError(EMPTY_EMAIL)
+        password.isEmpty() -> setError(EMPTY_PASSWORD)
         else -> launchAuthTask { signInWithEmailUseCase(email, password, it) }
     }
 }

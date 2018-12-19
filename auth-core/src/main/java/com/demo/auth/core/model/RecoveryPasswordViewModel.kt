@@ -11,8 +11,8 @@ class RecoveryPasswordViewModel<UserProfileDataType>(
 ) : AuthBaseViewModel<UserProfileDataType>() {
 
     fun sendRecoveryPasswordRequest(email: String) = when {
-        email.isEmpty() -> postError(EMPTY_EMAIL)
-        !emailValidator.validate(email) -> postError(INVALID_EMAIL)
+        email.isEmpty() -> setError(EMPTY_EMAIL)
+        !emailValidator.validate(email) -> setError(INVALID_EMAIL)
         else -> launchAuthTask { recoveryPasswordUseCase(email, it) }
     }
 }

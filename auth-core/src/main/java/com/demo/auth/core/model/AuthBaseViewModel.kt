@@ -1,12 +1,10 @@
 package com.demo.auth.core.model
 
 import android.util.Log
+import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.demo.auth.core.common.extensions.isOnProgress
-import com.demo.auth.core.common.extensions.postError
-import com.demo.auth.core.common.extensions.postOnProgress
-import com.demo.auth.core.common.extensions.withIOContext
+import com.demo.auth.core.common.extensions.*
 import com.demo.auth.core.entity.AuthResponse
 import com.demo.auth.core.entity.AuthResponseErrorType
 import com.demo.auth.core.entity.Event
@@ -27,17 +25,19 @@ abstract class AuthBaseViewModel<UserProfileDataType> : BaseViewModel() {
         return _response
     }
 
-    protected fun postError(errorType: AuthResponseErrorType) {
-        _response.postError(errorType)
+    @MainThread
+    protected fun setError(errorType: AuthResponseErrorType) {
+        _response.setError(errorType)
     }
 
+    @MainThread
     protected fun launchAuthTask(task: (response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>) -> Unit) {
         if (_response.isOnProgress()) {
             Log.w("LaunchAuthTask:", "Auth task skipped. Actually on progress")
             return
         }
 
-        _response.postOnProgress()
+        _response.setOnProgress()
         uiScope.launch {
             withIOContext {
                 task(_response)
