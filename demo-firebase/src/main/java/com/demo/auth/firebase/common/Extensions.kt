@@ -7,7 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.demo.auth.core.entity.AuthResponseErrorType
+import com.android.arch.auth.core.entity.AuthResponseErrorType
 import com.demo.auth.firebase.R
 import com.google.android.material.textfield.TextInputLayout
 

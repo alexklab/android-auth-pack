@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.demo.auth.core.entity.SocialNetworkType.TWITTER
+import com.android.arch.auth.core.entity.SocialNetworkType.TWITTER
 import com.twitter.sdk.android.core.*
 import com.twitter.sdk.android.core.identity.TwitterLoginButton
 

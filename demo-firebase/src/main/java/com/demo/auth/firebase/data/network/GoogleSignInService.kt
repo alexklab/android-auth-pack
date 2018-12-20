@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.demo.auth.core.entity.SocialNetworkType.GOOGLE
+import com.android.arch.auth.core.entity.SocialNetworkType.GOOGLE
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient

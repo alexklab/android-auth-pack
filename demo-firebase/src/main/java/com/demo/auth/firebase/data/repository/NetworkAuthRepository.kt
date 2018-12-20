@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.demo.auth.core.entity.SocialNetworkType
+import com.android.arch.auth.core.entity.SocialNetworkType
 import com.demo.auth.firebase.data.network.NetworkSignInService
 
 abstract class NetworkAuthRepository : LifecycleObserver {

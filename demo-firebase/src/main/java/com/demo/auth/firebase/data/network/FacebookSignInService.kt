@@ -3,7 +3,7 @@ package com.demo.auth.firebase.data.network
 import android.app.Activity
 import android.content.Intent
 import androidx.activity.ComponentActivity
-import com.demo.auth.core.entity.SocialNetworkType.FACEBOOK
+import com.android.arch.auth.core.entity.SocialNetworkType.FACEBOOK
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback

@@ -1,13 +1,13 @@
 package com.demo.auth.firebase.data.repository
 
 import androidx.lifecycle.MutableLiveData
-import com.demo.auth.core.common.extensions.postError
-import com.demo.auth.core.common.extensions.postEvent
-import com.demo.auth.core.entity.*
-import com.demo.auth.core.entity.AuthRequestStatus.FAILED
-import com.demo.auth.core.entity.AuthRequestStatus.SUCCESS
-import com.demo.auth.core.entity.AuthResponseErrorType.*
-import com.demo.auth.core.repos.AuthRepository
+import com.android.arch.auth.core.common.extensions.postError
+import com.android.arch.auth.core.common.extensions.postEvent
+import com.android.arch.auth.core.entity.*
+import com.android.arch.auth.core.entity.AuthRequestStatus.FAILED
+import com.android.arch.auth.core.entity.AuthRequestStatus.SUCCESS
+import com.android.arch.auth.core.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.repos.AuthRepository
 import com.facebook.AccessToken
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.tasks.Task
