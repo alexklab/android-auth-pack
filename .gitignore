@@ -15,6 +15,7 @@
 bin/
 gen/
 out/
+*.DS_Store
 
 # Gradle files
 .gradle/
@@ -42,4 +43,4 @@ captures/
 
 # Google services config
 google-services.json
-./src/main/res/values/auth_config.xml
+demo-firebase/src/main/res/values/auth_config.xml
