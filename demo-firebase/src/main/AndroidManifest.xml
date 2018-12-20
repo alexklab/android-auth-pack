@@ -29,18 +29,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Twitter sign in config -->
-        <meta-data android:name="com.android.arch.auth.TwitterConsumerApiKey"
-                   android:value="@string/twitter_consumer_api_key"/>
-
-        <meta-data android:name="com.android.arch.auth.TwitterConsumerApiSecretKey"
-                   android:value="@string/twitter_consumer_api_secret_key"/>
-
-        <!-- Google sign in config -->
-        <meta-data
-                android:name="com.android.arch.auth.GoogleWebClientId"
-                android:value="@string/google_web_client_id"/>
-
         <!-- Facebook Configuration -->
         <meta-data
                 android:name="com.facebook.sdk.ApplicationId"

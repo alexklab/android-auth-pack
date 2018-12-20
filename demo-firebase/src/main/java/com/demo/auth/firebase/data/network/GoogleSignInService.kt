@@ -17,16 +17,16 @@ import com.google.android.gms.common.api.ApiException
  * Project android-auth-pack
  */
 class GoogleSignInService(
+    private val webClientId: String,
     private val signInRequestCode: Int = RC_SIGN_IN
 ) : NetworkSignInService<GoogleSignInAccount>() {
 
     override val socialNetworkType = GOOGLE
-    private lateinit var webClientId: String
+
     private var googleSignInClient: GoogleSignInClient? = null
 
     private companion object {
         const val RC_SIGN_IN = 2040
-        const val WEB_CLIENT_ID_META = "com.android.arch.auth.GoogleWebClientId"
     }
 
     /**
@@ -34,8 +34,6 @@ class GoogleSignInService(
      */
     override fun onCreate(activity: ComponentActivity) {
         super.onCreate(activity)
-        applyGoogleWebClientId(activity)
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(webClientId)
             .requestEmail()
@@ -79,11 +77,5 @@ class GoogleSignInService(
         } else {
             postResult()
         }
-    }
-
-    private fun applyGoogleWebClientId(activity: ComponentActivity) = with(activity) {
-        webClientId = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)?.metaData
-            ?.getString(WEB_CLIENT_ID_META)
-                ?: throw IllegalArgumentException("Meta data not found: $WEB_CLIENT_ID_META")
     }
 }

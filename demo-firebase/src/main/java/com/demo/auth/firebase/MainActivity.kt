@@ -28,8 +28,13 @@ class MainActivity : AppCompatActivity() {
         firebaseAuthRepository.onCreate(
             this,
             FacebookSignInService(),
-            GoogleSignInService(),
-            TwitterSignInService()
+            GoogleSignInService(
+                webClientId = getString(R.string.google_web_client_id)
+            ),
+            TwitterSignInService(
+                consumerApiKey = getString(R.string.twitter_consumer_api_key),
+                consumerApiSecretKey = getString(R.string.twitter_consumer_api_secret_key)
+            )
         )
 
         supportFragmentManager.applyTransaction {
