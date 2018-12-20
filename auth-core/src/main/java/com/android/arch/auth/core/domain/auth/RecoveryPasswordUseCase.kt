@@ -1,9 +1,9 @@
 package com.android.arch.auth.core.domain.auth
 
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.entity.AuthResponse
-import com.android.arch.auth.core.entity.Event
-import com.android.arch.auth.core.repos.AuthRepository
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.Event
+import com.android.arch.auth.core.data.repository.AuthRepository
 
 class RecoveryPasswordUseCase<UserProfileDataType>(private val authRepository: AuthRepository<UserProfileDataType>) {
 

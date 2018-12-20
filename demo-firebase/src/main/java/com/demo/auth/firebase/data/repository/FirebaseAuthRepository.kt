@@ -3,16 +3,16 @@ package com.demo.auth.firebase.data.repository
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.extensions.postError
 import com.android.arch.auth.core.common.extensions.postEvent
-import com.android.arch.auth.core.entity.*
-import com.android.arch.auth.core.entity.AuthRequestStatus.FAILED
-import com.android.arch.auth.core.entity.AuthRequestStatus.SUCCESS
-import com.android.arch.auth.core.entity.AuthResponseErrorType.*
-import com.android.arch.auth.core.repos.AuthRepository
-import com.facebook.AccessToken
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.android.arch.auth.core.data.entity.*
+import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
+import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.SocialNetworkType.*
+import com.android.arch.auth.core.data.network.ParamsBundle
+import com.android.arch.auth.core.data.repository.AuthRepository
+import com.android.arch.auth.core.data.repository.NetworkAuthRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
-import com.twitter.sdk.android.core.TwitterSession
 
 class FirebaseAuthRepository<UserProfileDataType>(
     private val userDataFactory: Factory<UserProfileDataType>
@@ -77,7 +77,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
         getService(socialNetwork)
-            ?.signIn { c, e -> response.signInWithCredential(c, e) }
+            ?.signIn { _, params, e -> response.signInWithCredential(socialNetwork, params, e) }
             ?: response.postError(AUTH_CANCELED, "Fail signInWith $socialNetwork: undefined service")
     }
 
@@ -114,15 +114,15 @@ class FirebaseAuthRepository<UserProfileDataType>(
     }
 
     private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.signInWithCredential(
-        account: Any?,
+        socialNetwork: SocialNetworkType,
+        params: ParamsBundle?,
         exception: Exception?
     ) {
-        if (account != null) {
-            account.toAuthCredential()
-                ?.let { credential ->
-                    auth.signInWithCredential(credential)
-                        .addOnCompleteListener { postResult(it, ::signInWithCredentialsErrors) }
-                } ?: postError(AUTH_CANCELED, "Failed signInWithCredential. Unhandled account type: $account")
+        if (params != null) {
+            getAuthCredential(socialNetwork, params)?.let { credential ->
+                auth.signInWithCredential(credential)
+                    .addOnCompleteListener { postResult(it, ::signInWithCredentialsErrors) }
+            } ?: postError(AUTH_CANCELED, "Failed signInWithCredential. Unhandled account. Provider=$socialNetwork")
         } else {
             postError(AUTH_CANCELED, exception?.message)
         }
@@ -216,12 +216,15 @@ class FirebaseAuthRepository<UserProfileDataType>(
         ))
     }
 
-    private fun Any.toAuthCredential(): AuthCredential? = when (this) {
-        is AccessToken -> FacebookAuthProvider.getCredential(token)
-        is TwitterSession -> TwitterAuthProvider.getCredential(authToken.token, authToken.secret)
-        is GoogleSignInAccount -> GoogleAuthProvider.getCredential(idToken, null)
-        else -> null
-    }
+    private fun getAuthCredential(socialNetwork: SocialNetworkType, params: ParamsBundle): AuthCredential? =
+        with(params) {
+            when (socialNetwork) {
+                TWITTER -> TwitterAuthProvider.getCredential(key1, key2)
+                FACEBOOK -> FacebookAuthProvider.getCredential(key1)
+                GOOGLE -> GoogleAuthProvider.getCredential(key1, null)
+                else -> null
+            }
+        }
 
     private val Task<*>.authRequestStatus: AuthRequestStatus
         get() = if (isSuccessful) SUCCESS else FAILED

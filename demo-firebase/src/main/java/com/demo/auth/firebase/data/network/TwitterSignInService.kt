@@ -6,7 +6,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.android.arch.auth.core.entity.SocialNetworkType.TWITTER
+import com.android.arch.auth.core.data.entity.SocialNetworkType.TWITTER
+import com.android.arch.auth.core.data.network.NetworkSignInService
+import com.android.arch.auth.core.data.network.ParamsBundle
 import com.twitter.sdk.android.core.*
 import com.twitter.sdk.android.core.identity.TwitterLoginButton
 
@@ -20,9 +22,8 @@ class TwitterSignInService(
 ) : NetworkSignInService<TwitterSession>() {
 
     override val socialNetworkType = TWITTER
+
     private var twitterLoginButton: TwitterLoginButton? = null
-
-
     override fun onCreate(activity: ComponentActivity) {
         super.onCreate(activity)
         val authConfig = TwitterAuthConfig(consumerApiKey, consumerApiSecretKey)
@@ -62,4 +63,6 @@ class TwitterSignInService(
         twitterLoginButton?.onActivityResult(requestCode, resultCode, data)
             ?: Log.w("onActivityResult", "Unassigned state: twitterLoginButton = null")
     }
+
+    override fun getParamsBundle(data: TwitterSession) = ParamsBundle(data.authToken.token, data.authToken.secret)
 }

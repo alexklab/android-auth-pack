@@ -5,10 +5,10 @@ import androidx.lifecycle.Transformations.map
 import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
-import com.android.arch.auth.core.entity.AuthResponse
-import com.android.arch.auth.core.entity.AuthResponseErrorType.EMPTY_EMAIL
-import com.android.arch.auth.core.entity.AuthResponseErrorType.EMPTY_PASSWORD
-import com.android.arch.auth.core.entity.Event
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.EMPTY_EMAIL
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.EMPTY_PASSWORD
+import com.android.arch.auth.core.data.entity.Event
 
 /**
  * Created by alexk on 11/26/18.

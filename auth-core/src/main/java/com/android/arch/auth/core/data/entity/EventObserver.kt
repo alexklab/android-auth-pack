@@ -1,4 +1,4 @@
-package com.android.arch.auth.core.entity
+package com.android.arch.auth.core.data.entity
 
 import androidx.lifecycle.Observer
 

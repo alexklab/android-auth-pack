@@ -2,10 +2,11 @@ package com.demo.auth.firebase.data.network
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.android.arch.auth.core.entity.SocialNetworkType.GOOGLE
+import com.android.arch.auth.core.data.entity.SocialNetworkType.GOOGLE
+import com.android.arch.auth.core.data.network.NetworkSignInService
+import com.android.arch.auth.core.data.network.ParamsBundle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -26,6 +27,7 @@ class GoogleSignInService(
     private var googleSignInClient: GoogleSignInClient? = null
 
     private companion object {
+
         const val RC_SIGN_IN = 2040
     }
 
@@ -78,4 +80,6 @@ class GoogleSignInService(
             postResult()
         }
     }
+
+    override fun getParamsBundle(data: GoogleSignInAccount) = ParamsBundle(data.idToken.orEmpty())
 }

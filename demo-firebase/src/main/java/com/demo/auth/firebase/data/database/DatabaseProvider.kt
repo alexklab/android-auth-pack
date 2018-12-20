@@ -7,7 +7,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.arch.auth.core.common.CoroutineContextProvider
-import com.android.arch.auth.core.repos.UserProfileDataCache
+import com.android.arch.auth.core.data.repository.UserProfileDataCache
 import com.demo.auth.firebase.data.entity.UserProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

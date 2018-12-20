@@ -1,4 +1,4 @@
-package com.android.arch.auth.core.entity
+package com.android.arch.auth.core.data.entity
 
 /**
  * Created by alexk on 11/21/18.

@@ -3,11 +3,11 @@ package com.android.arch.auth.core.common.extensions
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.entity.AuthRequestStatus.FAILED
-import com.android.arch.auth.core.entity.AuthRequestStatus.ON_PROGRESS
-import com.android.arch.auth.core.entity.AuthResponse
-import com.android.arch.auth.core.entity.AuthResponseErrorType
-import com.android.arch.auth.core.entity.Event
+import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
+import com.android.arch.auth.core.data.entity.AuthRequestStatus.ON_PROGRESS
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType
+import com.android.arch.auth.core.data.entity.Event
 
 /**
  * Created by alexk on 12/13/18.

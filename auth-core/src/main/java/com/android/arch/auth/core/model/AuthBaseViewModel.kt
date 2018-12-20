@@ -5,9 +5,9 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.extensions.*
-import com.android.arch.auth.core.entity.AuthResponse
-import com.android.arch.auth.core.entity.AuthResponseErrorType
-import com.android.arch.auth.core.entity.Event
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType
+import com.android.arch.auth.core.data.entity.Event
 import kotlinx.coroutines.launch
 
 /**

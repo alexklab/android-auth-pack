@@ -1,12 +1,12 @@
-package com.demo.auth.firebase.data.repository
+package com.android.arch.auth.core.data.repository
 
 import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.android.arch.auth.core.entity.SocialNetworkType
-import com.demo.auth.firebase.data.network.NetworkSignInService
+import com.android.arch.auth.core.data.entity.SocialNetworkType
+import com.android.arch.auth.core.data.network.NetworkSignInService
 
 abstract class NetworkAuthRepository : LifecycleObserver {
 

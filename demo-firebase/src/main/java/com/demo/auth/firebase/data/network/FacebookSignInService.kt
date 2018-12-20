@@ -3,7 +3,9 @@ package com.demo.auth.firebase.data.network
 import android.app.Activity
 import android.content.Intent
 import androidx.activity.ComponentActivity
-import com.android.arch.auth.core.entity.SocialNetworkType.FACEBOOK
+import com.android.arch.auth.core.data.entity.SocialNetworkType.FACEBOOK
+import com.android.arch.auth.core.data.network.NetworkSignInService
+import com.android.arch.auth.core.data.network.ParamsBundle
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -18,9 +20,9 @@ import com.facebook.login.LoginResult
 class FacebookSignInService : NetworkSignInService<AccessToken>() {
 
     override val socialNetworkType = FACEBOOK
+
     private val callbackManager: CallbackManager by lazy { CallbackManager.Factory.create() }
     private val loginManager: LoginManager = LoginManager.getInstance()
-
     /**
      * Should be called in Activity.onCreate method
      */
@@ -52,4 +54,6 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
+
+    override fun getParamsBundle(data: AccessToken) = ParamsBundle(data.token)
 }

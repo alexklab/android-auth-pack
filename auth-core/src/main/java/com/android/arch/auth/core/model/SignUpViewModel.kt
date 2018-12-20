@@ -6,9 +6,9 @@ import com.android.arch.auth.core.common.FieldValidator
 import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.domain.auth.SignUpUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
-import com.android.arch.auth.core.entity.AuthResponse
-import com.android.arch.auth.core.entity.AuthResponseErrorType.*
-import com.android.arch.auth.core.entity.Event
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.Event
 
 class SignUpViewModel<UserProfileDataType>(
         private val emailValidator: FieldValidator,

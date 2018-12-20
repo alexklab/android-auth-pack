@@ -1,10 +1,10 @@
 package com.android.arch.auth.core.domain.auth
 
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.entity.AuthResponse
-import com.android.arch.auth.core.entity.Event
-import com.android.arch.auth.core.entity.SocialNetworkType
-import com.android.arch.auth.core.repos.AuthRepository
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.Event
+import com.android.arch.auth.core.data.entity.SocialNetworkType
+import com.android.arch.auth.core.data.repository.AuthRepository
 
 /**
  * Created by alexk on 10/29/18.

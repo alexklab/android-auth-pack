@@ -7,10 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.android.arch.auth.core.entity.*
-import com.android.arch.auth.core.entity.AuthRequestStatus.*
-import com.android.arch.auth.core.entity.AuthResponseErrorType.*
-import com.android.arch.auth.core.entity.SocialNetworkType.*
+import com.android.arch.auth.core.data.entity.*
+import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.SocialNetworkType.*
 import com.android.arch.auth.core.model.SignInWithEmailViewModel
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
 import com.demo.auth.firebase.MainActivity

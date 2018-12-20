@@ -1,9 +1,9 @@
-package com.android.arch.auth.core.repos
+package com.android.arch.auth.core.data.repository
 
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.entity.AuthResponse
-import com.android.arch.auth.core.entity.Event
-import com.android.arch.auth.core.entity.SocialNetworkType
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.Event
+import com.android.arch.auth.core.data.entity.SocialNetworkType
 
 /**
  * Created by alexk on 11/21/18.

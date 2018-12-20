@@ -3,7 +3,7 @@ package com.android.arch.auth.core.model
 import com.android.arch.auth.core.common.FieldValidator
 import com.android.arch.auth.core.domain.auth.SendUpdateProfileRequestUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
-import com.android.arch.auth.core.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
 
 class EditProfileViewModel<UserProfileDataType>(
         private val emailValidator: FieldValidator,

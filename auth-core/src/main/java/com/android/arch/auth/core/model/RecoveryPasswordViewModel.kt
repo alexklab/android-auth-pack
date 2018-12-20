@@ -2,8 +2,8 @@ package com.android.arch.auth.core.model
 
 import com.android.arch.auth.core.common.FieldValidator
 import com.android.arch.auth.core.domain.auth.RecoveryPasswordUseCase
-import com.android.arch.auth.core.entity.AuthResponseErrorType.EMPTY_EMAIL
-import com.android.arch.auth.core.entity.AuthResponseErrorType.INVALID_EMAIL
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.EMPTY_EMAIL
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.INVALID_EMAIL
 
 class RecoveryPasswordViewModel<UserProfileDataType>(
         private val emailValidator: FieldValidator,

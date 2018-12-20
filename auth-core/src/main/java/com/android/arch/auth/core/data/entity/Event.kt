@@ -1,4 +1,4 @@
-package com.android.arch.auth.core.entity
+package com.android.arch.auth.core.data.entity
 
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.

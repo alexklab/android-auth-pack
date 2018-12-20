@@ -1,6 +1,6 @@
 package com.android.arch.auth.core.model
 
-import com.android.arch.auth.core.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.testutils.LiveDataTest
 
 /**

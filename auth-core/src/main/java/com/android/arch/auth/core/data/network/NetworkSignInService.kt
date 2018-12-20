@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.network
+package com.android.arch.auth.core.data.network
 
 import android.app.Activity
 import android.content.Intent
@@ -7,8 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.android.arch.auth.core.entity.SocialNetworkType
-import com.google.firebase.auth.AuthCredential
+import com.android.arch.auth.core.data.entity.SocialNetworkType
 
 abstract class NetworkSignInService<ResponseDataType> : LifecycleObserver {
 
@@ -19,6 +18,8 @@ abstract class NetworkSignInService<ResponseDataType> : LifecycleObserver {
     abstract fun signIn(activity: Activity)
     abstract fun signOut()
     abstract fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+
+    protected abstract fun getParamsBundle(data: ResponseDataType): ParamsBundle
 
     fun signIn(callback: NetworkSignInCallBack<ResponseDataType>) {
         activity?.apply {
@@ -49,9 +50,9 @@ abstract class NetworkSignInService<ResponseDataType> : LifecycleObserver {
         signInCallback = null
     }
 
-    protected fun postResult(credential: ResponseDataType? = null, exception: Exception? = null) {
+    protected fun postResult(data: ResponseDataType? = null, exception: Exception? = null) {
         signInCallback
-            ?.let { it(credential, exception) }
+            ?.let { callback -> callback(data, data?.let { getParamsBundle(it) }, exception) }
             ?: Log.w("postResult", "Wrong state. signInCallback = null")
     }
 }

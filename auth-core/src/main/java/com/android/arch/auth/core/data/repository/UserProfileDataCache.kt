@@ -1,4 +1,4 @@
-package com.android.arch.auth.core.repos
+package com.android.arch.auth.core.data.repository
 
 import androidx.lifecycle.LiveData
 
