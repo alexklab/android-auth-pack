@@ -7,20 +7,24 @@ import com.demo.auth.core.entity.*
 import com.demo.auth.core.entity.AuthRequestStatus.FAILED
 import com.demo.auth.core.entity.AuthRequestStatus.SUCCESS
 import com.demo.auth.core.entity.AuthResponseErrorType.*
-import com.demo.auth.core.entity.SocialNetworkType.*
 import com.demo.auth.core.repos.AuthRepository
-import com.demo.auth.firebase.data.network.NetworkSignInService
+import com.facebook.AccessToken
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
+import com.twitter.sdk.android.core.TwitterSession
 
 class FirebaseAuthRepository<UserProfileDataType>(
-    private val userDataFactory: Factory<UserProfileDataType>,
-    private val googleSignInService: NetworkSignInService,
-    private val facebookSignInService: NetworkSignInService
-) : AuthRepository<UserProfileDataType> {
+    private val userDataFactory: Factory<UserProfileDataType>
+) : AuthRepository<UserProfileDataType>, NetworkAuthRepository() {
 
     interface Factory<UserProfileDataType> {
         fun create(user: FirebaseUser): UserProfileDataType
+    }
+
+    override fun signOut() {
+        auth.signOut()
+        allServicesSignOut()
     }
 
     /**
@@ -72,11 +76,9 @@ class FirebaseAuthRepository<UserProfileDataType>(
         socialNetwork: SocialNetworkType,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
-        when (socialNetwork) {
-            GOOGLE -> googleSignInService.signIn { c, e -> response.signInWithCredential(c, e) }
-            FACEBOOK -> facebookSignInService.signIn { c, e -> response.signInWithCredential(c, e) }
-            else -> response.postError(AUTH_CANCELED, "$socialNetwork signInService not implemented")
-        }
+        getService(socialNetwork)
+            ?.signIn { c, e -> response.signInWithCredential(c, e) }
+            ?: response.postError(AUTH_CANCELED, "Fail signInWith $socialNetwork: undefined service")
     }
 
     /**
@@ -92,13 +94,14 @@ class FirebaseAuthRepository<UserProfileDataType>(
             val request = UserProfileChangeRequest.Builder()
                 .setDisplayName(login)
                 .build()
-            updateProfile(request).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    updateEmail(email).addOnCompleteListener { response.postResult(it, ::updateEmailErrors) }
-                } else {
-                    response.postResult(task, ::updateProfileErrors)
+            updateProfile(request)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        updateEmail(email).addOnCompleteListener { response.postResult(it, ::updateEmailErrors) }
+                    } else {
+                        response.postResult(task, ::updateProfileErrors)
+                    }
                 }
-            }
         } ?: response.postError(AUTH_SERVICE_ERROR, "Fail updateProfile: user is logged out")
     }
 
@@ -111,12 +114,15 @@ class FirebaseAuthRepository<UserProfileDataType>(
     }
 
     private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.signInWithCredential(
-        credential: AuthCredential?,
+        account: Any?,
         exception: Exception?
     ) {
-        if (credential != null) {
-            auth.signInWithCredential(credential)
-                .addOnCompleteListener { postResult(it, ::signInWithCredentialsErrors) }
+        if (account != null) {
+            account.toAuthCredential()
+                ?.let { credential ->
+                    auth.signInWithCredential(credential)
+                        .addOnCompleteListener { postResult(it, ::signInWithCredentialsErrors) }
+                } ?: postError(AUTH_CANCELED, "Failed signInWithCredential. Unhandled account type: $account")
         } else {
             postError(AUTH_CANCELED, exception?.message)
         }
@@ -126,14 +132,14 @@ class FirebaseAuthRepository<UserProfileDataType>(
 
         // thrown if the user account you are trying to sign in to has been disabled.
         // Also thrown if credential is an EmailAuthCredential with an email address that does not correspond to an existing user.
-        is FirebaseAuthInvalidUserException,
+        is FirebaseAuthInvalidUserException -> AUTH_ACCOUNT_NOT_FOUND
 
         // thrown if the credential is malformed or has expired.
         // If credential instanceof EmailAuthCredential it will be thrown if the password is incorrect.
         is FirebaseAuthInvalidCredentialsException,
 
-        // thrown if there already exists an account with the email address asserted by the credential.
-        // Resolve this case by calling fetchProvidersForEmail(String) and then asking the user to sign in using one of them.
+            // thrown if there already exists an account with the email address asserted by the credential.
+            // Resolve this case by calling fetchProvidersForEmail(String) and then asking the user to sign in using one of them.
         is FirebaseAuthUserCollisionException -> AUTH_SERVICE_ERROR
 
         else -> AUTH_SERVICE_ERROR
@@ -208,6 +214,13 @@ class FirebaseAuthRepository<UserProfileDataType>(
             errorMessage = task.exception?.message,
             data = auth.currentUser?.let { userDataFactory.create(it) }
         ))
+    }
+
+    private fun Any.toAuthCredential(): AuthCredential? = when (this) {
+        is AccessToken -> FacebookAuthProvider.getCredential(token)
+        is TwitterSession -> TwitterAuthProvider.getCredential(authToken.token, authToken.secret)
+        is GoogleSignInAccount -> GoogleAuthProvider.getCredential(idToken, null)
+        else -> null
     }
 
     private val Task<*>.authRequestStatus: AuthRequestStatus

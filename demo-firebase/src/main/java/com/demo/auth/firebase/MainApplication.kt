@@ -29,15 +29,7 @@ class MainApplication : Application() {
 
     private val mainModuleModule = module {
         single { FirebaseUserProfileFactory() }
-        single { FacebookSignInService() }
-        single { GoogleSignInService(getString(R.string.google_web_client_id)) }
-        single {
-            FirebaseAuthRepository(
-                userDataFactory = get<FirebaseUserProfileFactory>(),
-                googleSignInService = get<GoogleSignInService>(),
-                facebookSignInService = get<FacebookSignInService>()
-            )
-        }
+        single { FirebaseAuthRepository(get<FirebaseUserProfileFactory>()) }
         single { DatabaseProvider() }
     }
 

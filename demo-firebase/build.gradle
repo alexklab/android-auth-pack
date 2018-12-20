@@ -22,6 +22,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 
 dependencies {
@@ -40,7 +45,11 @@ dependencies {
 
     implementation "com.google.firebase:firebase-auth:16.1.0"
     implementation "com.google.android.gms:play-services-auth:16.0.1"
+
     implementation 'com.facebook.android:facebook-login:4.38.1'
+
+    // Twitter Android SDK (only required for Twitter Login)
+    implementation 'com.twitter.sdk.android:twitter-core:3.3.0'
 
     implementation project(':auth-core')
 
