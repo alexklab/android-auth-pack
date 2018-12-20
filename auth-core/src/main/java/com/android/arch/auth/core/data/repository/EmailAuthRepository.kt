@@ -3,13 +3,12 @@ package com.android.arch.auth.core.data.repository
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
-import com.android.arch.auth.core.data.entity.SocialNetworkType
 
 /**
  * Created by alexk on 11/21/18.
  * Project android-auth-pack
  */
-interface AuthRepository<UserProfileDataType> {
+interface EmailAuthRepository<UserProfileDataType> {
 
     fun changePassword(
         uid: String,
@@ -30,11 +29,6 @@ interface AuthRepository<UserProfileDataType> {
     fun signInWithEmail(
         email: String,
         password: String,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    )
-
-    fun signInWithSocialNetwork(
-        socialNetwork: SocialNetworkType,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     )
 

@@ -10,7 +10,7 @@ import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_SERVICE_ERROR
 import com.android.arch.auth.core.data.entity.Event
-import com.android.arch.auth.core.data.repository.AuthRepository
+import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
@@ -43,7 +43,7 @@ class VerifyEmailViewModelTest : AuthBaseViewModelTest<UserProfile, VerifyEmailV
     var coroutineContextProviderRule = CoroutineContextProviderRule()
 
     @Mock
-    private lateinit var repository: AuthRepository<UserProfile>
+    private lateinit var repository: EmailAuthRepository<UserProfile>
 
     private var verifyEmailResponseError: AuthResponseErrorType? = null
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>

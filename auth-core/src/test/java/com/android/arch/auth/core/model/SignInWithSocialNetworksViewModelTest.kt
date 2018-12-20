@@ -13,7 +13,8 @@ import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_CANCELE
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_SERVICE_ERROR
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
-import com.android.arch.auth.core.data.repository.AuthRepository
+import com.android.arch.auth.core.data.repository.EmailAuthRepository
+import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
 import org.amshove.kluent.any
@@ -30,7 +31,8 @@ import java.util.*
  * Created by alexk on 12/14/18.
  * Project android-auth-pack
  */
-class SignInWithSocialNetworksViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWithSocialNetworksViewModel<UserProfile>>() {
+class SignInWithSocialNetworksViewModelTest :
+    AuthBaseViewModelTest<UserProfile, SignInWithSocialNetworksViewModel<UserProfile>>() {
 
     // Executes tasks in the Architecture Components in the same thread
     @get:Rule
@@ -41,7 +43,7 @@ class SignInWithSocialNetworksViewModelTest : AuthBaseViewModelTest<UserProfile,
     var coroutineContextProviderRule = CoroutineContextProviderRule()
 
     @Mock
-    private lateinit var repository: AuthRepository<UserProfile>
+    private lateinit var repository: SocialNetworkAuthRepository<UserProfile>
     @Mock
     private lateinit var userProfileDataCache: UserProfileDataCache<UserProfile>
 
@@ -51,8 +53,8 @@ class SignInWithSocialNetworksViewModelTest : AuthBaseViewModelTest<UserProfile,
 
     override val instance: SignInWithSocialNetworksViewModel<UserProfile>
         get() = SignInWithSocialNetworksViewModel(
-                SignInWithSocialNetworkUseCase(repository),
-                UpdateProfileUseCase(userProfileDataCache)
+            SignInWithSocialNetworkUseCase(repository),
+            UpdateProfileUseCase(userProfileDataCache)
         ).apply { authResponse = getRawResponseData() }
 
     @Before
@@ -61,51 +63,51 @@ class SignInWithSocialNetworksViewModelTest : AuthBaseViewModelTest<UserProfile,
         MockitoAnnotations.initMocks(this)
         `when`(repository.signInWithSocialNetwork(any(), any())).thenAnswer {
             (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                    .postEvent(signInWithSocialNetworksResponse.toAuthResponse(profile))
+                .postEvent(signInWithSocialNetworksResponse.toAuthResponse(profile))
 
         }
     }
 
     @Test
     fun `signInWithSocialNetwork() should handle error on service response AUTH_CANCELED`() = responseTestCase(
-            setup = { signInWithSocialNetworksResponse = AUTH_CANCELED },
-            action = { signInWithSocialNetwork(FACEBOOK) },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_CANCELED, response?.errorType)
-                verify(repository).signInWithSocialNetwork(FACEBOOK, authResponse)
-                verifyNoMoreInteractions(repository)
-                verifyZeroInteractions(userProfileDataCache)
-            })
+        setup = { signInWithSocialNetworksResponse = AUTH_CANCELED },
+        action = { signInWithSocialNetwork(FACEBOOK) },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(AUTH_CANCELED, response?.errorType)
+            verify(repository).signInWithSocialNetwork(FACEBOOK, authResponse)
+            verifyNoMoreInteractions(repository)
+            verifyZeroInteractions(userProfileDataCache)
+        })
 
     @Test
     fun `signInWithSocialNetwork() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            setup = { signInWithSocialNetworksResponse = AUTH_SERVICE_ERROR },
-            action = { signInWithSocialNetwork(INSTAGRAM) },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_SERVICE_ERROR, response?.errorType)
-                verify(repository).signInWithSocialNetwork(INSTAGRAM, authResponse)
-                verifyNoMoreInteractions(repository)
-                verifyZeroInteractions(userProfileDataCache)
-            })
+        setup = { signInWithSocialNetworksResponse = AUTH_SERVICE_ERROR },
+        action = { signInWithSocialNetwork(INSTAGRAM) },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(AUTH_SERVICE_ERROR, response?.errorType)
+            verify(repository).signInWithSocialNetwork(INSTAGRAM, authResponse)
+            verifyNoMoreInteractions(repository)
+            verifyZeroInteractions(userProfileDataCache)
+        })
 
     @Test
     fun `signInWithSocialNetwork() should handle success on service response SUCCESS`() = responseTestCase(
-            setup = { signInWithSocialNetworksResponse = null /* success */ },
-            action = { signInWithSocialNetwork(GOOGLE) },
-            expected = { response ->
-                assertEquals(SUCCESS, response?.status)
-                verify(repository).signInWithSocialNetwork(GOOGLE, authResponse)
-                verify(userProfileDataCache).updateProfile(profile)
-                verifyNoMoreInteractions(repository, userProfileDataCache)
-            })
+        setup = { signInWithSocialNetworksResponse = null /* success */ },
+        action = { signInWithSocialNetwork(GOOGLE) },
+        expected = { response ->
+            assertEquals(SUCCESS, response?.status)
+            verify(repository).signInWithSocialNetwork(GOOGLE, authResponse)
+            verify(userProfileDataCache).updateProfile(profile)
+            verifyNoMoreInteractions(repository, userProfileDataCache)
+        })
 
     private companion object {
         private val profile = UserProfile(
-                login = "user_name",
-                email = "user@mail.com",
-                uid = UUID.randomUUID().toString()
+            login = "user_name",
+            email = "user@mail.com",
+            uid = UUID.randomUUID().toString()
         )
     }
 }

@@ -8,8 +8,6 @@ import com.android.arch.auth.core.model.SignInWithEmailViewModel
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
 import com.demo.auth.firebase.data.database.DatabaseProvider
 import com.demo.auth.firebase.data.entity.UserProfile
-import com.demo.auth.firebase.data.network.FacebookSignInService
-import com.demo.auth.firebase.data.network.GoogleSignInService
 import com.demo.auth.firebase.data.repository.FirebaseAuthRepository
 import com.demo.auth.firebase.data.repository.FirebaseUserProfileFactory
 import org.koin.android.ext.android.startKoin

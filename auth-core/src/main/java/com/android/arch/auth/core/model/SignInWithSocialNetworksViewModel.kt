@@ -10,8 +10,8 @@ import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 
 class SignInWithSocialNetworksViewModel<UserProfileDataType>(
-        private val signInWithSocialNetworkUseCase: SignInWithSocialNetworkUseCase<UserProfileDataType>,
-        private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
+    private val signInWithSocialNetworkUseCase: SignInWithSocialNetworkUseCase<UserProfileDataType>,
+    private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
 ) : AuthBaseViewModel<UserProfileDataType>() {
 
     override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> = map(getRawResponseData()) {
@@ -21,6 +21,5 @@ class SignInWithSocialNetworksViewModel<UserProfileDataType>(
     fun signInWithSocialNetwork(socialNetwork: SocialNetworkType) {
         launchAuthTask { signInWithSocialNetworkUseCase(socialNetwork, it) }
     }
-
 
 }

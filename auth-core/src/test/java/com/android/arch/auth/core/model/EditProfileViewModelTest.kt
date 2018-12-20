@@ -12,7 +12,7 @@ import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
 import com.android.arch.auth.core.data.entity.Event
-import com.android.arch.auth.core.data.repository.AuthRepository
+import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
 import com.nhaarman.mockito_kotlin.verify
@@ -51,7 +51,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
     var coroutineContextProviderRule = CoroutineContextProviderRule()
 
     @Mock
-    private lateinit var repository: AuthRepository<UserProfile>
+    private lateinit var repository: EmailAuthRepository<UserProfile>
     @Mock
     private lateinit var userProfileDataCache: UserProfileDataCache<UserProfile>
     @Mock

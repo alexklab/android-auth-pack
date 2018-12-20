@@ -9,14 +9,17 @@ import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
 import com.android.arch.auth.core.data.network.ParamsBundle
-import com.android.arch.auth.core.data.repository.AuthRepository
+import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.NetworkAuthRepository
+import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 
 class FirebaseAuthRepository<UserProfileDataType>(
     private val userDataFactory: Factory<UserProfileDataType>
-) : AuthRepository<UserProfileDataType>, NetworkAuthRepository() {
+) : EmailAuthRepository<UserProfileDataType>,
+    SocialNetworkAuthRepository<UserProfileDataType>,
+    NetworkAuthRepository() {
 
     interface Factory<UserProfileDataType> {
         fun create(user: FirebaseUser): UserProfileDataType
