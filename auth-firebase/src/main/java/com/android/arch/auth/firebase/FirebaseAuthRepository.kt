@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.repository
+package com.android.arch.auth.firebase
 
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.extensions.postError

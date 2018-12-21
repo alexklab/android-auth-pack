@@ -1,6 +1,6 @@
 package com.demo.auth.firebase.data.entity
 
-import com.demo.auth.firebase.data.repository.FirebaseAuthRepository
+import com.android.arch.auth.firebase.FirebaseAuthRepository
 import com.google.firebase.auth.FirebaseUser
 
 class FirebaseUserProfileFactory : FirebaseAuthRepository.Factory<UserProfile> {

@@ -19,6 +19,7 @@ buildscript {
         constraint_layout_version = '2.0.0-alpha2'
         espresso_version = '3.1.1'
         facebook_login_version = '4.38.1'
+        firebase_auth_version = '16.1.0'
         junit_version = '4.12'
         google_services_version = '4.2.0'
         gradle_version = '3.2.1'
