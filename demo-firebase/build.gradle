@@ -34,6 +34,7 @@ dependencies {
     implementation project(':auth-core')
     implementation project(':auth-google')
     implementation project(':auth-facebook')
+    implementation project(':auth-twitter')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ktx_coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$ktx_coroutines_version"
@@ -47,9 +48,6 @@ dependencies {
     implementation "org.koin:koin-androidx-viewmodel:$koin_version"
 
     implementation "com.google.firebase:firebase-auth:16.1.0"
-
-    // Twitter Android SDK (only required for Twitter Login)
-    implementation 'com.twitter.sdk.android:twitter-core:3.3.0'
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "androidx.room:room-testing:$room_version"

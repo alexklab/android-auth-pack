@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.network
+package com.android.arch.auth.twitter
 
 import android.app.Activity
 import android.content.Intent
@@ -62,7 +62,7 @@ class TwitterSignInService(
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         twitterLoginButton?.onActivityResult(requestCode, resultCode, data)
-            ?: Log.w("onActivityResult", "Unassigned state: twitterLoginButton = null")
+            ?: Log.e("onActivityResult", "Unassigned state: twitterLoginButton = null")
     }
 
     override fun getParamsBundle(data: TwitterSession) = ParamsBundle(data.authToken.token, data.authToken.secret)

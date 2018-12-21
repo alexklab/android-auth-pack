@@ -9,7 +9,7 @@ import com.demo.auth.firebase.data.database.DatabaseProvider
 import com.demo.auth.firebase.data.entity.UserProfile
 import com.android.arch.auth.facebook.FacebookSignInService
 import com.android.arch.auth.google.GoogleSignInService
-import com.demo.auth.firebase.data.network.TwitterSignInService
+import com.android.arch.auth.twitter.TwitterSignInService
 import com.demo.auth.firebase.data.repository.FirebaseAuthRepository
 import com.demo.auth.firebase.data.ui.SignInFragment
 import org.koin.android.ext.android.inject
