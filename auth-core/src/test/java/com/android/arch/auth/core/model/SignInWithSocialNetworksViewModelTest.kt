@@ -13,7 +13,6 @@ import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_CANCELE
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_SERVICE_ERROR
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
-import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule

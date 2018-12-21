@@ -107,7 +107,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = EMPTY_VALUE, email = EMAIL) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EMPTY_LOGIN, result?.errorType)
+                assertEquals(EMPTY_FIELD_LOGIN, result?.errorType)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 
@@ -116,7 +116,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = LOGIN, email = EMPTY_VALUE) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EMPTY_EMAIL, result?.errorType)
+                assertEquals(EMPTY_FIELD_EMAIL, result?.errorType)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 
@@ -125,7 +125,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = LOGIN, email = INVALID_VALUE) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(INVALID_EMAIL, result?.errorType)
+                assertEquals(MALFORMED_EMAIL, result?.errorType)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 
@@ -134,7 +134,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = INVALID_VALUE, email = EMAIL) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(INVALID_LOGIN, result?.errorType)
+                assertEquals(MALFORMED_LOGIN, result?.errorType)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 

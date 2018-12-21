@@ -79,8 +79,8 @@ class SignInFragment : Fragment() {
         Log.d("handleSignInResponse:", "$response")
 
         fun handleErrors(errorType: AuthResponseErrorType?) = when (errorType) {
-            EMPTY_EMAIL -> emailLayout.error = getString(R.string.error_field_required)
-            EMPTY_PASSWORD -> passwordLayout.error = getString(R.string.error_field_required)
+            EMPTY_FIELD_EMAIL -> emailLayout.error = getString(R.string.error_field_required)
+            EMPTY_FIELD_PASSWORD -> passwordLayout.error = getString(R.string.error_field_required)
             AUTH_CANCELED -> setButtonsClickable(isClickable = true)
             AUTH_WRONG_PASSWORD -> passwordLayout.error = getString(R.string.error_incorrect_password)
             AUTH_ACCOUNT_NOT_FOUND -> emailLayout.error = getString(R.string.error_email_not_found)

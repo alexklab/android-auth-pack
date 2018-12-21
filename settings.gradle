@@ -1,1 +1,1 @@
-include ':demo-firebase', ':auth-core', ':auth-google'
+include ':demo-firebase', ':auth-core', ':auth-google', ':auth-facebook'

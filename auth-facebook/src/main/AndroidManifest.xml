@@ -1,2 +1,2 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.android.arch.auth.core"/>
+          package="com.android.arch.auth.facebook"/>

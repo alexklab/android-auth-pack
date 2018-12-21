@@ -1,6 +1,7 @@
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = rootProject.group_name
+version = rootProject.versionName
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'

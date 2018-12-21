@@ -24,6 +24,7 @@ class TwitterSignInService(
     override val socialNetworkType = TWITTER
 
     private var twitterLoginButton: TwitterLoginButton? = null
+
     override fun onCreate(activity: ComponentActivity) {
         super.onCreate(activity)
         val authConfig = TwitterAuthConfig(consumerApiKey, consumerApiSecretKey)

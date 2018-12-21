@@ -101,7 +101,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EMPTY_LOGIN, result?.errorType)
+                assertEquals(EMPTY_FIELD_LOGIN, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -117,7 +117,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EMPTY_EMAIL, result?.errorType)
+                assertEquals(EMPTY_FIELD_EMAIL, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -133,7 +133,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EMPTY_PASSWORD, result?.errorType)
+                assertEquals(EMPTY_FIELD_PASSWORD, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -149,7 +149,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EMPTY_CONFIRM_PASSWORD, result?.errorType)
+                assertEquals(EMPTY_FIELD_CONFIRM_PASSWORD, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -165,7 +165,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(DISABLED_TERMS_OF_USE, result?.errorType)
+                assertEquals(ENABLE_TERMS_OF_USE_REQUIRED, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -181,7 +181,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(INVALID_LOGIN, result?.errorType)
+                assertEquals(MALFORMED_LOGIN, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -197,7 +197,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(INVALID_PASSWORD, result?.errorType)
+                assertEquals(WEAK_PASSWORD, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -213,7 +213,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(INVALID_EMAIL, result?.errorType)
+                assertEquals(MALFORMED_EMAIL, result?.errorType)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -245,11 +245,11 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
 
     @Test
     fun `signUp() should handle error on service response ACCOUNT_ALREADY_EXIST`() = responseTestCase(
-            setup = { signUpResponseError = EMAIL_ALREADY_EXIST },
+            setup = { signUpResponseError = AUTH_EMAIL_ALREADY_EXIST },
             action = { signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, VALID_PASSWORD, true) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EMAIL_ALREADY_EXIST, result?.errorType)
+                assertEquals(AUTH_EMAIL_ALREADY_EXIST, result?.errorType)
                 verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, authResponse)
                 verifyNoMoreInteractions(repository)
                 verifyZeroInteractions(cache)

@@ -23,15 +23,15 @@ class SignUpViewModel<UserProfileDataType>(
     }
 
     fun signUp(login: String, email: String, password: String, confirmPassword: String, isEnabledTermsOfUse: Boolean) = when {
-        login.isEmpty() -> setError(EMPTY_LOGIN)
-        !loginValidator.validate(login) -> setError(INVALID_LOGIN)
-        email.isEmpty() -> setError(EMPTY_EMAIL)
-        !emailValidator.validate(email) -> setError(INVALID_EMAIL)
-        password.isEmpty() -> setError(EMPTY_PASSWORD)
-        !passwordValidator.validate(password) -> setError(INVALID_PASSWORD)
-        confirmPassword.isEmpty() -> setError(EMPTY_CONFIRM_PASSWORD)
-        confirmPassword != password -> setError(INVALID_CONFIRM_PASSWORD)
-        !isEnabledTermsOfUse -> setError(DISABLED_TERMS_OF_USE)
+        login.isEmpty() -> setError(EMPTY_FIELD_LOGIN)
+        !loginValidator.validate(login) -> setError(MALFORMED_LOGIN)
+        email.isEmpty() -> setError(EMPTY_FIELD_EMAIL)
+        !emailValidator.validate(email) -> setError(MALFORMED_EMAIL)
+        password.isEmpty() -> setError(EMPTY_FIELD_PASSWORD)
+        !passwordValidator.validate(password) -> setError(WEAK_PASSWORD)
+        confirmPassword.isEmpty() -> setError(EMPTY_FIELD_CONFIRM_PASSWORD)
+        confirmPassword != password -> setError(NOT_MATCHED_CONFIRM_PASSWORD)
+        !isEnabledTermsOfUse -> setError(ENABLE_TERMS_OF_USE_REQUIRED)
         else -> launchAuthTask { signUpUseCase(login, email, password, it) }
     }
 }

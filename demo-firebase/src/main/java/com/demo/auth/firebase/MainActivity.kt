@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import com.demo.auth.firebase.common.applyTransaction
 import com.demo.auth.firebase.data.database.DatabaseProvider
 import com.demo.auth.firebase.data.entity.UserProfile
-import com.demo.auth.firebase.data.network.FacebookSignInService
+import com.android.arch.auth.facebook.FacebookSignInService
 import com.android.arch.auth.google.GoogleSignInService
 import com.demo.auth.firebase.data.network.TwitterSignInService
 import com.demo.auth.firebase.data.repository.FirebaseAuthRepository

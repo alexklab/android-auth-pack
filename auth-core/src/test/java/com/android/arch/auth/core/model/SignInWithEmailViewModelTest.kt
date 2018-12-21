@@ -66,7 +66,7 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
             action = { signInWithEmail(email = EMPTY_VALUE, password = VALID_PASSWORD) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_EMAIL, response?.errorType)
+                assertEquals(EMPTY_FIELD_EMAIL, response?.errorType)
                 verifyZeroInteractions(repository, cache)
             })
 
@@ -75,7 +75,7 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
             action = { signInWithEmail(email = VALID_EMAIL, password = EMPTY_VALUE) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_PASSWORD, response?.errorType)
+                assertEquals(EMPTY_FIELD_PASSWORD, response?.errorType)
                 verifyZeroInteractions(repository, cache)
             })
 

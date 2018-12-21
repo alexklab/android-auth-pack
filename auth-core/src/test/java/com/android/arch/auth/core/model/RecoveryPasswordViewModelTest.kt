@@ -70,7 +70,7 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
     fun `sendRecoveryPasswordRequest() email should be NOT empty`() = responseTestCase(
             action = { sendRecoveryPasswordRequest(emptyEmail) },
             expected = { result ->
-                assertEquals(EMPTY_EMAIL, result?.errorType)
+                assertEquals(EMPTY_FIELD_EMAIL, result?.errorType)
                 assertEquals(FAILED, result?.status)
                 verifyZeroInteractions(repository)
             }
@@ -80,7 +80,7 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
     fun `sendRecoveryPasswordRequest() email should be valid`() = responseTestCase(
             action = { sendRecoveryPasswordRequest(invalidEmail) },
             expected = { result ->
-                assertEquals(INVALID_EMAIL, result?.errorType)
+                assertEquals(MALFORMED_EMAIL, result?.errorType)
                 assertEquals(FAILED, result?.status)
                 verifyZeroInteractions(repository)
             }

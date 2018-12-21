@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.network
+package com.android.arch.auth.facebook
 
 import android.app.Activity
 import android.content.Intent

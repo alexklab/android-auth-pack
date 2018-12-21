@@ -89,7 +89,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
             },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_PASSWORD, response?.errorType)
+                assertEquals(EMPTY_FIELD_PASSWORD, response?.errorType)
                 verifyZeroInteractions(repository, profileDataCache)
             }
     )
@@ -105,7 +105,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
             },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_NEW_PASSWORD, response?.errorType)
+                assertEquals(EMPTY_FIELD_NEW_PASSWORD, response?.errorType)
                 verifyZeroInteractions(repository, profileDataCache)
             }
     )
@@ -121,7 +121,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
             },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(INVALID_PASSWORD, response?.errorType)
+                assertEquals(WEAK_PASSWORD, response?.errorType)
                 verifyZeroInteractions(repository, profileDataCache)
             }
     )
@@ -137,7 +137,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
             },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_CONFIRM_PASSWORD, response?.errorType)
+                assertEquals(EMPTY_FIELD_CONFIRM_PASSWORD, response?.errorType)
                 verifyZeroInteractions(repository, profileDataCache)
             }
     )
@@ -153,7 +153,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
             },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(INVALID_CONFIRM_PASSWORD, response?.errorType)
+                assertEquals(NOT_MATCHED_CONFIRM_PASSWORD, response?.errorType)
                 verifyZeroInteractions(repository, profileDataCache)
             }
     )
