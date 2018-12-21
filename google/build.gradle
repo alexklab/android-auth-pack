@@ -30,7 +30,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':auth-core')
+    implementation project(':core')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "com.google.android.gms:play-services-auth:$play_services_auth_version"

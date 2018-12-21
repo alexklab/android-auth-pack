@@ -8,7 +8,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-
 android {
     compileSdkVersion rootProject.compileSdkVersion
 
@@ -17,7 +16,6 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
         versionName rootProject.versionName
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -27,14 +25,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':auth-core')
+    implementation project(':core')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
-    implementation "com.facebook.android:facebook-login:$facebook_login_version"
+    implementation "com.google.firebase:firebase-auth:$firebase_auth_version"
 
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test:runner:$test_runner_version"
