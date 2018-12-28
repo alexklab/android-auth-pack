@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.ui
+package com.demo.auth.firebase.ui
 
 import android.os.Bundle
 import android.util.Log

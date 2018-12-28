@@ -43,4 +43,4 @@ captures/
 
 # Google services config
 google-services.json
-demo-firebase/src/main/res/values/auth_config.xml
+*_config.xml
