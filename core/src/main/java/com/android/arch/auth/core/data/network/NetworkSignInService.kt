@@ -3,8 +3,6 @@ package com.android.arch.auth.core.data.network
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.OnLifecycleEvent
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 
 abstract class NetworkSignInService<ResponseDataType> : OnActivityCreatedListener() {
