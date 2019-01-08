@@ -3,15 +3,12 @@ package com.android.arch.auth.core.data.network
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 
-abstract class NetworkSignInService<ResponseDataType> : LifecycleObserver {
+abstract class NetworkSignInService<ResponseDataType> : OnActivityCreatedListener() {
 
-    protected var activity: Activity? = null
     private var signInCallback: NetworkSignInCallBack<ResponseDataType>? = null
 
     abstract val socialNetworkType: SocialNetworkType
@@ -29,24 +26,10 @@ abstract class NetworkSignInService<ResponseDataType> : LifecycleObserver {
     }
 
     /**
-     * Should be called in Activity.onCreate method
-     */
-    open fun onCreate(activity: ComponentActivity) {
-        this.activity = activity
-
-        activity.lifecycle.apply {
-            removeObserver(this@NetworkSignInService)
-            addObserver(this@NetworkSignInService)
-        }
-    }
-
-    /**
      * Should be called in Activity.onDestroy method
      */
-    @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    open fun onDestroy() {
-        activity = null
+    override fun onDestroy() {
+        super.onDestroy()
         signInCallback = null
     }
 

@@ -2,19 +2,16 @@ package com.android.arch.auth.core.data.repository
 
 import android.content.Intent
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.data.network.NetworkSignInService
+import com.android.arch.auth.core.data.network.OnActivityCreatedListener
 
-abstract class NetworkAuthRepository : LifecycleObserver {
+abstract class NetworkAuthRepository : OnActivityCreatedListener() {
 
     private val signInServiceRegister = hashMapOf<SocialNetworkType, NetworkSignInService<*>>()
 
-    @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onDestroy() {
+    override fun onDestroy() {
+        super.onDestroy()
         signInServiceRegister.clear()
     }
 
@@ -22,14 +19,10 @@ abstract class NetworkAuthRepository : LifecycleObserver {
      * Should be called on Activity.onCreate
      */
     fun onCreate(activity: ComponentActivity, vararg services: NetworkSignInService<*>) {
+        super.onCreate(activity)
         services.forEach {
             it.onCreate(activity)
             signInServiceRegister[it.socialNetworkType] = it
-        }
-
-        activity.lifecycle.apply {
-            removeObserver(this@NetworkAuthRepository)
-            addObserver(this@NetworkAuthRepository)
         }
     }
 
