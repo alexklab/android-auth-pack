@@ -22,12 +22,12 @@ In your `project/build.gradle` file add a dependency
 
 ```groovy
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
- ```
+    repositories {
+	...
+	maven { url 'https://jitpack.io' }
+    }
+}
+```
 
 In your `app/build.gradle` file add a dependency on one of the AndroidAuthPack
 libraries.
