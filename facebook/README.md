@@ -84,8 +84,8 @@ Implement View model
 
 Create and use `FacebookSignInService` in your activity
 
-```java
-facebookSignInService = FacebookSignInService()
+```kotlin
+private val facebookSignInService = FacebookSignInService()
 
 override fun onCreate(savedInstanceState: Bundle?) { 	
     facebookSignInService.onCreate(this)
@@ -96,5 +96,4 @@ private fun signIn(){
     	// TODO store user
     }
 }
-
 ```
