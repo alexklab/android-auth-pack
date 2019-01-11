@@ -91,6 +91,11 @@ override fun onCreate(savedInstanceState: Bundle?) {
     facebookSignInService.onCreate(this)
 }
 
+override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    facebookSignInService.onActivityResult(requestCode, resultCode, data)
+}
+
 private fun signIn(){
     facebookSignInService.signIn{ token, bundle, exception ->
     	// TODO store user
