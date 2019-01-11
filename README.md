@@ -23,7 +23,7 @@ In your `project/build.gradle` file add a dependency
 ```groovy
 allprojects {
     repositories {
-	...
+	// ...
 	maven { url 'https://jitpack.io' }
     }
 }
