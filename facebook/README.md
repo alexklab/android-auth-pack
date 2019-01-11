@@ -1,5 +1,6 @@
 # AndroidAuthPack for login with Facebook
 
+# Configuration 
 
 In your `project/build.gradle` file add a dependency
 
@@ -22,8 +23,9 @@ dependencies {
 ```
 
 On the [Facebook developer dashboard](https://developers.facebook.com) site, 
-enable Android platform and get the App IDs for your app
-Define the resource string `facebook_application_id` to match the application ID:
+enable Android platform and get the App IDs for your app. 
+
+Define the string resources to match the application ID:
 
 ```xml
 <resources>
