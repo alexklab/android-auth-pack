@@ -77,3 +77,24 @@ Add to your `AndroidManifest.xml` Facebook activities and `meta-data`
 	</application>
 </manifest>
 ```
+
+## Usage
+
+Implement View model
+
+Create and use `FacebookSignInService` in your activity
+
+```java
+facebookSignInService = FacebookSignInService()
+
+override fun onCreate(savedInstanceState: Bundle?) { 	
+    facebookSignInService.onCreate(this)
+}
+
+private fun signIn(){
+    facebookSignInService.signIn{ token, bundle, exception ->
+    	// TODO store user
+    }
+}
+
+```
