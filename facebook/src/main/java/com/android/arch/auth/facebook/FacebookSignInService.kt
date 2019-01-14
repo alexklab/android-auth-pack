@@ -131,7 +131,7 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
         private const val DATA = "data"
         private const val NAME = "name"
         private const val FIRST_NAME = "first_name"
-        private const val LAST_NAME = "lastN_name"
+        private const val LAST_NAME = "last_name"
         private const val EMAIL = "email"
         private const val PICTURE = "picture"
         private const val PERMISSIONS = "$ID,$NAME,$FIRST_NAME,$LAST_NAME,$EMAIL,$PICTURE.width(200)"

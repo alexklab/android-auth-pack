@@ -110,7 +110,12 @@ private fun signIn(){
          facebookProfile.picture - user logo url
     	*/
     } else {
-        // TODO: handle signIn Error
+         when(e){
+             is FacebookOperationCanceledException -> //TODO handle cancelation
+             is FacebookException -> // TODO handle facebook exception. see Facebook SDK
+             else -> // TODO: handle undefined exception
+         }
+        */
     }
 }
 ```
