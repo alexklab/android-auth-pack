@@ -18,7 +18,7 @@ libraries.
 
 ```groovy
 dependencies {
-    implementation "com.github.alexklab.android-auth-pack:facebook:1.0.4"
+    implementation "com.github.alexklab.android-auth-pack:facebook:$last_auth_pack_version"
 }
 ```
 
@@ -97,8 +97,20 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
 }
 
 private fun signIn(){
-    facebookSignInService.signIn{ token, bundle, exception ->
-    	// TODO store user
+    facebookSignInService.signIn{ (facebookProfile, e) ->
+
+    if(facebookProfile != null){
+    	/*
+    	 TODO: store user profile
+    	 facebookProfile.id - unique user facebookId
+         facebookProfile.name - user name (by default 'firstName + lastName')
+         facebookProfile.firstName - user first name
+         facebookProfile.lastName - user last name
+         facebookProfile.email - user email
+         facebookProfile.picture - user logo url
+    	*/
+    } else {
+        // TODO: handle signIn Error
     }
 }
 ```
