@@ -7,8 +7,8 @@ In your `project/build.gradle` file add a dependency
 ```groovy
 allprojects {
     repositories {
-	    // ...
-	    maven { url 'https://jitpack.io' }
+        // ...
+	maven { url 'https://jitpack.io' }
     }
 }
 ```
@@ -29,7 +29,7 @@ Define the string resources to match the application ID:
 
 ```xml
 <resources>
-    <string name="facebook_application_id" translatable="false">APP_ID</string>
+	<string name="facebook_application_id" translatable="false">APP_ID</string>
 </resources>
 ```
 
@@ -46,19 +46,20 @@ Add to your `AndroidManifest.xml` Facebook activity and `meta-data`
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 	<application
 	    android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme">
-		<!-- ... Meta-Data -->
-		<meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
+	    android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+		
+	    <!-- ... Meta-Data -->
+	    <meta-data
+                android:name="com.facebook.sdk.ApplicationId"
+                android:value="@string/facebook_app_id" />
 		
 		<!-- ... Login activity -->
-		<activity
-            android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
+	    <activity
+                android:name="com.facebook.FacebookActivity"
+                android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+                android:label="@string/app_name" />
 		
 	</application>
 </manifest>
