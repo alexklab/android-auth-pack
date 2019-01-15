@@ -7,8 +7,8 @@ In your `project/build.gradle` file add a dependency
 ```groovy
 allprojects {
     repositories {
-	// ...
-	maven { url 'https://jitpack.io' }
+	    // ...
+	    maven { url 'https://jitpack.io' }
     }
 }
 ```
@@ -23,16 +23,13 @@ dependencies {
 ```
 
 On the [Facebook developer dashboard](https://developers.facebook.com) site, 
-enable Android platform and get the App IDs for your app. 
+enable Android platform and get the App ID for your app.
 
 Define the string resources to match the application ID:
 
 ```xml
 <resources>
-    <!-- ... -->
     <string name="facebook_application_id" translatable="false">APP_ID</string>
-    <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
-    <string name="facebook_login_protocol_scheme" translatable="false">fbAPP_ID</string>
 </resources>
 ```
 
@@ -44,35 +41,24 @@ Add to your `AndroidManifest.xml` internet `uses-permission`
 </manifest>
 ```
 
-Add to your `AndroidManifest.xml` Facebook activities and `meta-data`
+Add to your `AndroidManifest.xml` Facebook activity and `meta-data`
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 	<application
 	    android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme">
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
 		<!-- ... Meta-Data -->
 		<meta-data
-            	    android:name="com.facebook.sdk.ApplicationId"
-            	    android:value="@string/facebook_app_id" />
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 		
-		<!-- ... Login activities -->
+		<!-- ... Login activity -->
 		<activity
-            	    android:name="com.facebook.FacebookActivity"
-            	    android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            	    android:label="@string/app_name" />
-
-        	<activity
-            	    android:name="com.facebook.CustomTabActivity"
-            	    android:exported="true">
-            		<intent-filter>
-                		<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-                		<category android:name="android.intent.category.BROWSABLE" />
-				<data android:scheme="@string/fb_login_protocol_scheme" />
-            		</intent-filter>
-        	</activity>
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
 		
 	</application>
 </manifest>
@@ -97,25 +83,20 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
 }
 
 private fun signIn(){
-    facebookSignInService.signIn{ (facebookProfile, e) ->
+    facebookSignInService.signIn{ (profile, e, errType) ->
 
     if(facebookProfile != null){
     	/*
     	 TODO: store user profile
-    	 facebookProfile.id - unique user facebookId
-         facebookProfile.name - user name (by default 'firstName + lastName')
-         facebookProfile.firstName - user first name
-         facebookProfile.lastName - user last name
-         facebookProfile.email - user email
-         facebookProfile.picture - user logo url
+    	 profile.id - unique user facebookId
+         profile.name - user name (by default 'firstName + lastName')
+         profile.firstName - user first name
+         profile.lastName - user last name
+         profile.email - user email
+         profile.picture - user logo url
     	*/
     } else {
-         when(e){
-             is FacebookOperationCanceledException -> //TODO handle cancelation
-             is FacebookException -> // TODO handle facebook exception. see Facebook SDK
-             else -> // TODO: handle undefined exception
-         }
-        */
+        // TODO handle errType, (AUTH_CANCELED or AUTH_SERVER_ERROR)
     }
 }
 ```

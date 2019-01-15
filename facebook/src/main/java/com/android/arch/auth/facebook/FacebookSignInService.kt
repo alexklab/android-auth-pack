@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
 import com.android.arch.auth.core.data.entity.SocialNetworkType.FACEBOOK
 import com.android.arch.auth.core.data.network.NetworkSignInService
 import com.android.arch.auth.core.data.network.ParamsBundle
@@ -64,6 +66,13 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
 
     override fun getParamsBundle(data: AccessToken) = ParamsBundle(data.token)
 
+    override fun getErrorType(exception: Exception?): AuthResponseErrorType? = exception?.let {
+        when (it) {
+            is FacebookOperationCanceledException -> AUTH_CANCELED
+            else -> AUTH_SERVICE_ERROR
+        }
+    }
+
     /**
      * Sign in User with Facebook via two steps:
      *     - fetch facebook accessToken
@@ -82,7 +91,9 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
     }
 
     private fun handleFacebookSignInError(e: Exception) {
-        facebookSignInCallback?.let { postFacebookSignInResult(FacebookSignInResponse(exception = e)) } ?: postResult(null, e)
+        facebookSignInCallback?.let {
+            postFacebookSignInResult(FacebookSignInResponse(exception = e, errorType = getErrorType(e)))
+        } ?: postResult(null, e)
     }
 
     private fun postFacebookSignInResult(data: FacebookSignInResponse) {
@@ -119,7 +130,7 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
             null
         }
 
-        return FacebookSignInResponse(profile, error?.exception)
+        return FacebookSignInResponse(profile, error?.exception, getErrorType(error?.exception))
     }
 
     private var facebookSignInCallback: FacebookSignInCallback? = null
@@ -137,5 +148,6 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
         private const val PERMISSIONS = "$ID,$NAME,$FIRST_NAME,$LAST_NAME,$EMAIL,$PICTURE.width(200)"
 
         private val READ_PERMISSIONS = listOf("email", "public_profile")
+
     }
 }

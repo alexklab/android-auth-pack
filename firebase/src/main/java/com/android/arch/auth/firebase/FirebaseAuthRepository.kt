@@ -84,9 +84,9 @@ class FirebaseAuthRepository<UserProfileDataType>(
         socialNetwork: SocialNetworkType,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
-        getService(socialNetwork)
-            ?.signIn { _, params, e -> response.signInWithCredential(socialNetwork, params, e) }
-            ?: response.postError(AUTH_CANCELED, "Fail signInWith $socialNetwork: undefined service")
+        getService(socialNetwork)?.apply {
+            signIn { _, params, e -> response.signInWithCredential(socialNetwork, params, e, getErrorType(e)) }
+        } ?: response.postError(AUTH_CANCELED, "Fail signInWith $socialNetwork: undefined service")
     }
 
     /**
@@ -130,7 +130,8 @@ class FirebaseAuthRepository<UserProfileDataType>(
     private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.signInWithCredential(
         socialNetwork: SocialNetworkType,
         params: ParamsBundle?,
-        exception: Exception?
+        exception: Exception?,
+        errorType: AuthResponseErrorType?
     ) {
         if (params != null) {
             getAuthCredential(socialNetwork, params)?.let { credential ->
@@ -138,7 +139,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
                     .addOnCompleteListener { postResult(it.isSuccessful, it.exception, ::signInWithCredentialsErrors) }
             } ?: postError(AUTH_CANCELED, "Failed signInWithCredential. Unhandled account. Provider=$socialNetwork")
         } else {
-            postError(AUTH_CANCELED, exception?.message)
+            postError(errorType ?: AUTH_CANCELED, exception?.message)
         }
     }
 

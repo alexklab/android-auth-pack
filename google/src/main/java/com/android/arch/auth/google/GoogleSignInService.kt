@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
 import com.android.arch.auth.core.data.entity.SocialNetworkType.GOOGLE
 import com.android.arch.auth.core.data.network.NetworkSignInService
 import com.android.arch.auth.core.data.network.ParamsBundle
@@ -12,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Status
 
 /**
  * Created by alexk on 12/19/18.
@@ -29,6 +32,13 @@ class GoogleSignInService(
     private companion object {
 
         const val RC_SIGN_IN = 2040
+    }
+
+    override fun getErrorType(exception: Exception?): AuthResponseErrorType? = exception?.let {
+        when (it) {
+            is GoogleSignInCanceledException -> AUTH_CANCELED
+            else -> AUTH_SERVICE_ERROR
+        }
     }
 
     /**
@@ -77,9 +87,11 @@ class GoogleSignInService(
                 postResult(exception = e)
             }
         } else {
-            postResult()
+            postResult(exception = GoogleSignInCanceledException())
         }
     }
 
     override fun getParamsBundle(data: GoogleSignInAccount) = ParamsBundle(data.idToken.orEmpty())
+
+    class GoogleSignInCanceledException : ApiException(Status.RESULT_CANCELED)
 }

@@ -3,6 +3,7 @@ package com.android.arch.auth.core.data.network
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.android.arch.auth.core.data.entity.AuthResponseErrorType
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 
 abstract class NetworkSignInService<ResponseDataType> : OnActivityCreatedListener() {
@@ -15,6 +16,8 @@ abstract class NetworkSignInService<ResponseDataType> : OnActivityCreatedListene
     abstract fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
 
     protected abstract fun getParamsBundle(data: ResponseDataType): ParamsBundle
+
+    open fun getErrorType(exception: Exception?): AuthResponseErrorType? = null
 
     fun signIn(callback: NetworkSignInCallBack<ResponseDataType>) {
         activity?.apply {
