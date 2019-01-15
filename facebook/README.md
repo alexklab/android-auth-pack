@@ -84,9 +84,9 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
 }
 
 private fun signIn(){
-    facebookSignInService.signIn{ (profile, e, errType) ->
+    facebookSignInService.signInAndFetchProfile{ 
 
-    if(profile != null){
+    if(it.profile != null){
     	/*
     	 TODO: store user profile
     	 profile.id - unique user facebookId
