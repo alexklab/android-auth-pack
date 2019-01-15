@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         service.onCreate(this)
 
         signInButton.setOnClickListener {
-            service.signIn { acc, _, e ->
+            service.signIn { (acc, e) ->
                 val msg = if (acc != null) {
                     "SignIn Success: $acc"
                 } else {

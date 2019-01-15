@@ -4,22 +4,21 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType
+import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 
-abstract class NetworkSignInService<ResponseDataType> : OnActivityCreatedListener() {
+abstract class NetworkSignInService : OnActivityCreatedListener() {
 
-    private var signInCallback: NetworkSignInCallBack<ResponseDataType>? = null
+    private var signInCallback: NetworkSignInCallBack? = null
 
     abstract val socialNetworkType: SocialNetworkType
     abstract fun signIn(activity: Activity)
     abstract fun signOut()
     abstract fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
 
-    protected abstract fun getParamsBundle(data: ResponseDataType): ParamsBundle
-
     open fun getErrorType(exception: Exception?): AuthResponseErrorType? = null
 
-    fun signIn(callback: NetworkSignInCallBack<ResponseDataType>) {
+    fun signIn(callback: NetworkSignInCallBack) {
         activity?.apply {
             signInCallback = callback
             signIn(this)
@@ -34,9 +33,9 @@ abstract class NetworkSignInService<ResponseDataType> : OnActivityCreatedListene
         signInCallback = null
     }
 
-    protected fun postResult(data: ResponseDataType? = null, exception: Exception? = null) {
+    protected fun postResult(response: SignInResponse) {
         signInCallback
-            ?.let { callback -> callback(data, data?.let { getParamsBundle(it) }, exception) }
+            ?.let { callback -> callback(response) }
             ?: Log.w("postResult", "Wrong state. signInCallback = null")
     }
 }

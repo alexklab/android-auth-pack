@@ -1,5 +1,5 @@
 package com.android.arch.auth.core.data.network
 
-import java.lang.Exception
+import com.android.arch.auth.core.data.entity.SignInResponse
 
-typealias NetworkSignInCallBack<DataType> = (DataType?, ParamsBundle?, Exception?) -> Unit
+typealias NetworkSignInCallBack = (SignInResponse) -> Unit

@@ -7,9 +7,11 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthUserProfile
+import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType.FACEBOOK
+import com.android.arch.auth.core.data.network.NetworkSignInCallBack
 import com.android.arch.auth.core.data.network.NetworkSignInService
-import com.android.arch.auth.core.data.network.ParamsBundle
 import com.facebook.*
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
@@ -18,7 +20,7 @@ import com.facebook.login.LoginResult
  * Created by alexk on 12/19/18.
  * Project android-auth-pack
  */
-class FacebookSignInService : NetworkSignInService<AccessToken>() {
+class FacebookSignInService : NetworkSignInService() {
 
     override val socialNetworkType = FACEBOOK
 
@@ -33,12 +35,14 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
         loginManager.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
 
             override fun onSuccess(result: LoginResult) = with(result) {
-                facebookSignInCallback?.let { fetchProfile(accessToken) } ?: postResult(accessToken, null)
+                signInAndFetchCallback
+                    ?.let { fetchProfile(accessToken) }
+                    ?: postResult(SignInResponse(token = accessToken.token))
             }
 
-            override fun onError(exception: FacebookException) = handleFacebookSignInError(exception)
+            override fun onError(exception: FacebookException) = handleSignInError(exception)
 
-            override fun onCancel() = handleFacebookSignInError(FacebookOperationCanceledException("canceled"))
+            override fun onCancel() = handleSignInError(FacebookOperationCanceledException("canceled"))
 
         })
     }
@@ -49,7 +53,7 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
     override fun onDestroy() {
         super.onDestroy()
         loginManager.unregisterCallback(callbackManager)
-        facebookSignInCallback = null
+        signInAndFetchCallback = null
     }
 
     override fun signIn(activity: Activity) {
@@ -63,8 +67,6 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
-
-    override fun getParamsBundle(data: AccessToken) = ParamsBundle(data.token)
 
     override fun getErrorType(exception: Exception?): AuthResponseErrorType? = exception?.let {
         when (it) {
@@ -83,40 +85,41 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
      *    FacebookException - in other cases. See Facebook SDK
      *
      */
-    fun signIn(callback: FacebookSignInCallback) {
+    fun signInAndFetchProfile(callback: NetworkSignInCallBack) {
         activity?.apply {
-            facebookSignInCallback = callback
+            signInAndFetchCallback = callback
             signIn(this)
         } ?: Log.w("signIn", "not attached. activity = null")
     }
 
-    private fun handleFacebookSignInError(e: Exception) {
-        facebookSignInCallback?.let {
-            postFacebookSignInResult(FacebookSignInResponse(exception = e, errorType = getErrorType(e)))
-        } ?: postResult(null, e)
+    private fun handleSignInError(e: Exception) {
+        val response = SignInResponse(exception = e, errorType = getErrorType(e))
+        signInAndFetchCallback
+            ?.let { postSignInAndFetchResult(response) }
+            ?: postResult(response)
     }
 
-    private fun postFacebookSignInResult(data: FacebookSignInResponse) {
-        facebookSignInCallback
+    private fun postSignInAndFetchResult(data: SignInResponse) {
+        signInAndFetchCallback
             ?.let { callback -> callback(data) }
-            ?: Log.w("postResult", "Wrong state. facebookSignInCallback = null")
+            ?: Log.w("postResult", "Wrong state. signInAndFetchCallback = null")
     }
 
-    private fun fetchProfile(token: AccessToken?) {
-        token?.let {
-            GraphRequest.newMeRequest(token) { _, response ->
-                postFacebookSignInResult(response.toFacebookSignInResponse())
+    private fun fetchProfile(accessToken: AccessToken?) {
+        accessToken?.let {
+            GraphRequest.newMeRequest(accessToken) { _, response ->
+                postSignInAndFetchResult(response.toFacebookSignInResponse(accessToken.token))
             }.apply {
                 parameters = Bundle().apply { putString(PARAMS_KEY, PERMISSIONS) }
                 executeAsync()
             }
-        } ?: handleFacebookSignInError(FacebookAuthorizationException("Failed fetch profile. Token undefined"))
+        } ?: handleSignInError(FacebookAuthorizationException("Failed fetch profile. Token undefined"))
     }
 
-    private fun GraphResponse.toFacebookSignInResponse(): FacebookSignInResponse {
+    private fun GraphResponse.toFacebookSignInResponse(token: String): SignInResponse {
         val profile = try {
             jsonObject?.let {
-                FacebookProfile(
+                AuthUserProfile(
                     id = it.getString(ID),
                     name = it.getString(NAME),
                     email = it.getString(EMAIL),
@@ -126,14 +129,19 @@ class FacebookSignInService : NetworkSignInService<AccessToken>() {
                 )
             }
         } catch (e: Exception) {
-            Log.e("FacebookSignInResponse", "Failed wrapping response", e)
+            Log.e("SignInResponse", "Failed wrapping response", e)
             null
         }
 
-        return FacebookSignInResponse(profile, error?.exception, getErrorType(error?.exception))
+        return SignInResponse(
+            token = token,
+            profile = profile,
+            exception = error?.exception,
+            errorType = getErrorType(error?.exception)
+        )
     }
 
-    private var facebookSignInCallback: FacebookSignInCallback? = null
+    private var signInAndFetchCallback: NetworkSignInCallBack? = null
 
     companion object {
         private const val PARAMS_KEY = "fields"

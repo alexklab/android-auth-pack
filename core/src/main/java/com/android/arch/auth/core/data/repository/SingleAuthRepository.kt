@@ -18,11 +18,11 @@ import com.android.arch.auth.core.data.network.NetworkSignInService
  * Created by alexk on 12/20/18.
  * Project android-auth-pack
  */
-class SingleAuthRepository<UserProfileDataType, AuthResponseType>(
-    private val factory: Factory<UserProfileDataType, AuthResponseType>
+class SingleAuthRepository<UserProfileDataType>(
+    private val factory: Factory<UserProfileDataType, AuthUserProfile>
 ) : SocialNetworkAuthRepository<UserProfileDataType>, LifecycleObserver {
 
-    private var service: NetworkSignInService<AuthResponseType>? = null
+    private var service: NetworkSignInService? = null
 
     interface Factory<UserProfileDataType, AuthResponseType> {
         fun create(user: AuthResponseType): UserProfileDataType
@@ -31,7 +31,7 @@ class SingleAuthRepository<UserProfileDataType, AuthResponseType>(
     /**
      * Should be called on Activity.onCreate
      */
-    fun onCreate(activity: ComponentActivity, service: NetworkSignInService<AuthResponseType>) {
+    fun onCreate(activity: ComponentActivity, service: NetworkSignInService) {
         this.service = service
         service.onCreate(activity)
 
@@ -59,10 +59,10 @@ class SingleAuthRepository<UserProfileDataType, AuthResponseType>(
         socialNetwork: SocialNetworkType,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ): Unit = with(response) {
-        service?.signIn { account, _, e ->
+        service?.signIn { (account, exception, errType) ->
             account
                 ?.let { postEvent(AuthResponse(SUCCESS, data = factory.create(it))) }
-                ?: postError(AUTH_CANCELED, e?.message)
+                ?: postError(errType ?: AUTH_CANCELED, exception?.message)
         } ?: postError(AUTH_CANCELED, "SignIn: Wrong state. Service = null")
     }
 

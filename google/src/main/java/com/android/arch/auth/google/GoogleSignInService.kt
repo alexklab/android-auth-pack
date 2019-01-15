@@ -6,9 +6,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthUserProfile
+import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType.GOOGLE
 import com.android.arch.auth.core.data.network.NetworkSignInService
-import com.android.arch.auth.core.data.network.ParamsBundle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -23,7 +24,7 @@ import com.google.android.gms.common.api.Status
 class GoogleSignInService(
     private val webClientId: String,
     private val signInRequestCode: Int = RC_SIGN_IN
-) : NetworkSignInService<GoogleSignInAccount>() {
+) : NetworkSignInService() {
 
     override val socialNetworkType = GOOGLE
 
@@ -81,17 +82,33 @@ class GoogleSignInService(
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                postResult(account)
+                handleSignInResult(account)
             } catch (e: ApiException) {
                 Log.w("onActivityResult", "Google sign in failed", e)
-                postResult(exception = e)
+                handleSignInResult(exception = e)
             }
         } else {
-            postResult(exception = GoogleSignInCanceledException())
+            handleSignInResult(exception = GoogleSignInCanceledException())
         }
     }
 
-    override fun getParamsBundle(data: GoogleSignInAccount) = ParamsBundle(data.idToken.orEmpty())
+    private fun handleSignInResult(account:GoogleSignInAccount? = null, exception: Exception? = null){
+        postResult(SignInResponse(
+            token = account?.idToken,
+            exception = exception,
+            errorType = getErrorType(exception),
+            profile = account?.let{
+                AuthUserProfile(
+                    id = it.id.orEmpty(),
+                    email = it.email,
+                    name = it.displayName.orEmpty(),
+                    firstName = it.givenName,
+                    lastName = it.familyName,
+                    picture = it.photoUrl?.toString()
+                )
+            }
+        ))
+    }
 
     class GoogleSignInCanceledException : ApiException(Status.RESULT_CANCELED)
 }

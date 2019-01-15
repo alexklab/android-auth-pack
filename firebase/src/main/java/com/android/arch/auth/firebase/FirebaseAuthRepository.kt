@@ -1,5 +1,6 @@
 package com.android.arch.auth.firebase
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.extensions.postError
 import com.android.arch.auth.core.common.extensions.postEvent
@@ -8,7 +9,6 @@ import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
-import com.android.arch.auth.core.data.network.ParamsBundle
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.NetworkAuthRepository
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
@@ -85,7 +85,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
         getService(socialNetwork)?.apply {
-            signIn { _, params, e -> response.signInWithCredential(socialNetwork, params, e, getErrorType(e)) }
+            signIn { response.signInWithCredential(socialNetwork, it) }
         } ?: response.postError(AUTH_CANCELED, "Fail signInWith $socialNetwork: undefined service")
     }
 
@@ -129,18 +129,13 @@ class FirebaseAuthRepository<UserProfileDataType>(
 
     private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.signInWithCredential(
         socialNetwork: SocialNetworkType,
-        params: ParamsBundle?,
-        exception: Exception?,
-        errorType: AuthResponseErrorType?
+        response: SignInResponse
     ) {
-        if (params != null) {
-            getAuthCredential(socialNetwork, params)?.let { credential ->
-                auth.signInWithCredential(credential)
-                    .addOnCompleteListener { postResult(it.isSuccessful, it.exception, ::signInWithCredentialsErrors) }
-            } ?: postError(AUTH_CANCELED, "Failed signInWithCredential. Unhandled account. Provider=$socialNetwork")
-        } else {
-            postError(errorType ?: AUTH_CANCELED, exception?.message)
-        }
+        getAuthCredential(socialNetwork, response)?.let { credential ->
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { postResult(it.isSuccessful, it.exception, ::signInWithCredentialsErrors) }
+        } ?: postError(response.errorType ?: AUTH_CANCELED, response.exception?.message)
+
     }
 
     private fun signInWithCredentialsErrors(exception: Exception?): AuthResponseErrorType? = when (exception) {
@@ -223,12 +218,24 @@ class FirebaseAuthRepository<UserProfileDataType>(
         ))
     }
 
-    private fun getAuthCredential(socialNetwork: SocialNetworkType, params: ParamsBundle): AuthCredential? =
-        with(params) {
+    private fun getAuthCredential(socialNetwork: SocialNetworkType, response: SignInResponse): AuthCredential? =
+        with(response) {
+            val responseToken = token
+            if (responseToken == null) {
+                Log.e("getAuthCredential", "Undefined token. Provider $socialNetwork")
+                return null
+            }
             when (socialNetwork) {
-                TWITTER -> TwitterAuthProvider.getCredential(key1, key2)
-                FACEBOOK -> FacebookAuthProvider.getCredential(key1)
-                GOOGLE -> GoogleAuthProvider.getCredential(key1, null)
+                GOOGLE -> GoogleAuthProvider.getCredential(responseToken, null)
+                FACEBOOK -> FacebookAuthProvider.getCredential(responseToken)
+                TWITTER -> {
+                    val responseTokenSecret = tokenSecret
+                    if (responseTokenSecret == null) {
+                        Log.e("getAuthCredential", "Undefined tokenSecret. Provider $socialNetwork")
+                        return null
+                    }
+                    TwitterAuthProvider.getCredential(responseToken, responseTokenSecret)
+                }
                 else -> null
             }
         }

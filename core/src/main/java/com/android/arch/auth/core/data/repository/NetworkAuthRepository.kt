@@ -8,7 +8,7 @@ import com.android.arch.auth.core.data.network.OnActivityCreatedListener
 
 abstract class NetworkAuthRepository : OnActivityCreatedListener() {
 
-    private val signInServiceRegister = hashMapOf<SocialNetworkType, NetworkSignInService<*>>()
+    private val signInServiceRegister = hashMapOf<SocialNetworkType, NetworkSignInService>()
 
     override fun onDestroy() {
         super.onDestroy()
@@ -18,7 +18,7 @@ abstract class NetworkAuthRepository : OnActivityCreatedListener() {
     /**
      * Should be called on Activity.onCreate
      */
-    fun onCreate(activity: ComponentActivity, vararg services: NetworkSignInService<*>) {
+    fun onCreate(activity: ComponentActivity, vararg services: NetworkSignInService) {
         super.onCreate(activity)
         services.forEach {
             it.onCreate(activity)
@@ -36,5 +36,5 @@ abstract class NetworkAuthRepository : OnActivityCreatedListener() {
         signInServiceRegister.forEach { (_, service) -> service.signOut() }
     }
 
-    protected fun getService(type: SocialNetworkType): NetworkSignInService<*>? = signInServiceRegister[type]
+    protected fun getService(type: SocialNetworkType): NetworkSignInService? = signInServiceRegister[type]
 }

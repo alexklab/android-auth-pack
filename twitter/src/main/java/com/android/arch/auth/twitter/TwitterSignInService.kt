@@ -6,11 +6,13 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
+import com.android.arch.auth.core.data.entity.AuthUserProfile
+import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType.TWITTER
 import com.android.arch.auth.core.data.network.NetworkSignInService
-import com.android.arch.auth.core.data.network.ParamsBundle
 import com.twitter.sdk.android.core.*
 import com.twitter.sdk.android.core.identity.TwitterLoginButton
+import java.lang.Exception
 
 /**
  * Created by alexk on 12/20/18.
@@ -19,7 +21,7 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton
 class TwitterSignInService(
     private val consumerApiKey: String,
     private val consumerApiSecretKey: String
-) : NetworkSignInService<TwitterSession>() {
+) : NetworkSignInService() {
 
     override val socialNetworkType = TWITTER
 
@@ -37,8 +39,8 @@ class TwitterSignInService(
 
         twitterLoginButton = TwitterLoginButton(activity).apply {
             callback = object : Callback<TwitterSession>() {
-                override fun success(result: Result<TwitterSession>) = postResult(result.data)
-                override fun failure(e: TwitterException) = postResult(exception = e)
+                override fun success(result: Result<TwitterSession>) = handleSignInResult(result.data)
+                override fun failure(e: TwitterException) = handleSignInResult(exception = e)
             }
         }
     }
@@ -65,5 +67,18 @@ class TwitterSignInService(
             ?: Log.e("onActivityResult", "Unassigned state: twitterLoginButton = null")
     }
 
-    override fun getParamsBundle(data: TwitterSession) = ParamsBundle(data.authToken.token, data.authToken.secret)
+    private fun handleSignInResult(data: TwitterSession? = null, exception: Exception? = null) {
+        postResult(SignInResponse(
+            token = data?.authToken?.token,
+            tokenSecret = data?.authToken?.secret,
+            exception = exception,
+            errorType = getErrorType(exception),
+            profile = data?.let {
+                AuthUserProfile(
+                    id = it.userId.toString(),
+                    name = it.userName
+                )
+            }
+        ))
+    }
 }

@@ -2,9 +2,10 @@ package com.android.arch.instagram
 
 import android.app.Activity
 import android.content.Intent
+import com.android.arch.auth.core.data.entity.AuthUserProfile
+import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.data.network.NetworkSignInService
-import com.android.arch.auth.core.data.network.ParamsBundle
 import com.android.arch.instagram.data.InstagramUserAccount
 import com.android.arch.instagram.ui.InstagramAuthDialog
 
@@ -15,7 +16,7 @@ import com.android.arch.instagram.ui.InstagramAuthDialog
 class InstagramSignInService(
     private val clientId: String,
     private val redirectUrl: String
-) : NetworkSignInService<InstagramUserAccount>(), InstagramAuthDialog.AuthTokenListener {
+) : NetworkSignInService(), InstagramAuthDialog.AuthTokenListener {
 
     override val socialNetworkType = SocialNetworkType.INSTAGRAM
 
@@ -24,7 +25,17 @@ class InstagramSignInService(
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {}
 
     override fun onAuthTokenResponse(account: InstagramUserAccount?, e: Exception?) {
-        postResult(account, e)
+        postResult(SignInResponse(
+            exception = e,
+            errorType = getErrorType(e),
+            profile = account?.let {
+                AuthUserProfile(
+                    id = it.id,
+                    name = it.fullName,
+                    picture = it.profilePicture
+                )
+            }
+        ))
     }
 
     override fun signIn(activity: Activity) {
@@ -35,11 +46,4 @@ class InstagramSignInService(
             redirectUrl = redirectUrl
         ).apply { show() }
     }
-
-    override fun getParamsBundle(data: InstagramUserAccount) = ParamsBundle(
-        key1 = data.id,
-        key2 = data.userName,
-        key3 = data.fullName,
-        key4 = data.profilePicture
-    )
 }
