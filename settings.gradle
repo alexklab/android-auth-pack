@@ -1,1 +1,1 @@
-include ':demo-firebase', ':core', ':google', ':facebook', ':twitter', ':firebase', ':instagram', ':demo-instagram'
+include ':core', ':google', ':facebook', ':twitter', ':firebase', ':instagram', ':demo-firebase', ':demo-instagram', ':demo-google'
