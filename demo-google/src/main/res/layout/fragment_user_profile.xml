@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:padding="16dp"
+        android:layout_height="match_parent">
+
+    <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Google Account Profile"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            tools:ignore="HardcodedText"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            tools:ignore="HardcodedText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:text="Account ID"/>
+
+    <TextView
+            android:id="@+id/accountIdTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="Aas dfasdf asdf asdf sdfasdf"/>
+
+    <TextView
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Icon"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            tools:ignore="HardcodedText"/>
+
+    <ImageView
+            android:id="@+id/iconImageView"
+            android:layout_width="160dp"
+            android:background="@android:color/darker_gray"
+            android:layout_height="160dp"
+            android:contentDescription="@null"/>
+
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:layout_marginTop="8dp"
+            android:text="Email"/>
+
+    <TextView
+            android:id="@+id/emailTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="asdasd@adfadsf.com"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:text="Display Name"/>
+
+    <TextView
+            android:id="@+id/displayNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="ASD ASDF asdfasdf adsf "/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:layout_marginTop="8dp"
+            android:text="Given Name"/>
+
+    <TextView
+            android:id="@+id/givenNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="null"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:layout_marginTop="8dp"
+            android:text="Family Name"/>
+
+    <TextView
+            android:id="@+id/familyNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="asd asdf sdaf "/>
+
+    <Button
+            android:id="@+id/logoutButton"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:text="Logout"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText"/>
+
+</LinearLayout>

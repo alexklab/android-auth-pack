@@ -2,7 +2,7 @@
     <string name="app_name">Demo Login with Firebase</string>
 
     <!-- Social Networks APIs keys -->
-    <string name="google_web_client_id" translatable="false">427552587226-06tg3k2v0iqbpn4ou3c2par10ke9fsog.apps.googleusercontent.com</string>
+    <string name="google_web_client_id" translatable="false">todo web client id</string>
     <string name="twitter_consumer_api_key" translatable="false">todo consumer api key</string>
     <string name="twitter_consumer_api_secret_key" translatable="false">todo api secret key</string>
     <string name="facebook_app_id" translatable="false">todo api id</string>
