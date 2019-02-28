@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Demo Auth Instagram</string>
+    <string name="instagram_client_id">todo client id</string>
+    <string name="instagram_redirect_url">todo redirect url</string>
 </resources>

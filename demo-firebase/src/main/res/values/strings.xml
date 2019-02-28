@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">Demo Login with Firebase</string>
+
+    <!-- Social Networks APIs keys -->
+    <string name="google_web_client_id" translatable="false">427552587226-06tg3k2v0iqbpn4ou3c2par10ke9fsog.apps.googleusercontent.com</string>
+    <string name="twitter_consumer_api_key" translatable="false">todo consumer api key</string>
+    <string name="twitter_consumer_api_secret_key" translatable="false">todo api secret key</string>
+    <string name="facebook_app_id" translatable="false">todo api id</string>
+    <string name="fb_login_protocol_scheme" translatable="false">todo login protocol scheme</string>
+
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
@@ -11,9 +19,7 @@
     <string name="error_field_required">This field is required</string>
     <string name="error_email_not_found">This email not found</string>
     <string name="error_email_not_activated">This email not verified</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
     <string name="back">Back</string>
     <string name="retry">Retry</string>
     <string name="error_response_title">Connection error</string>
