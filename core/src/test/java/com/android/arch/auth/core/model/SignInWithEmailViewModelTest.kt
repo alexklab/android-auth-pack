@@ -8,8 +8,8 @@ import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthResponseError
+import com.android.arch.auth.core.data.entity.AuthResponseError.*
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
@@ -48,7 +48,8 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
     @Mock
     private lateinit var cache: UserProfileDataCache<UserProfile>
 
-    private var signInWithEmailResponse: AuthResponseErrorType? = null
+    private var signInWithEmailResponse: AuthResponseError? = null
+    private val customError = ServiceError("Custom Error")
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
     @Before
@@ -66,7 +67,7 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
             action = { signInWithEmail(email = EMPTY_VALUE, password = VALID_PASSWORD) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_FIELD_EMAIL, response?.errorType)
+                assertEquals(EmailRequired, response?.error)
                 verifyZeroInteractions(repository, cache)
             })
 
@@ -75,17 +76,17 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
             action = { signInWithEmail(email = VALID_EMAIL, password = EMPTY_VALUE) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_FIELD_PASSWORD, response?.errorType)
+                assertEquals(PasswordRequired, response?.error)
                 verifyZeroInteractions(repository, cache)
             })
 
     @Test
     fun `signInWithEmail() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            setup = { signInWithEmailResponse = AUTH_SERVICE_ERROR },
+            setup = { signInWithEmailResponse = customError },
             action = { signInWithEmail(VALID_EMAIL, VALID_PASSWORD) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_SERVICE_ERROR, response?.errorType)
+                assertEquals(customError, response?.error)
                 verify(repository).signInWithEmail(VALID_EMAIL, VALID_PASSWORD, authResponse)
                 verifyNoMoreInteractions(repository)
                 verifyZeroInteractions(cache)
@@ -93,11 +94,11 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
 
     @Test
     fun `signInWithEmail() should handle error on service response AUTH_WRONG_PASSWORD`() = responseTestCase(
-            setup = { signInWithEmailResponse = AUTH_WRONG_PASSWORD },
+            setup = { signInWithEmailResponse = WrongPassword },
             action = { signInWithEmail(VALID_EMAIL, VALID_PASSWORD) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_WRONG_PASSWORD, response?.errorType)
+                assertEquals(WrongPassword, response?.error)
                 verify(repository).signInWithEmail(VALID_EMAIL, VALID_PASSWORD, authResponse)
                 verifyNoMoreInteractions(repository)
                 verifyZeroInteractions(cache)
@@ -105,11 +106,11 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
 
     @Test
     fun `signInWithEmail() should handle error on service response AUTH_ACCOUNT_NOT_FOUND`() = responseTestCase(
-            setup = { signInWithEmailResponse = AUTH_ACCOUNT_NOT_FOUND },
+            setup = { signInWithEmailResponse = AccountNotFound },
             action = { signInWithEmail(VALID_EMAIL, VALID_PASSWORD) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_ACCOUNT_NOT_FOUND, response?.errorType)
+                assertEquals(AccountNotFound, response?.error)
                 verify(repository).signInWithEmail(VALID_EMAIL, VALID_PASSWORD, authResponse)
                 verifyNoMoreInteractions(repository)
                 verifyZeroInteractions(cache)
@@ -117,11 +118,11 @@ class SignInWithEmailViewModelTest : AuthBaseViewModelTest<UserProfile, SignInWi
 
     @Test
     fun `signInWithEmail() should handle error on service response AUTH_ACCOUNT_NOT_ACTIVATED`() = responseTestCase(
-            setup = { signInWithEmailResponse = AUTH_ACCOUNT_NOT_ACTIVATED },
+            setup = { signInWithEmailResponse = AccountNotActivated },
             action = { signInWithEmail(VALID_EMAIL, VALID_PASSWORD) },
             expected = { response ->
                 assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_ACCOUNT_NOT_ACTIVATED, response?.errorType)
+                assertEquals(AccountNotActivated, response?.error)
                 verify(repository).signInWithEmail(VALID_EMAIL, VALID_PASSWORD, authResponse)
                 verifyNoMoreInteractions(repository)
                 verifyZeroInteractions(cache)

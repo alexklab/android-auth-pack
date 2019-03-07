@@ -5,10 +5,10 @@ package com.android.arch.auth.core.data.entity
  * Project android-auth-pack
  */
 data class AuthResponse<UserProfileDataType>(
-        val status: AuthRequestStatus,
-        val errorType: AuthResponseErrorType? = null,
-        val errorMessage: String? = null,
-        val data: UserProfileDataType? = null) {
+    val status: AuthRequestStatus,
+    val error: AuthResponseError? = null,
+    val data: UserProfileDataType? = null
+) {
 
     fun isSuccess() = status == AuthRequestStatus.SUCCESS
 }

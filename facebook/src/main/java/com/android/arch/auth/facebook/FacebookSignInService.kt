@@ -5,8 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthResponseError
 import com.android.arch.auth.core.data.entity.AuthUserProfile
 import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType.FACEBOOK
@@ -68,10 +67,10 @@ class FacebookSignInService : NetworkSignInService() {
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun getErrorType(exception: Exception?): AuthResponseErrorType? = exception?.let {
+    override fun getErrorType(exception: Exception?): AuthResponseError? = exception?.let {
         when (it) {
-            is FacebookOperationCanceledException -> AUTH_CANCELED
-            else -> AUTH_SERVICE_ERROR
+            is FacebookOperationCanceledException -> AuthResponseError.Canceled
+            else -> AuthResponseError.ServiceError("Facebook: SignIN failed. ${it.message}", it)
         }
     }
 
@@ -93,7 +92,7 @@ class FacebookSignInService : NetworkSignInService() {
     }
 
     private fun handleSignInError(e: Exception) {
-        val response = SignInResponse(exception = e, errorType = getErrorType(e))
+        val response = SignInResponse(error = getErrorType(e))
         signInAndFetchCallback
             ?.let { postSignInAndFetchResult(response) }
             ?: postResult(response)
@@ -136,8 +135,7 @@ class FacebookSignInService : NetworkSignInService() {
         return SignInResponse(
             token = token,
             profile = profile,
-            exception = error?.exception,
-            errorType = getErrorType(error?.exception)
+            error = getErrorType(error?.exception)
         )
     }
 

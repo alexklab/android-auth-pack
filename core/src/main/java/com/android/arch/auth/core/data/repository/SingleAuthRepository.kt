@@ -11,7 +11,6 @@ import com.android.arch.auth.core.common.extensions.postError
 import com.android.arch.auth.core.common.extensions.postEvent
 import com.android.arch.auth.core.data.entity.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
 import com.android.arch.auth.core.data.network.NetworkSignInService
 
 /**
@@ -59,11 +58,11 @@ class SingleAuthRepository<UserProfileDataType>(
         socialNetwork: SocialNetworkType,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ): Unit = with(response) {
-        service?.signIn { (account, exception, errType) ->
+        service?.signIn { (account, error) ->
             account
                 ?.let { postEvent(AuthResponse(SUCCESS, data = factory.create(it))) }
-                ?: postError(errType ?: AUTH_CANCELED, exception?.message)
-        } ?: postError(AUTH_CANCELED, "SignIn: Wrong state. Service = null")
+                ?: postError(error ?: AuthResponseError.Canceled)
+        } ?: postError(AuthResponseError.Canceled)
     }
 
     override fun signOut() {

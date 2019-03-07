@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.extensions.*
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
+import com.android.arch.auth.core.data.entity.AuthResponseError
 import com.android.arch.auth.core.data.entity.Event
 import kotlinx.coroutines.launch
 
@@ -26,8 +26,8 @@ abstract class AuthBaseViewModel<UserProfileDataType> : BaseViewModel() {
     }
 
     @MainThread
-    protected fun setError(errorType: AuthResponseErrorType) {
-        _response.setError(errorType)
+    protected fun setError(error: AuthResponseError) {
+        _response.setError(error)
     }
 
     @MainThread

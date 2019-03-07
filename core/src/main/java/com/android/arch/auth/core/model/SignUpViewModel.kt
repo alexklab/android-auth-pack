@@ -7,7 +7,7 @@ import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.domain.auth.SignUpUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthResponseError.*
 import com.android.arch.auth.core.data.entity.Event
 
 class SignUpViewModel<UserProfileDataType>(
@@ -23,15 +23,15 @@ class SignUpViewModel<UserProfileDataType>(
     }
 
     fun signUp(login: String, email: String, password: String, confirmPassword: String, isEnabledTermsOfUse: Boolean) = when {
-        login.isEmpty() -> setError(EMPTY_FIELD_LOGIN)
-        !loginValidator.validate(login) -> setError(MALFORMED_LOGIN)
-        email.isEmpty() -> setError(EMPTY_FIELD_EMAIL)
-        !emailValidator.validate(email) -> setError(MALFORMED_EMAIL)
-        password.isEmpty() -> setError(EMPTY_FIELD_PASSWORD)
-        !passwordValidator.validate(password) -> setError(WEAK_PASSWORD)
-        confirmPassword.isEmpty() -> setError(EMPTY_FIELD_CONFIRM_PASSWORD)
-        confirmPassword != password -> setError(NOT_MATCHED_CONFIRM_PASSWORD)
-        !isEnabledTermsOfUse -> setError(ENABLE_TERMS_OF_USE_REQUIRED)
+        login.isEmpty() -> setError(LoginRequired)
+        !loginValidator.validate(login) -> setError(MalformedLogin)
+        email.isEmpty() -> setError(EmailRequired)
+        !emailValidator.validate(email) -> setError(MalformedEmail)
+        password.isEmpty() -> setError(PasswordRequired)
+        !passwordValidator.validate(password) -> setError(WeakPassword)
+        confirmPassword.isEmpty() -> setError(ConfirmPasswordRequired)
+        confirmPassword != password -> setError(NotMatchedConfirmPassword)
+        !isEnabledTermsOfUse -> setError(EnableTermsOfUseRequired)
         else -> launchAuthTask { signUpUseCase(login, email, password, it) }
     }
 }

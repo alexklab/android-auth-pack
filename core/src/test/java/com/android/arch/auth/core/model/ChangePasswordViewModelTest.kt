@@ -9,8 +9,8 @@ import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthResponseError
+import com.android.arch.auth.core.data.entity.AuthResponseError.*
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
@@ -35,9 +35,9 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
 
     override val instance: ChangePasswordViewModel<UserProfile>
         get() = ChangePasswordViewModel(
-                passwordValidator,
-                ChangePasswordUseCase(repository),
-                GetProfileUidUseCase(profileDataCache)
+            passwordValidator,
+            ChangePasswordUseCase(repository),
+            GetProfileUidUseCase(profileDataCache)
         ).apply { authResponse = getRawResponseData() }
 
     // Executes tasks in the Architecture Components in the same thread
@@ -55,8 +55,8 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     @Mock
     private lateinit var passwordValidator: FieldValidator
 
-    private var changePasswordResponseError: AuthResponseErrorType? = null
-
+    private var changePasswordResponseError: AuthResponseError? = null
+    private val customServiceError = ServiceError("Custom cause")
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
 
@@ -74,144 +74,152 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         `when`(passwordValidator.validate(any())).thenAnswer { it.arguments[0] == validPassword }
         `when`(repository.changePassword(any(), any(), any(), any())).thenAnswer {
             (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                    .postEvent(changePasswordResponseError.toAuthResponse())
+                .postEvent(changePasswordResponseError.toAuthResponse())
         }
     }
 
     @Test
     fun `changePassword() old password should be NOT empty`() = responseTestCase(
-            // Given empty old password
-            action = {
-                changePassword(
-                        oldPassword = emptyPassword,
-                        newPassword = validPassword,
-                        newConfirmPassword = validPassword)
-            },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_FIELD_PASSWORD, response?.errorType)
-                verifyZeroInteractions(repository, profileDataCache)
-            }
+        // Given empty old password
+        action = {
+            changePassword(
+                oldPassword = emptyPassword,
+                newPassword = validPassword,
+                newConfirmPassword = validPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(OldPasswordRequired, response?.error)
+            verifyZeroInteractions(repository, profileDataCache)
+        }
     )
 
     @Test
     fun `changePassword() new password should be NOT empty`() = responseTestCase(
-            // Given empty new password
-            action = {
-                changePassword(
-                        oldPassword = validPassword,
-                        newPassword = emptyPassword,
-                        newConfirmPassword = emptyPassword)
-            },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_FIELD_NEW_PASSWORD, response?.errorType)
-                verifyZeroInteractions(repository, profileDataCache)
-            }
+        // Given empty new password
+        action = {
+            changePassword(
+                oldPassword = validPassword,
+                newPassword = emptyPassword,
+                newConfirmPassword = emptyPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(PasswordRequired, response?.error)
+            verifyZeroInteractions(repository, profileDataCache)
+        }
     )
 
     @Test
     fun `changePassword() new password should be valid`() = responseTestCase(
-            // Given weak new password
-            action = {
-                changePassword(
-                        oldPassword = validPassword,
-                        newPassword = invalidPassword,
-                        newConfirmPassword = invalidPassword)
-            },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(WEAK_PASSWORD, response?.errorType)
-                verifyZeroInteractions(repository, profileDataCache)
-            }
+        // Given weak new password
+        action = {
+            changePassword(
+                oldPassword = validPassword,
+                newPassword = invalidPassword,
+                newConfirmPassword = invalidPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(WeakPassword, response?.error)
+            verifyZeroInteractions(repository, profileDataCache)
+        }
     )
 
     @Test
     fun `changePassword() confirm password should be NOT empty`() = responseTestCase(
-            // Given empty confirm password
-            action = {
-                changePassword(
-                        oldPassword = validPassword,
-                        newPassword = validPassword,
-                        newConfirmPassword = emptyPassword)
-            },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(EMPTY_FIELD_CONFIRM_PASSWORD, response?.errorType)
-                verifyZeroInteractions(repository, profileDataCache)
-            }
+        // Given empty confirm password
+        action = {
+            changePassword(
+                oldPassword = validPassword,
+                newPassword = validPassword,
+                newConfirmPassword = emptyPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(ConfirmPasswordRequired, response?.error)
+            verifyZeroInteractions(repository, profileDataCache)
+        }
     )
 
     @Test
     fun `changePassword() confirm password should be equals to new password`() = responseTestCase(
-            // Given wrong confirm password
-            action = {
-                changePassword(
-                        oldPassword = validPassword,
-                        newPassword = validPassword,
-                        newConfirmPassword = invalidPassword)
-            },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(NOT_MATCHED_CONFIRM_PASSWORD, response?.errorType)
-                verifyZeroInteractions(repository, profileDataCache)
-            }
+        // Given wrong confirm password
+        action = {
+            changePassword(
+                oldPassword = validPassword,
+                newPassword = validPassword,
+                newConfirmPassword = invalidPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(NotMatchedConfirmPassword, response?.error)
+            verifyZeroInteractions(repository, profileDataCache)
+        }
     )
 
     @Test
     fun `changePassword() should handle success on service response SUCCESS`() = responseTestCase(
-            // Given correct request params, success changePasswordResponse
-            setup = { changePasswordResponseError = null /* success */ },
-            action = {
-                changePassword(
-                        oldPassword = validPassword,
-                        newPassword = validPassword,
-                        newConfirmPassword = validPassword)
-            },
-            expected = { response ->
-                assertEquals(SUCCESS, response?.status)
-                verify(profileDataCache).getProfileUid()
-                verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
-                verifyNoMoreInteractions(repository, profileDataCache)
-            }
+        // Given correct request params, success changePasswordResponse
+        setup = { changePasswordResponseError = null /* success */ },
+        action = {
+            changePassword(
+                oldPassword = validPassword,
+                newPassword = validPassword,
+                newConfirmPassword = validPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(SUCCESS, response?.status)
+            verify(profileDataCache).getProfileUid()
+            verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
+            verifyNoMoreInteractions(repository, profileDataCache)
+        }
     )
 
     @Test
     fun `changePassword() should handle error on service response AUTH_WRONG_PASSWORD`() = responseTestCase(
-            // Given correct request params, failed changePasswordResponse
-            setup = { changePasswordResponseError = AUTH_WRONG_PASSWORD },
-            action = {
-                changePassword(
-                        oldPassword = validPassword,
-                        newPassword = validPassword,
-                        newConfirmPassword = validPassword)
-            },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_WRONG_PASSWORD, response?.errorType)
-                verify(profileDataCache).getProfileUid()
-                verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
-                verifyNoMoreInteractions(repository, profileDataCache)
-            }
+        // Given correct request params, failed changePasswordResponse
+        setup = { changePasswordResponseError = WrongPassword },
+        action = {
+            changePassword(
+                oldPassword = validPassword,
+                newPassword = validPassword,
+                newConfirmPassword = validPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(WrongPassword, response?.error)
+            verify(profileDataCache).getProfileUid()
+            verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
+            verifyNoMoreInteractions(repository, profileDataCache)
+        }
     )
 
     @Test
     fun `changePassword() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            // Given correct request params, response: service error
-            setup = { changePasswordResponseError = AUTH_SERVICE_ERROR },
-            action = {
-                changePassword(
-                        oldPassword = validPassword,
-                        newPassword = validPassword,
-                        newConfirmPassword = validPassword)
-            },
-            expected = { response ->
-                assertEquals(FAILED, response?.status)
-                assertEquals(AUTH_SERVICE_ERROR, response?.errorType)
-                verify(profileDataCache).getProfileUid()
-                verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
-                verifyNoMoreInteractions(repository, profileDataCache)
-            }
+        // Given correct request params, response: service error
+        setup = { changePasswordResponseError = customServiceError },
+        action = {
+            changePassword(
+                oldPassword = validPassword,
+                newPassword = validPassword,
+                newConfirmPassword = validPassword
+            )
+        },
+        expected = { response ->
+            assertEquals(FAILED, response?.status)
+            assertEquals(customServiceError, response?.error)
+            verify(profileDataCache).getProfileUid()
+            verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
+            verifyNoMoreInteractions(repository, profileDataCache)
+        }
     )
 
 }

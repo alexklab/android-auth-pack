@@ -6,8 +6,7 @@ import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.EMPTY_FIELD_EMAIL
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.EMPTY_FIELD_PASSWORD
+import com.android.arch.auth.core.data.entity.AuthResponseError.*
 import com.android.arch.auth.core.data.entity.Event
 
 /**
@@ -24,8 +23,8 @@ class SignInWithEmailViewModel<UserProfileDataType>(
     }
 
     fun signInWithEmail(email: String, password: String): Unit = when {
-        email.isEmpty() -> setError(EMPTY_FIELD_EMAIL)
-        password.isEmpty() -> setError(EMPTY_FIELD_PASSWORD)
+        email.isEmpty() -> setError(EmailRequired)
+        password.isEmpty() -> setError(PasswordRequired)
         else -> launchAuthTask { signInWithEmailUseCase(email, password, it) }
     }
 }

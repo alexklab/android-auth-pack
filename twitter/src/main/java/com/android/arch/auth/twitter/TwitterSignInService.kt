@@ -71,8 +71,7 @@ class TwitterSignInService(
         postResult(SignInResponse(
             token = data?.authToken?.token,
             tokenSecret = data?.authToken?.secret,
-            exception = exception,
-            errorType = getErrorType(exception),
+            error = getErrorType(exception),
             profile = data?.let {
                 AuthUserProfile(
                     id = it.userId.toString(),

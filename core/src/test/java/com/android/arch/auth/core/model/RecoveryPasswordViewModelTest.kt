@@ -8,8 +8,8 @@ import com.android.arch.auth.core.domain.auth.RecoveryPasswordUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthResponseError
+import com.android.arch.auth.core.data.entity.AuthResponseError.*
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
@@ -42,7 +42,8 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
 
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
-    private var recoverPasswordResponseError: AuthResponseErrorType? = null
+    private var recoverPasswordResponseError: AuthResponseError? = null
+    private val customError = ServiceError("Custom Error")
 
     override val instance: RecoveryPasswordViewModel<UserProfile>
         get() = RecoveryPasswordViewModel(
@@ -70,7 +71,7 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
     fun `sendRecoveryPasswordRequest() email should be NOT empty`() = responseTestCase(
             action = { sendRecoveryPasswordRequest(emptyEmail) },
             expected = { result ->
-                assertEquals(EMPTY_FIELD_EMAIL, result?.errorType)
+                assertEquals(EmailRequired, result?.error)
                 assertEquals(FAILED, result?.status)
                 verifyZeroInteractions(repository)
             }
@@ -80,7 +81,7 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
     fun `sendRecoveryPasswordRequest() email should be valid`() = responseTestCase(
             action = { sendRecoveryPasswordRequest(invalidEmail) },
             expected = { result ->
-                assertEquals(MALFORMED_EMAIL, result?.errorType)
+                assertEquals(MalformedEmail, result?.error)
                 assertEquals(FAILED, result?.status)
                 verifyZeroInteractions(repository)
             }
@@ -88,11 +89,11 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
 
     @Test
     fun `sendRecoveryPasswordRequest() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            setup = { recoverPasswordResponseError = AUTH_SERVICE_ERROR },
+            setup = { recoverPasswordResponseError = customError },
             action = { sendRecoveryPasswordRequest(validEmail) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(AUTH_SERVICE_ERROR, result?.errorType)
+                assertEquals(customError, result?.error)
                 verify(repository).recoverPassword(validEmail, authResponse)
                 verifyNoMoreInteractions(repository)
             }
@@ -100,10 +101,10 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
 
     @Test
     fun `sendRecoveryPasswordRequest() should handle error on service response AUTH_ACCOUNT_NOT_FOUND`() = responseTestCase(
-            setup = { recoverPasswordResponseError = AUTH_ACCOUNT_NOT_FOUND },
+            setup = { recoverPasswordResponseError = AccountNotFound },
             action = { sendRecoveryPasswordRequest(validEmail) },
             expected = { result ->
-                assertEquals(AUTH_ACCOUNT_NOT_FOUND, result?.errorType)
+                assertEquals(AccountNotFound, result?.error)
                 assertEquals(FAILED, result?.status)
                 verify(repository).recoverPassword(validEmail, authResponse)
                 verifyNoMoreInteractions(repository)

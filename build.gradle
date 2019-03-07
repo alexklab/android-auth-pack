@@ -5,8 +5,8 @@ buildscript {
     ext {
         // App version
         group_name = 'com.github.alexklab.android-auth-pack'
-        versionName = '1.0.5-alpha3' // X.Y.Z; X = Major, Y = minor, Z = Patch level
-        versionCode = 1005 // XYZZ
+        versionName = '1.1.0-alpha1' // X.Y.Z; X = Major, Y = minor, Z = Patch level
+        versionCode = 1100 // XYZZ
 
         // Sdk and tools
         compileSdkVersion = 28
@@ -23,7 +23,7 @@ buildscript {
         firebase_auth_version = '16.1.0'
         junit_version = '4.12'
         google_services_version = '4.2.0'
-        gradle_version = '3.3.1'
+        gradle_version = '3.3.2'
         gradle_plugin_version = '2.1'
         glide_version = '4.9.0'
         kluent_version = '1.38'

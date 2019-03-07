@@ -26,8 +26,7 @@ class InstagramSignInService(
 
     override fun onAuthTokenResponse(account: InstagramUserAccount?, e: Exception?) {
         postResult(SignInResponse(
-            exception = e,
-            errorType = getErrorType(e),
+            error = getErrorType(e),
             profile = account?.let {
                 AuthUserProfile(
                     id = it.id,

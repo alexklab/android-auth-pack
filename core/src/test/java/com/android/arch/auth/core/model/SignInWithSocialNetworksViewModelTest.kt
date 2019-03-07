@@ -8,9 +8,7 @@ import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_CANCELED
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_SERVICE_ERROR
+import com.android.arch.auth.core.data.entity.AuthResponseError
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
@@ -48,7 +46,8 @@ class SignInWithSocialNetworksViewModelTest :
 
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
-    private var signInWithSocialNetworksResponse: AuthResponseErrorType? = null
+    private var signInWithSocialNetworksResponse: AuthResponseError? = null
+    private val customError = AuthResponseError.ServiceError("Custom Error")
 
     override val instance: SignInWithSocialNetworksViewModel<UserProfile>
         get() = SignInWithSocialNetworksViewModel(
@@ -69,11 +68,11 @@ class SignInWithSocialNetworksViewModelTest :
 
     @Test
     fun `signInWithSocialNetwork() should handle error on service response AUTH_CANCELED`() = responseTestCase(
-        setup = { signInWithSocialNetworksResponse = AUTH_CANCELED },
+        setup = { signInWithSocialNetworksResponse = AuthResponseError.Canceled },
         action = { signInWithSocialNetwork(FACEBOOK) },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(AUTH_CANCELED, response?.errorType)
+            assertEquals(AuthResponseError.Canceled, response?.error)
             verify(repository).signInWithSocialNetwork(FACEBOOK, authResponse)
             verifyNoMoreInteractions(repository)
             verifyZeroInteractions(userProfileDataCache)
@@ -81,11 +80,11 @@ class SignInWithSocialNetworksViewModelTest :
 
     @Test
     fun `signInWithSocialNetwork() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-        setup = { signInWithSocialNetworksResponse = AUTH_SERVICE_ERROR },
+        setup = { signInWithSocialNetworksResponse = customError },
         action = { signInWithSocialNetwork(INSTAGRAM) },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(AUTH_SERVICE_ERROR, response?.errorType)
+            assertEquals(customError, response?.error)
             verify(repository).signInWithSocialNetwork(INSTAGRAM, authResponse)
             verifyNoMoreInteractions(repository)
             verifyZeroInteractions(userProfileDataCache)

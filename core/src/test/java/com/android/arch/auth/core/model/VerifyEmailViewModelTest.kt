@@ -7,8 +7,7 @@ import com.android.arch.auth.core.domain.auth.SendVerifiedEmailKeyUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.AUTH_SERVICE_ERROR
+import com.android.arch.auth.core.data.entity.AuthResponseError
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
@@ -45,7 +44,8 @@ class VerifyEmailViewModelTest : AuthBaseViewModelTest<UserProfile, VerifyEmailV
     @Mock
     private lateinit var repository: EmailAuthRepository<UserProfile>
 
-    private var verifyEmailResponseError: AuthResponseErrorType? = null
+    private var verifyEmailResponseError: AuthResponseError? = null
+    private val customError = AuthResponseError.ServiceError("Custom Error")
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
     private val verifyEmailKey = "t123wer123ert"
@@ -74,11 +74,11 @@ class VerifyEmailViewModelTest : AuthBaseViewModelTest<UserProfile, VerifyEmailV
 
     @Test
     fun `sendVerifyEmailRequest() should post service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            setup = { verifyEmailResponseError = AUTH_SERVICE_ERROR },
+            setup = { verifyEmailResponseError = customError },
             action = { sendVerifyEmailRequest(verifyEmailKey) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(AUTH_SERVICE_ERROR, result?.errorType)
+                assertEquals(customError, result?.error)
                 verify(repository).sendVerifiedEmailKeyUseCase(verifyEmailKey, authResponse)
                 verifyNoMoreInteractions(repository)
             })
