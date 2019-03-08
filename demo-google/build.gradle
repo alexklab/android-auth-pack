@@ -27,10 +27,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //implementation "com.github.alexklab.android-auth-pack:core:$auth_pack_version"
-    //implementation "com.github.alexklab.android-auth-pack:google:$auth_pack_version"
-    implementation project(':core')
-    implementation project(':google')
+    implementation "com.github.alexklab.android-auth-pack:core:$auth_pack_version"
+    implementation "com.github.alexklab.android-auth-pack:google:$auth_pack_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ktx_coroutines_version"

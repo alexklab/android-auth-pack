@@ -31,18 +31,11 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-   /* implementation "com.github.alexklab.android-auth-pack:core:$auth_pack_version"
+    implementation "com.github.alexklab.android-auth-pack:core:$auth_pack_version"
     implementation "com.github.alexklab.android-auth-pack:twitter:$auth_pack_version"
     implementation "com.github.alexklab.android-auth-pack:google:$auth_pack_version"
     implementation "com.github.alexklab.android-auth-pack:facebook:$auth_pack_version"
     implementation "com.github.alexklab.android-auth-pack:firebase:$auth_pack_version"
-*/
-    implementation project(':core')
-    implementation project(':twitter')
-    implementation project(':google')
-    implementation project(':facebook')
-    implementation project(':firebase')
-    implementation "com.facebook.android:facebook-login:$facebook_login_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ktx_coroutines_version"
