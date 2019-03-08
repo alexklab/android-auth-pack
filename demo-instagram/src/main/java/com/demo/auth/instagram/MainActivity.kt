@@ -1,9 +1,9 @@
 package com.demo.auth.instagram
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.android.arch.instagram.InstagramSignInService
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -20,11 +20,11 @@ class MainActivity : AppCompatActivity() {
         service.onCreate(this)
 
         signInButton.setOnClickListener {
-            service.signIn { (acc, e) ->
-                val msg = if (acc != null) {
-                    "SignIn Success: $acc"
+            service.signIn { (account, error) ->
+                val msg = if (account != null) {
+                    "SignIn Success: $account"
                 } else {
-                    "SignIn Error: ${e?.message}"
+                    "SignIn Error: $error"
                 }
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                 Log.d("signIn Response", msg)

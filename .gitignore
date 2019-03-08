@@ -44,3 +44,4 @@ captures/
 # Google services config
 google-services.json
 demo-google/src/main/res/values/config.xml
+demo-firebase/src/main/res/values/config.xml

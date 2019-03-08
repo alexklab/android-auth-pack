@@ -26,8 +26,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':core')
-    implementation project(':instagram')
+    implementation "com.github.alexklab.android-auth-pack:core:$auth_pack_version"
+    implementation "com.github.alexklab.android-auth-pack:instagram:$auth_pack_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"

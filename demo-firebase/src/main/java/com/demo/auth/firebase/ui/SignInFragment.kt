@@ -7,13 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.android.arch.auth.core.data.entity.*
+import com.android.arch.auth.core.data.entity.AuthError
+import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType.*
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.EventObserver
+import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
 import com.android.arch.auth.core.model.SignInWithEmailViewModel
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
-import com.demo.auth.firebase.MainActivity
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.data.entity.UserProfile
@@ -44,7 +46,7 @@ class SignInFragment : Fragment() {
         facebookSignInButton.setOnClickListener { sendSignInWithSocialNetwork(FACEBOOK) }
         twitterSignInButton.setOnClickListener { sendSignInWithSocialNetwork(TWITTER) }
 
-        //signUpButton.setOnClickListener { mainActivity?.addFragment(SignUpFragment()) }
+        // signUpButton.setOnClickListener { mainActivity?.addFragment(SignUpFragment()) }
         // forgotPasswordButton.setOnClickListener { mainActivity?.addFragment(RecoveryPasswordFragment()) }
     }
 
@@ -78,22 +80,22 @@ class SignInFragment : Fragment() {
     private fun handleSignInResponse(response: AuthResponse<UserProfile>): Unit = with(response) {
         Log.d("handleSignInResponse:", "$response")
 
-        fun handleErrors(errorType: AuthResponseErrorType?) = when (errorType) {
-            EMPTY_FIELD_EMAIL -> emailLayout.error = getString(R.string.error_field_required)
-            EMPTY_FIELD_PASSWORD -> passwordLayout.error = getString(R.string.error_field_required)
-            AUTH_CANCELED -> setButtonsClickable(isClickable = true)
-            AUTH_WRONG_PASSWORD -> passwordLayout.error = getString(R.string.error_incorrect_password)
-            AUTH_ACCOUNT_NOT_FOUND -> emailLayout.error = getString(R.string.error_email_not_found)
-            AUTH_ACCOUNT_NOT_ACTIVATED -> emailLayout.error = getString(R.string.error_email_not_activated)
+        fun handleErrors(errorType: AuthError?) = when (errorType) {
+            EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
+            PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
+            CanceledAuthError -> setButtonsClickable(isClickable = true)
+            WrongPasswordAuthError -> passwordLayout.error = getString(R.string.error_incorrect_password)
+            AccountNotFoundAuthError -> emailLayout.error = getString(R.string.error_email_not_found)
+            AccountNotActivatedAuthError -> emailLayout.error = getString(R.string.error_email_not_activated)
             else -> showFailRequestAlert(errorType, onRetry = ::sendSignInWithEmailRequest)
         }
 
         fun dismissProgressAndHandleError() {
-            Log.w("Fail AuthResponse:", "$errorType. Cause: '$errorMessage'")
-            Toast.makeText(context, "$errorType. $errorMessage", Toast.LENGTH_LONG).show()
+            Log.w("Fail AuthResponse:", "$error", error?.exception)
+            Toast.makeText(context, "${error?.errorName}", Toast.LENGTH_LONG).show()
             progressBar.visibility = View.GONE
             setButtonsClickable(isClickable = true)
-            handleErrors(errorType)
+            handleErrors(error)
         }
 
         when (status) {
@@ -103,7 +105,6 @@ class SignInFragment : Fragment() {
         }
     }
 
-    private val mainActivity: MainActivity? get() = activity as? MainActivity
     private val signInWithEmailViewModel: SignInWithEmailViewModel<UserProfile> by inject()
     private val signInWithSocialNetworksViewModel: SignInWithSocialNetworksViewModel<UserProfile> by inject()
 }

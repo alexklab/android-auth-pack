@@ -7,7 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
+import com.android.arch.auth.core.data.entity.AuthError
 import com.demo.auth.firebase.R
 import com.google.android.material.textfield.TextInputLayout
 
@@ -26,8 +26,8 @@ fun Fragment.applyContext(action: Context.() -> Unit) {
     context?.action() ?: Log.w("applyContext:", "Unsupported operation. context = null")
 }
 
-fun Fragment.showFailRequestAlert(errorType: AuthResponseErrorType?, onRetry: () -> Unit) = applyContext {
-    Log.w("showFailRequestAlert:", "Error: $errorType")
+fun Fragment.showFailRequestAlert(error: AuthError?, onRetry: () -> Unit) = applyContext {
+    Log.w("showFailRequestAlert:", "Error: $error", error?.exception)
     AlertDialog.Builder(this)
         .setTitle(R.string.error_response_title)
         .setMessage(R.string.error_response_message)
