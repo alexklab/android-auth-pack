@@ -35,19 +35,19 @@ libraries.
 ```groovy
 dependencies {
     // AndroidAuthPack for login with Custom Auth System 
-    implementation "com.github.alexklab.android-auth-pack:core:1.0.4"
+    implementation "com.github.alexklab.android-auth-pack:core:$auth_pack_version"
     
     // AndroidAuthPack for login with Twitter 
-    implementation "com.github.alexklab.android-auth-pack:twitter:1.0.4"
+    implementation "com.github.alexklab.android-auth-pack:twitter:$auth_pack_version"
     
     // AndroidAuthPack for login with Google
-    implementation "com.github.alexklab.android-auth-pack:google:1.0.4"
+    implementation "com.github.alexklab.android-auth-pack:google:$auth_pack_version"
     
     // AndroidAuthPack for login with Facebook
-    implementation "com.github.alexklab.android-auth-pack:facebook:1.0.4"
+    implementation "com.github.alexklab.android-auth-pack:facebook:$auth_pack_version"
     
     // AndroidAuthPack for login with Firebase
-    implementation "com.github.alexklab.android-auth-pack:firebase:1.0.4"
+    implementation "com.github.alexklab.android-auth-pack:firebase:$auth_pack_version"
 }
 ```
 
