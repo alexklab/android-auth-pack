@@ -6,14 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.ON_PROGRESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseError
+import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.Event
 
 /**
  * Created by alexk on 12/13/18.
  * Project android-auth-pack
  */
-fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postError(error: AuthResponseError) {
+fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postError(error: AuthError) {
     postEvent(AuthResponse(FAILED, error))
 }
 
@@ -29,7 +29,7 @@ fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.postEvent(response
 }
 
 @MainThread
-fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.setError(error: AuthResponseError) {
+fun <DataType> MutableLiveData<Event<AuthResponse<DataType>>>.setError(error: AuthError) {
     setEvent(AuthResponse(FAILED, error))
 }
 

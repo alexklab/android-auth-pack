@@ -7,11 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.android.arch.auth.core.data.entity.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
-import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseErrorType
-import com.android.arch.auth.core.data.entity.EventObserver
-import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
 import com.demo.auth.google.R
 import com.demo.auth.google.common.showFailRequestAlert
@@ -44,12 +41,12 @@ class SignInFragment : Fragment() {
         Log.d("handleSignInResponse:", "$response")
 
         fun dismissProgressAndHandleError() {
-            Log.w("Fail AuthResponse:", "$errorType. Cause: '$errorMessage'")
-            Toast.makeText(context, "$errorType. $errorMessage", Toast.LENGTH_LONG).show()
+            Log.w("Fail AuthResponse:", "${error?.errorName}: '${error?.message}'", error?.exception)
+            Toast.makeText(context, "Failed: ${error?.errorName}", Toast.LENGTH_LONG).show()
             progressBar.visibility = View.GONE
             signInButton.isClickable = true
-            if (errorType != AuthResponseErrorType.AUTH_CANCELED) {
-                showFailRequestAlert(errorType, onRetry = ::sendSignInWithGoogleRequest)
+            if (error != AuthError.CanceledAuthError) {
+                showFailRequestAlert(error, onRetry = ::sendSignInWithGoogleRequest)
             }
         }
 

@@ -9,8 +9,8 @@ import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseError
-import com.android.arch.auth.core.data.entity.AuthResponseError.*
+import com.android.arch.auth.core.data.entity.AuthError
+import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
@@ -55,8 +55,8 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     @Mock
     private lateinit var passwordValidator: FieldValidator
 
-    private var changePasswordResponseError: AuthResponseError? = null
-    private val customServiceError = ServiceError("Custom cause")
+    private var changePasswordError: AuthError? = null
+    private val customServiceError = ServiceAuthError("Custom cause")
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
 
@@ -69,12 +69,12 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     @Suppress("UNCHECKED_CAST")
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        changePasswordResponseError = null
+        changePasswordError = null
         `when`(profileDataCache.getProfileUid()).thenReturn(uid)
         `when`(passwordValidator.validate(any())).thenAnswer { it.arguments[0] == validPassword }
         `when`(repository.changePassword(any(), any(), any(), any())).thenAnswer {
             (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                .postEvent(changePasswordResponseError.toAuthResponse())
+                .postEvent(changePasswordError.toAuthResponse())
         }
     }
 
@@ -90,7 +90,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(OldPasswordRequired, response?.error)
+            assertEquals(OldPasswordRequiredAuthError, response?.error)
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -107,7 +107,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(PasswordRequired, response?.error)
+            assertEquals(PasswordRequiredAuthError, response?.error)
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -124,7 +124,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(WeakPassword, response?.error)
+            assertEquals(WeakPasswordAuthError, response?.error)
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -141,7 +141,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(ConfirmPasswordRequired, response?.error)
+            assertEquals(ConfirmPasswordRequiredAuthError, response?.error)
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -158,7 +158,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(NotMatchedConfirmPassword, response?.error)
+            assertEquals(NotMatchedConfirmPasswordAuthError, response?.error)
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -166,7 +166,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     @Test
     fun `changePassword() should handle success on service response SUCCESS`() = responseTestCase(
         // Given correct request params, success changePasswordResponse
-        setup = { changePasswordResponseError = null /* success */ },
+        setup = { changePasswordError = null /* success */ },
         action = {
             changePassword(
                 oldPassword = validPassword,
@@ -185,7 +185,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     @Test
     fun `changePassword() should handle error on service response AUTH_WRONG_PASSWORD`() = responseTestCase(
         // Given correct request params, failed changePasswordResponse
-        setup = { changePasswordResponseError = WrongPassword },
+        setup = { changePasswordError = WrongPasswordAuthError },
         action = {
             changePassword(
                 oldPassword = validPassword,
@@ -195,7 +195,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         },
         expected = { response ->
             assertEquals(FAILED, response?.status)
-            assertEquals(WrongPassword, response?.error)
+            assertEquals(WrongPasswordAuthError, response?.error)
             verify(profileDataCache).getProfileUid()
             verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
             verifyNoMoreInteractions(repository, profileDataCache)
@@ -205,7 +205,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     @Test
     fun `changePassword() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
         // Given correct request params, response: service error
-        setup = { changePasswordResponseError = customServiceError },
+        setup = { changePasswordError = customServiceError },
         action = {
             changePassword(
                 oldPassword = validPassword,

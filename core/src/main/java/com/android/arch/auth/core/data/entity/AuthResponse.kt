@@ -6,7 +6,7 @@ package com.android.arch.auth.core.data.entity
  */
 data class AuthResponse<UserProfileDataType>(
     val status: AuthRequestStatus,
-    val error: AuthResponseError? = null,
+    val error: AuthError? = null,
     val data: UserProfileDataType? = null
 ) {
 

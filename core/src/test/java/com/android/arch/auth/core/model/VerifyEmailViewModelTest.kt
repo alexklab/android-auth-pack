@@ -7,7 +7,7 @@ import com.android.arch.auth.core.domain.auth.SendVerifiedEmailKeyUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseError
+import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
@@ -44,8 +44,8 @@ class VerifyEmailViewModelTest : AuthBaseViewModelTest<UserProfile, VerifyEmailV
     @Mock
     private lateinit var repository: EmailAuthRepository<UserProfile>
 
-    private var verifyEmailResponseError: AuthResponseError? = null
-    private val customError = AuthResponseError.ServiceError("Custom Error")
+    private var verifyEmailError: AuthError? = null
+    private val customError = AuthError.ServiceAuthError("Custom Error")
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
     private val verifyEmailKey = "t123wer123ert"
@@ -54,17 +54,17 @@ class VerifyEmailViewModelTest : AuthBaseViewModelTest<UserProfile, VerifyEmailV
     @Suppress("UNCHECKED_CAST")
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        verifyEmailResponseError = null
+        verifyEmailError = null
 
         `when`(repository.sendVerifiedEmailKeyUseCase(any(), any())).thenAnswer {
             (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                    .postEvent(verifyEmailResponseError.toAuthResponse())
+                    .postEvent(verifyEmailError.toAuthResponse())
         }
     }
 
     @Test
     fun `sendVerifyEmailRequest() should post service response SUCCESS`() = responseTestCase(
-            setup = { verifyEmailResponseError = null /* success */ },
+            setup = { verifyEmailError = null /* success */ },
             action = { sendVerifyEmailRequest(verifyEmailKey) },
             expected = { result ->
                 assertEquals(SUCCESS, result?.status)
@@ -74,7 +74,7 @@ class VerifyEmailViewModelTest : AuthBaseViewModelTest<UserProfile, VerifyEmailV
 
     @Test
     fun `sendVerifyEmailRequest() should post service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            setup = { verifyEmailResponseError = customError },
+            setup = { verifyEmailError = customError },
             action = { sendVerifyEmailRequest(verifyEmailKey) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)

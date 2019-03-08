@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.android.arch.auth.core.data.entity.AuthResponseError
+import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthUserProfile
 import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType.GOOGLE
@@ -34,10 +34,10 @@ class GoogleSignInService(
         const val RC_SIGN_IN = 2040
     }
 
-    override fun getErrorType(exception: Exception?): AuthResponseError? = exception?.let {
+    override fun getErrorType(exception: Exception?): AuthError? = exception?.let {
         when (it) {
-            is GoogleSignInCanceledException -> AuthResponseError.Canceled
-            else -> AuthResponseError.ServiceError("Google SignIn Error: ${exception.message}", exception = exception)
+            is GoogleSignInCanceledException -> AuthError.CanceledAuthError
+            else -> AuthError.ServiceAuthError("Google SignIn Error: ${exception.message}", exception = exception)
         }
     }
 

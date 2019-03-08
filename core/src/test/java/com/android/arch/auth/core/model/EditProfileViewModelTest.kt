@@ -9,8 +9,8 @@ import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthResponseError
-import com.android.arch.auth.core.data.entity.AuthResponseError.*
+import com.android.arch.auth.core.data.entity.AuthError
+import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
@@ -71,8 +71,8 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
     }
 
     private var getProfileAnswer: UserProfile? = null
-    private var editProfileResponseError: AuthResponseError? = null
-    private val customError = ServiceError("Custom error")
+    private var editProfileError: AuthError? = null
+    private val customError = ServiceAuthError("Custom error")
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
     @Before
@@ -81,11 +81,11 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         MockitoAnnotations.initMocks(this)
 
         getProfileAnswer = null
-        editProfileResponseError = null
+        editProfileError = null
 
         `when`(repository.sendUpdateProfileRequest(any(), any(), any(), any())).thenAnswer {
             (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                    .postEvent(editProfileResponseError.toAuthResponse())
+                    .postEvent(editProfileError.toAuthResponse())
         }
 
         `when`(userProfileDataCache.getProfile()).thenAnswer {
@@ -108,7 +108,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = EMPTY_VALUE, email = EMAIL) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(LoginRequired, result?.error)
+                assertEquals(LoginRequiredAuthError, result?.error)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 
@@ -117,7 +117,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = LOGIN, email = EMPTY_VALUE) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EmailRequired, result?.error)
+                assertEquals(EmailRequiredAuthError, result?.error)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 
@@ -126,7 +126,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = LOGIN, email = INVALID_VALUE) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(MalformedEmail, result?.error)
+                assertEquals(MalformedEmailAuthError, result?.error)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 
@@ -135,17 +135,17 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
             action = { updateProfile(login = INVALID_VALUE, email = EMAIL) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(MalformedLogin, result?.error)
+                assertEquals(MalformedLoginAuthError, result?.error)
                 verifyZeroInteractions(repository, userProfileDataCache)
             })
 
     @Test
     fun `updateProfile() login should be auth already, on service response AUTH_LOGIN_ALREADY_EXIST`() = responseTestCase(
-            setup = { editProfileResponseError = LoginAlreadyExist },
+            setup = { editProfileError = LoginAlreadyExistAuthError },
             action = { updateProfile(login = LOGIN, email = EMAIL) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(LoginAlreadyExist, result?.error)
+                assertEquals(LoginAlreadyExistAuthError, result?.error)
                 verify(userProfileDataCache).getProfileUid()
                 verify(repository).sendUpdateProfileRequest(UID, LOGIN, EMAIL, authResponse)
                 verifyNoMoreInteractions(repository, userProfileDataCache)
@@ -153,7 +153,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
 
     @Test
     fun `updateProfile() should handle success on service response SUCCESS`() = responseTestCase(
-            setup = { editProfileResponseError = null /* success */ },
+            setup = { editProfileError = null /* success */ },
             action = { updateProfile(login = LOGIN, email = EMAIL) },
             expected = { result ->
                 assertEquals(SUCCESS, result?.status)
@@ -164,7 +164,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
 
     @Test
     fun `updateProfile() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            setup = { editProfileResponseError = customError },
+            setup = { editProfileError = customError },
             action = { updateProfile(login = LOGIN, email = EMAIL) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)

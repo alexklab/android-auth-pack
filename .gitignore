@@ -43,4 +43,4 @@ captures/
 
 # Google services config
 google-services.json
-*_config.xml
+demo-google/src/main/res/values/config.xml

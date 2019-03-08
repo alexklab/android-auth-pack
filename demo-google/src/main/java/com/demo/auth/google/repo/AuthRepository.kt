@@ -30,8 +30,7 @@ class AuthRepository(private val signInService: GoogleSignInService) :
             response.postEvent(
                 AuthResponse(
                     status = if (data.profile != null) SUCCESS else FAILED,
-                    errorType = signInService.getErrorType(data.exception),
-                    errorMessage = data.exception?.message,
+                    error = data.error,
                     data = data.profile?.let { UserProfile(it) }
                 )
             )

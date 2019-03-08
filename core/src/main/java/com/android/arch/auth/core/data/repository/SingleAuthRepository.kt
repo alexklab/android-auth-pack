@@ -61,8 +61,8 @@ class SingleAuthRepository<UserProfileDataType>(
         service?.signIn { (account, error) ->
             account
                 ?.let { postEvent(AuthResponse(SUCCESS, data = factory.create(it))) }
-                ?: postError(error ?: AuthResponseError.Canceled)
-        } ?: postError(AuthResponseError.Canceled)
+                ?: postError(error ?: AuthError.CanceledAuthError)
+        } ?: postError(AuthError.CanceledAuthError)
     }
 
     override fun signOut() {

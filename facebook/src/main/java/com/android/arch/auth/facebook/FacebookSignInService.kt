@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.android.arch.auth.core.data.entity.AuthResponseError
+import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthUserProfile
 import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType.FACEBOOK
@@ -67,10 +67,10 @@ class FacebookSignInService : NetworkSignInService() {
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun getErrorType(exception: Exception?): AuthResponseError? = exception?.let {
+    override fun getErrorType(exception: Exception?): AuthError? = exception?.let {
         when (it) {
-            is FacebookOperationCanceledException -> AuthResponseError.Canceled
-            else -> AuthResponseError.ServiceError("Facebook: SignIN failed. ${it.message}", it)
+            is FacebookOperationCanceledException -> AuthError.CanceledAuthError
+            else -> AuthError.ServiceAuthError("Facebook: SignIN failed. ${it.message}", it)
         }
     }
 
