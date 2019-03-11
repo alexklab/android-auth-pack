@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.extensions.postError
 import com.android.arch.auth.core.common.extensions.postEvent
 import com.android.arch.auth.core.data.entity.*
+import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
-import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.NetworkAuthRepository
@@ -62,8 +62,16 @@ class FirebaseAuthRepository<UserProfileDataType>(
     ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                if (it.isSuccessful) auth.currentUser?.sendEmailVerification()
-                response.postResult(it.isSuccessful, it.exception?.toSignUpWithEmailError())
+                val user = auth.currentUser
+                if (it.isSuccessful && user != null) {
+                    user.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(login).build())
+                        .addOnCompleteListener { task ->
+                            user.sendEmailVerification()
+                            response.postResult(task.isSuccessful, task.exception?.toUpdateProfileError())
+                        }
+                } else {
+                    response.postResult(it.isSuccessful, it.exception?.toSignUpWithEmailError())
+                }
             }
     }
 
@@ -97,6 +105,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
         auth.currentUser?.apply {
             val request = UserProfileChangeRequest.Builder()
                 .setDisplayName(login)
+                .setPhotoUri(photoUrl)
                 .build()
             updateProfile(request)
                 .addOnCompleteListener { task ->
