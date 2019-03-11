@@ -1,13 +1,17 @@
 package com.demo.auth.firebase.common
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.RecyclerView
 import com.android.arch.auth.core.data.entity.AuthError
+import com.demo.auth.firebase.GlideApp
 import com.demo.auth.firebase.R
 import com.google.android.material.textfield.TextInputLayout
 
@@ -43,4 +47,20 @@ fun FragmentManager.applyTransaction(transaction: FragmentTransaction.() -> Frag
     beginTransaction()
         .transaction()
         .commit()
+}
+
+fun Fragment.loadIcon(url: Uri?, view: ImageView?) {
+    view?.let {
+        GlideApp.with(this)
+            .load(url)
+            .into(view)
+    }
+}
+
+fun RecyclerView.ViewHolder.loadIcon(url: String?, view: ImageView?) {
+    view?.let {
+        GlideApp.with(this.itemView.context)
+            .load(url)
+            .into(view)
+    }
 }

@@ -49,6 +49,10 @@ dependencies {
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-androidx-viewmodel:$koin_version"
 
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
+
+
     testImplementation "junit:junit:$junit_version"
     testImplementation "androidx.room:room-testing:$room_version"
     androidTestImplementation "androidx.test:runner:$test_runner_version"
