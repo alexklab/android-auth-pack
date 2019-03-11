@@ -172,8 +172,8 @@ class FirebaseAuthRepository<UserProfileDataType>(
     }
 
     private fun Exception.toSendPasswordResetEmailError(): AuthError? = when (this) {
-        // thrown when given an ActionCodeSettings that does not have canHandleCodeInApp set to true.
-        is IllegalArgumentException -> ServiceAuthError("Firebase: Sending reset email failed. Given an ActionCodeSettings that does not have canHandleCodeInApp set to true")
+        // thrown if there is no user corresponding to the given email address
+        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
         else -> ServiceAuthError("Firebase: Sending reset email failed", this)
     }
 
