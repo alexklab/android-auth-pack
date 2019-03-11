@@ -100,7 +100,7 @@ class SignInFragment : Fragment() {
 
         when (status) {
             FAILED -> dismissProgressAndHandleError()
-            SUCCESS -> activity?.finish()
+            SUCCESS -> { /* replace with userProfileFragment */}
             ON_PROGRESS -> progressBar.visibility = View.VISIBLE
         }
     }
