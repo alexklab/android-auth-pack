@@ -1,15 +1,19 @@
 package com.demo.auth.firebase
 
 import android.app.Application
+import com.android.arch.auth.core.domain.auth.NetworksSignOutUseCase
 import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
 import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
+import com.android.arch.auth.core.domain.profile.DeleteProfileUseCase
+import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.model.SignInWithEmailViewModel
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
-import com.demo.auth.firebase.data.database.DatabaseProvider
-import com.demo.auth.firebase.data.entity.UserProfile
 import com.android.arch.auth.firebase.FirebaseAuthRepository
+import com.demo.auth.firebase.data.database.DatabaseProvider
 import com.demo.auth.firebase.data.entity.FirebaseUserProfileFactory
+import com.demo.auth.firebase.data.entity.UserProfile
+import com.demo.auth.firebase.ui.UserProfileViewModel
 import org.koin.android.ext.android.startKoin
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
@@ -43,6 +47,14 @@ class MainApplication : Application() {
             SignInWithSocialNetworksViewModel(
                 SignInWithSocialNetworkUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 UpdateProfileUseCase(get<DatabaseProvider>())
+            )
+        }
+
+        viewModel {
+            UserProfileViewModel(
+                GetProfileUseCase(get<DatabaseProvider>()),
+                NetworksSignOutUseCase(get<FirebaseAuthRepository<UserProfile>>()),
+                DeleteProfileUseCase(get<DatabaseProvider>())
             )
         }
     }
