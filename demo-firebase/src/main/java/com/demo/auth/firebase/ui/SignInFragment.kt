@@ -16,6 +16,7 @@ import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
 import com.android.arch.auth.core.model.SignInWithEmailViewModel
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
+import com.demo.auth.firebase.MainActivity
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.data.entity.UserProfile
@@ -46,7 +47,7 @@ class SignInFragment : Fragment() {
         facebookSignInButton.setOnClickListener { sendSignInWithSocialNetwork(FACEBOOK) }
         twitterSignInButton.setOnClickListener { sendSignInWithSocialNetwork(TWITTER) }
 
-        // signUpButton.setOnClickListener { mainActivity?.addFragment(SignUpFragment()) }
+        signUpButton.setOnClickListener { mainActivity?.addFragment(SignUpFragment()) }
         // forgotPasswordButton.setOnClickListener { mainActivity?.addFragment(RecoveryPasswordFragment()) }
     }
 
@@ -100,11 +101,13 @@ class SignInFragment : Fragment() {
 
         when (status) {
             FAILED -> dismissProgressAndHandleError()
-            SUCCESS -> { /* replace with userProfileFragment */}
+            SUCCESS -> { /* replace with userProfileFragment */
+            }
             ON_PROGRESS -> progressBar.visibility = View.VISIBLE
         }
     }
 
+    private val mainActivity: MainActivity? get() = activity as? MainActivity
     private val signInWithEmailViewModel: SignInWithEmailViewModel<UserProfile> by inject()
     private val signInWithSocialNetworksViewModel: SignInWithSocialNetworksViewModel<UserProfile> by inject()
 }

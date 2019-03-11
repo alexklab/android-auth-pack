@@ -3,6 +3,7 @@ package com.demo.auth.firebase
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.android.arch.auth.facebook.FacebookSignInService
 import com.android.arch.auth.firebase.FirebaseAuthRepository
@@ -43,6 +44,13 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         firebaseAuthRepository.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun addFragment(fragment: Fragment) {
+        supportFragmentManager.applyTransaction {
+            replace(R.id.fragments_container, fragment, TAG)
+                .addToBackStack(TAG)
+        }
     }
 
     private fun updateUI(profile: UserProfile?): Unit = supportFragmentManager.applyTransaction {
