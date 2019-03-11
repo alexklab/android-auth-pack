@@ -12,6 +12,7 @@ import com.demo.auth.firebase.common.loadIcon
 import com.demo.auth.firebase.data.entity.UserProfile
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import org.koin.android.ext.android.inject
+import java.text.SimpleDateFormat
 import java.util.*
 
 class UserProfileFragment : Fragment() {
@@ -50,14 +51,14 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun Long.toDateValue(): String {
-        val date = Date(this * 1000)
-        return date.toString()
+        return SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(Date(this))
     }
 
     private val providersAdapter = UserInfoAdapter()
     private val viewModel: UserProfileViewModel by inject()
 
-    companion object {
-        private const val DEFAULT_VALUE = "-NULL-"
+    private companion object {
+        const val DEFAULT_VALUE = "-NULL-"
+        const val DATE_FORMAT = "dd MMMM YYYY HH:mm:ss"
     }
 }
