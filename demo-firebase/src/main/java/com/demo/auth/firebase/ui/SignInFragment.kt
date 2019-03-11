@@ -46,9 +46,8 @@ class SignInFragment : Fragment() {
         googleSignInButton.setOnClickListener { sendSignInWithSocialNetwork(GOOGLE) }
         facebookSignInButton.setOnClickListener { sendSignInWithSocialNetwork(FACEBOOK) }
         twitterSignInButton.setOnClickListener { sendSignInWithSocialNetwork(TWITTER) }
-
         signUpButton.setOnClickListener { mainActivity?.addFragment(SignUpFragment()) }
-        // forgotPasswordButton.setOnClickListener { mainActivity?.addFragment(RecoveryPasswordFragment()) }
+        forgotPasswordButton.setOnClickListener { mainActivity?.addFragment(RecoveryPasswordFragment()) }
     }
 
     override fun onResume() {

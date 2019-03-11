@@ -1,13 +1,11 @@
 package com.demo.auth.firebase
 
 import android.app.Application
-import com.android.arch.auth.core.domain.auth.NetworksSignOutUseCase
-import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
-import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
-import com.android.arch.auth.core.domain.auth.SignUpUseCase
+import com.android.arch.auth.core.domain.auth.*
 import com.android.arch.auth.core.domain.profile.DeleteProfileUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
+import com.android.arch.auth.core.model.RecoveryPasswordViewModel
 import com.android.arch.auth.core.model.SignInWithEmailViewModel
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
 import com.android.arch.auth.core.model.SignUpViewModel
@@ -70,6 +68,13 @@ class MainApplication : Application() {
                 PasswordFieldValidator(),
                 SignUpUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 UpdateProfileUseCase(get<DatabaseProvider>())
+            )
+        }
+
+        viewModel {
+            RecoveryPasswordViewModel(
+                EmailFieldValidator(),
+                RecoveryPasswordUseCase(get<FirebaseAuthRepository<UserProfile>>())
             )
         }
     }
