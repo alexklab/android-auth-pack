@@ -5,8 +5,8 @@ buildscript {
     ext {
         // App version
         group_name = 'com.github.alexklab.android-auth-pack'
-        versionName = '1.1.0-alpha4' // X.Y.Z; X = Major, Y = minor, Z = Patch level
-        versionCode = 1104 // XYZZ
+        versionName = '1.1.0-alpha5' // X.Y.Z; X = Major, Y = minor, Z = Patch level
+        versionCode = 1105 // XYZZ
 
         // Sdk and tools
         compileSdkVersion = 28
