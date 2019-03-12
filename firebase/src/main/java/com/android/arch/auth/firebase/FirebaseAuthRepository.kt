@@ -38,10 +38,24 @@ class FirebaseAuthRepository<UserProfileDataType>(
         newPassword: String,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
-        auth.currentUser
-            ?.updatePassword(newPassword)
-            ?.addOnCompleteListener { response.postResult(it.isSuccessful, it.exception?.toUpdatePasswordError()) }
-            ?: response.postError(RecentLoginRequiredAuthError)
+        val firebaseUser = auth.currentUser
+        val email = firebaseUser?.providerData
+            ?.first { it.providerId == EmailAuthProvider.PROVIDER_ID }
+            ?.email
+        if (email != null) {
+            firebaseUser.reauthenticate(EmailAuthProvider.getCredential(email, oldPassword))
+                .addOnCompleteListener { authTask ->
+                    if (authTask.isSuccessful) {
+                        firebaseUser.updatePassword(newPassword).addOnCompleteListener {
+                            response.postResult(it.isSuccessful, it.exception?.toUpdatePasswordError())
+                        }
+                    } else {
+                        response.postResult(authTask.isSuccessful, authTask.exception?.toSignInWithEmailError())
+                    }
+                }
+        } else {
+            response.postError(AccountNotFoundAuthError)
+        }
     }
 
     override fun recoverPassword(
@@ -117,7 +131,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
                         response.postResult(task.isSuccessful, task.exception?.toUpdateProfileError())
                     }
                 }
-        } ?: response.postError(RecentLoginRequiredAuthError)
+        } ?: response.postError(AccountNotFoundAuthError)
     }
 
     override fun sendVerifiedEmailKeyUseCase(
