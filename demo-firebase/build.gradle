@@ -35,9 +35,7 @@ dependencies {
     implementation "com.github.alexklab.android-auth-pack:twitter:$auth_pack_version"
     implementation "com.github.alexklab.android-auth-pack:google:$auth_pack_version"
     implementation "com.github.alexklab.android-auth-pack:facebook:$auth_pack_version"
-    //implementation "com.github.alexklab.android-auth-pack:firebase:$auth_pack_version"
-    implementation project(':firebase')
-    implementation "com.google.firebase:firebase-auth:$firebase_auth_version"
+    implementation "com.github.alexklab.android-auth-pack:firebase:$auth_pack_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ktx_coroutines_version"

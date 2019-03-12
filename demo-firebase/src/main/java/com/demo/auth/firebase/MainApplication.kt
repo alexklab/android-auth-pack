@@ -3,12 +3,10 @@ package com.demo.auth.firebase
 import android.app.Application
 import com.android.arch.auth.core.domain.auth.*
 import com.android.arch.auth.core.domain.profile.DeleteProfileUseCase
+import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
-import com.android.arch.auth.core.model.RecoveryPasswordViewModel
-import com.android.arch.auth.core.model.SignInWithEmailViewModel
-import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
-import com.android.arch.auth.core.model.SignUpViewModel
+import com.android.arch.auth.core.model.*
 import com.android.arch.auth.firebase.FirebaseAuthRepository
 import com.demo.auth.firebase.common.EmailFieldValidator
 import com.demo.auth.firebase.common.LoginFieldValidator
@@ -36,6 +34,9 @@ class MainApplication : Application() {
         single { FirebaseUserProfileFactory() }
         single { FirebaseAuthRepository(get<FirebaseUserProfileFactory>()) }
         single { DatabaseProvider() }
+        single { EmailFieldValidator() }
+        single { LoginFieldValidator() }
+        single { PasswordFieldValidator() }
     }
 
     private val viewModelModule = module {
@@ -63,9 +64,9 @@ class MainApplication : Application() {
 
         viewModel {
             SignUpViewModel(
-                EmailFieldValidator(),
-                LoginFieldValidator(),
-                PasswordFieldValidator(),
+                get<EmailFieldValidator>(),
+                get<LoginFieldValidator>(),
+                get<PasswordFieldValidator>(),
                 SignUpUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 UpdateProfileUseCase(get<DatabaseProvider>())
             )
@@ -73,8 +74,16 @@ class MainApplication : Application() {
 
         viewModel {
             RecoveryPasswordViewModel(
-                EmailFieldValidator(),
+                get<EmailFieldValidator>(),
                 RecoveryPasswordUseCase(get<FirebaseAuthRepository<UserProfile>>())
+            )
+        }
+
+        viewModel {
+            ChangePasswordViewModel(
+                get<PasswordFieldValidator>(),
+                ChangePasswordUseCase(get<FirebaseAuthRepository<UserProfile>>()),
+                GetProfileUidUseCase(get<DatabaseProvider>())
             )
         }
     }

@@ -21,8 +21,8 @@
     <string name="error_email_not_found">This email not found</string>
     <string name="error_email_not_activated">This email not verified</string>
     <plurals name="symbols">
-        <item quantity="one">symbol</item>
-        <item quantity="other">symbols</item>
+        <item quantity="one">digit or letter</item>
+        <item quantity="other">digits or letters</item>
     </plurals>
     <string name="weak_password_error">Minimal password length - %s</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
@@ -48,5 +48,11 @@
     <string name="message_recover_password">An email has been sent to your e-mail with instructions for recovering a
         password
     </string>
+    <string name="confirm_password">Confirm Password</string>
 
+    <string name="change_password_subtitle">Type your old, new and confirm passwords in the boxes. Press Submit button to submit changes</string>
+    <string name="change_password">Change password</string>
+    <string name="message_change_password">Password successfully changed!</string>
+    <string name="old_password">Old Password</string>
+    <string name="submit">Submit</string>
 </resources>

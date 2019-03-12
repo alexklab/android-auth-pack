@@ -3,6 +3,7 @@ package com.demo.auth.firebase.common
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -31,6 +32,10 @@ fun clearAllErrors(vararg layouts: TextInputLayout?) {
 
 fun TextView.setTextColorRes(@ColorRes colorRes: Int) {
     setTextColor(ContextCompat.getColor(context, colorRes))
+}
+
+fun View.setVisibleOrGone(isVisible:Boolean){
+    visibility = if(isVisible) View.VISIBLE else View.GONE
 }
 
 fun Fragment.applyContext(action: Context.() -> Unit) {
