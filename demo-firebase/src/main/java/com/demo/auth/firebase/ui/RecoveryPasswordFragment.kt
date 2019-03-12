@@ -38,6 +38,11 @@ class RecoveryPasswordFragment : Fragment() {
         sendButton.setOnClickListener { sendRecoveryPasswordRequest() }
     }
 
+    override fun onResume() {
+        super.onResume()
+        activity?.title = "Firebase: Recovery password"
+    }
+
     private fun sendRecoveryPasswordRequest() {
         sendButton.isClickable = false
         clearAllErrors(emailLayout)
