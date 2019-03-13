@@ -37,6 +37,7 @@ class UserProfileFragment : Fragment() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
 
+        editProfileButton.setOnClickListener { mainActivity?.addFragment(EditProfileFragment()) }
         changePasswordButton.setOnClickListener { mainActivity?.addFragment(ChangePasswordFragment()) }
         logoutButton.setOnClickListener { viewModel.logout() }
     }

@@ -34,8 +34,16 @@ fun TextView.setTextColorRes(@ColorRes colorRes: Int) {
     setTextColor(ContextCompat.getColor(context, colorRes))
 }
 
-fun View.setVisibleOrGone(isVisible:Boolean){
-    visibility = if(isVisible) View.VISIBLE else View.GONE
+fun View.setVisibleOrGone(isVisible: Boolean) {
+    visibility = if (isVisible) View.VISIBLE else View.GONE
+}
+
+fun View.setVisible() {
+    visibility = View.VISIBLE
+}
+
+fun View.setGone() {
+    visibility = View.GONE
 }
 
 fun Fragment.applyContext(action: Context.() -> Unit) {

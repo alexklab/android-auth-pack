@@ -86,6 +86,16 @@ class MainApplication : Application() {
                 GetProfileUidUseCase(get<DatabaseProvider>())
             )
         }
+
+        viewModel {
+            EditProfileViewModel(
+                get<EmailFieldValidator>(),
+                get<LoginFieldValidator>(),
+                SendEditProfileRequestUseCase(get<FirebaseAuthRepository<UserProfile>>()),
+                GetProfileUseCase(get<DatabaseProvider>()),
+                UpdateProfileUseCase(get<DatabaseProvider>())
+            )
+        }
     }
 
 }

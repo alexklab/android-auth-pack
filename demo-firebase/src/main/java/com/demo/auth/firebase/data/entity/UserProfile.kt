@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import java.io.Serializable
 import java.util.*
@@ -53,6 +54,9 @@ data class UserProfile(
         isAnonymous = user.isAnonymous,
         isEmailVerified = user.isEmailVerified
     )
+
+    fun containsEmailAuthProvider(): Boolean =
+        providersData.any { it.providerId == EmailAuthProvider.PROVIDER_ID }
 
     companion object {
         const val PROFILE_KEY: Int = 10500
