@@ -2,6 +2,7 @@ package com.android.arch.auth.core.data.repository
 
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.EditProfileRequest
 import com.android.arch.auth.core.data.entity.Event
 
 /**
@@ -17,6 +18,11 @@ interface EmailAuthRepository<UserProfileDataType> {
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     )
 
+    fun editProfile(
+        request: EditProfileRequest,
+        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
+    )
+
     fun recoverPassword(email: String, response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>)
 
     fun signUp(
@@ -29,13 +35,6 @@ interface EmailAuthRepository<UserProfileDataType> {
     fun signInWithEmail(
         email: String,
         password: String,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    )
-
-    fun sendUpdateProfileRequest(
-        uid: String,
-        login: String,
-        email: String,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     )
 

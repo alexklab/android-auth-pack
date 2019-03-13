@@ -1,26 +1,53 @@
 package com.android.arch.auth.core.model
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations.map
 import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.data.entity.AuthError.*
-import com.android.arch.auth.core.domain.auth.SendUpdateProfileRequestUseCase
-import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.EditProfileRequest
+import com.android.arch.auth.core.data.entity.Event
+import com.android.arch.auth.core.data.entity.RequestParam
+import com.android.arch.auth.core.domain.auth.SendEditProfileRequestUseCase
+import com.android.arch.auth.core.domain.profile.GetProfileUseCase
+import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
 class EditProfileViewModel<UserProfileDataType>(
-        private val emailValidator: FieldValidator,
-        private val loginValidator: FieldValidator,
-        private val sendUpdateProfileRequestUseCase: SendUpdateProfileRequestUseCase<UserProfileDataType>,
-        private val getProfileUidUseCase: GetProfileUidUseCase<UserProfileDataType>
+    private val emailValidator: FieldValidator,
+    private val loginValidator: FieldValidator,
+    private val sendEditProfileRequestUseCase: SendEditProfileRequestUseCase<UserProfileDataType>,
+    private val getProfileUseCase: GetProfileUseCase<UserProfileDataType>,
+    private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
 ) : AuthBaseViewModel<UserProfileDataType>() {
 
-    fun updateProfile(login: String = "", email: String = "") = when {
-        login.isEmpty() -> setError(LoginRequiredAuthError)
-        !loginValidator.validate(login) -> setError(MalformedLoginAuthError)
-        email.isEmpty() -> setError(EmailRequiredAuthError)
-        !emailValidator.validate(email) -> setError(MalformedEmailAuthError)
-        else -> launchAuthTask {
-            getProfileUidUseCase()?.let { uid ->
-                sendUpdateProfileRequestUseCase(uid, login, email, it)
+    override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> = map(getRawResponseData()) {
+        it.applyOnSuccess(updateProfileUseCase::invoke)
+    }
+
+    val profile: LiveData<UserProfileDataType> by lazy { getProfileUseCase() }
+
+    private val editProfileRequest = EditProfileRequest()
+
+    fun sendEditRequest(editActions:EditProfileRequest.()->Unit):Unit = with(editProfileRequest) {
+        resetAll()
+        editActions()
+        when {
+            loginParam.isNotValidBy(String::isNullOrEmpty) -> setError(LoginRequiredAuthError)
+            loginParam.isNotValidBy(loginValidator) -> setError(MalformedLoginAuthError)
+            emailParam.isNotValidBy(String::isNullOrEmpty) -> setError(EmailRequiredAuthError)
+            emailParam.isNotValidBy(emailValidator) -> setError(MalformedEmailAuthError)
+            else -> launchAuthTask {
+                sendEditProfileRequestUseCase(editProfileRequest, it)
             }
         }
+    }
+
+    private fun RequestParam<String>.isNotValidBy(validate: String.() -> Boolean): Boolean {
+        return isChanged && value.orEmpty().validate()
+    }
+
+    private fun RequestParam<String>.isNotValidBy(validator: FieldValidator): Boolean {
+        return isChanged && !validator.validate(value.orEmpty())
     }
 }

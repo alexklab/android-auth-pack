@@ -12,6 +12,7 @@ import com.android.arch.auth.core.data.entity.SocialNetworkType.*
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.NetworkAuthRepository
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 
 class FirebaseAuthRepository<UserProfileDataType>(
@@ -43,14 +44,17 @@ class FirebaseAuthRepository<UserProfileDataType>(
             ?.first { it.providerId == EmailAuthProvider.PROVIDER_ID }
             ?.email
         if (email != null) {
-            firebaseUser.reauthenticate(EmailAuthProvider.getCredential(email, oldPassword))
+            firebaseUser
+                .reauthenticate(EmailAuthProvider.getCredential(email, oldPassword))
                 .addOnCompleteListener { authTask ->
                     if (authTask.isSuccessful) {
-                        firebaseUser.updatePassword(newPassword).addOnCompleteListener {
-                            response.postResult(it.isSuccessful, it.exception?.toUpdatePasswordError())
-                        }
+                        firebaseUser
+                            .updatePassword(newPassword)
+                            .addOnCompleteListener {
+                                response.postResult(it, ::handleUpdatePasswordError)
+                            }
                     } else {
-                        response.postResult(authTask.isSuccessful, authTask.exception?.toSignInWithEmailError())
+                        response.postResult(authTask, ::handleSignInWithEmailError)
                     }
                 }
         } else {
@@ -64,7 +68,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
     ) {
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener {
-                response.postResult(it.isSuccessful, it.exception?.toSendPasswordResetEmailError())
+                response.postResult(it, ::handleSendPasswordResetEmailError)
             }
     }
 
@@ -76,15 +80,15 @@ class FirebaseAuthRepository<UserProfileDataType>(
     ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                val user = auth.currentUser
-                if (it.isSuccessful && user != null) {
-                    user.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(login).build())
-                        .addOnCompleteListener { task ->
-                            user.sendEmailVerification()
-                            response.postResult(task.isSuccessful, task.exception?.toUpdateProfileError())
-                        }
+                if (it.isSuccessful) {
+                    auth.currentUser
+                        ?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(login).build())
+                        ?.addOnCompleteListener { task ->
+                            auth.currentUser?.sendEmailVerification()
+                            response.postResult(task, ::handleUpdateProfileError)
+                        } ?: response.postError(AccountNotFoundAuthError)
                 } else {
-                    response.postResult(it.isSuccessful, it.exception?.toSignUpWithEmailError())
+                    response.postResult(it, ::handleSignUpWithEmailError)
                 }
             }
     }
@@ -95,43 +99,63 @@ class FirebaseAuthRepository<UserProfileDataType>(
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { response.postResult(it.isSuccessful, it.exception?.toSignInWithEmailError()) }
+            .addOnCompleteListener {
+                response.postResult(it, ::handleSignInWithEmailError)
+            }
     }
 
     override fun signInWithSocialNetwork(
         socialNetwork: SocialNetworkType,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
     ) {
-        getService(socialNetwork)?.apply {
-            signIn { response.signInWithCredential(socialNetwork, it) }
-        } ?: response.postError(AuthError.CanceledAuthError)
+        getService(socialNetwork)
+            ?.signIn { response.signInWithCredential(socialNetwork, it) }
+            ?: response.postError(AuthError.CanceledAuthError)
     }
 
     /**
      * this is a security sensitive operation that requires the user to have recently signed in.
      */
-    override fun sendUpdateProfileRequest(
-        uid: String,
-        login: String,
-        email: String,
+    override fun editProfile(
+        request: EditProfileRequest,
         response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
+    ): Unit = with(request) {
         auth.currentUser?.apply {
-            val request = UserProfileChangeRequest.Builder()
-                .setDisplayName(login)
-                .setPhotoUri(photoUrl)
-                .build()
-            updateProfile(request)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        updateEmail(email).addOnCompleteListener {
-                            response.postResult(it.isSuccessful, it.exception?.toUpdateEmailError())
+            if (loginParam.isChanged || photoUriParam.isChanged) {
+                updateProfile(UserProfileChangeRequest.Builder()
+                    .apply { if (loginParam.isChanged) setDisplayName(loginParam.value) }
+                    .apply { if (photoUriParam.isChanged) setPhotoUri(photoUriParam.value) }
+                    .build())
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            updateEmail(request, response)
+                        } else {
+                            response.postResult(task, ::handleUpdateProfileError)
                         }
-                    } else {
-                        response.postResult(task.isSuccessful, task.exception?.toUpdateProfileError())
                     }
-                }
+            } else {
+                updateEmail(request, response)
+            }
         } ?: response.postError(AccountNotFoundAuthError)
+    }
+
+    private fun FirebaseUser.updateEmail(
+        request: EditProfileRequest,
+        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
+    ): Unit = with(request) {
+        if (emailParam.isChanged) {
+            val email = emailParam.value
+            if (email.isNullOrEmpty()) {
+                response.postError(EmailRequiredAuthError)
+            } else {
+                updateEmail(email)
+                    .addOnCompleteListener {
+                        response.postResult(it, ::handleUpdateEmailError)
+                    }
+            }
+        } else {
+            response.postEvent(AuthResponse(SUCCESS, null, userProfile))
+        }
     }
 
     override fun sendVerifiedEmailKeyUseCase(
@@ -146,14 +170,39 @@ class FirebaseAuthRepository<UserProfileDataType>(
         socialNetwork: SocialNetworkType,
         response: SignInResponse
     ) {
-        getAuthCredential(socialNetwork, response)?.let { credential ->
+        response.getAuthCredential(socialNetwork)?.let { credential ->
             auth.signInWithCredential(credential)
-                .addOnCompleteListener { postResult(it.isSuccessful, it.exception?.toSignInWithCredentialsError()) }
+                .addOnCompleteListener {
+                    postResult(it, ::handleSignInWithCredentialsError)
+                }
         } ?: postError(response.error ?: CanceledAuthError)
 
     }
 
-    private fun Exception.toSignInWithCredentialsError(): AuthError? = when (this) {
+    private fun SignInResponse.getAuthCredential(socialNetwork: SocialNetworkType): AuthCredential? {
+        val responseToken = token
+        if (responseToken == null) {
+            Log.e("getAuthCredential", "Undefined token. Provider $socialNetwork")
+            return null
+        }
+        return when (socialNetwork) {
+            GOOGLE -> GoogleAuthProvider.getCredential(responseToken, null)
+            FACEBOOK -> FacebookAuthProvider.getCredential(responseToken)
+            TWITTER -> {
+                val responseTokenSecret = tokenSecret
+                if (responseTokenSecret == null) {
+                    Log.e("getAuthCredential", "Undefined tokenSecret. Provider $socialNetwork")
+                    null
+                } else {
+                    TwitterAuthProvider.getCredential(responseToken, responseTokenSecret)
+                }
+            }
+            else -> null
+        }
+    }
+
+
+    private fun handleSignInWithCredentialsError(exception: Exception): AuthError = when (exception) {
         // thrown if the user account you are trying to sign in to has been disabled.
         // Also thrown if credential is an EmailAuthCredential with an email address that does not correspond to an existing user.
         is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
@@ -163,51 +212,50 @@ class FirebaseAuthRepository<UserProfileDataType>(
         // thrown if there already exists an account with the email address asserted by the credential.
         // Resolve this case by calling fetchProvidersForEmail(String) and then asking the user to sign in using one of them.
         is FirebaseAuthUserCollisionException -> AccountsCollisionAuthError
-        else -> ServiceAuthError("Firebase: Sign in with credentials failed", this)
+        else -> ServiceAuthError("Firebase: Sign in with credentials failed", exception)
     }
 
-
-    private fun Exception.toSignInWithEmailError(): AuthError? = when (this) {
+    private fun handleSignInWithEmailError(exception: Exception): AuthError = when (exception) {
         // thrown if the user account corresponding to email does not exist or has been disabled
         is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
         // thrown if the password is wrong
         is FirebaseAuthInvalidCredentialsException -> AuthError.WrongPasswordAuthError
-        else -> ServiceAuthError("Firebase: Sign in with email failed", this)
+        else -> ServiceAuthError("Firebase: Sign in with email failed", exception)
     }
 
-    private fun Exception.toSignUpWithEmailError(): AuthError? = when (this) {
+    private fun handleSignUpWithEmailError(exception: Exception): AuthError = when (exception) {
         // thrown if the password is not strong enough
         is FirebaseAuthWeakPasswordException -> WeakPasswordAuthError
         // thrown if the email address is malformed
         is FirebaseAuthInvalidCredentialsException -> MalformedEmailAuthError
         // thrown if there already exists an account with the given email address
         is FirebaseAuthUserCollisionException -> EmailAlreadyExistAuthError
-        else -> ServiceAuthError("Firebase: Sign up with email failed", this)
+        else -> ServiceAuthError("Firebase: Sign up with email failed", exception)
     }
 
-    private fun Exception.toSendPasswordResetEmailError(): AuthError? = when (this) {
+    private fun handleSendPasswordResetEmailError(exception: Exception): AuthError = when (exception) {
         // thrown if there is no user corresponding to the given email address
         is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
-        else -> ServiceAuthError("Firebase: Sending reset email failed", this)
+        else -> ServiceAuthError("Firebase: Sending reset email failed", exception)
     }
 
-    private fun Exception.toUpdateProfileError(): AuthError? = when (this) {
+    private fun handleUpdateProfileError(exception: Exception): AuthError = when (exception) {
         // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
         is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
-        else -> ServiceAuthError("Firebase: Profile updating failed", this)
+        else -> ServiceAuthError("Firebase: Profile updating failed", exception)
     }
 
-    private fun Exception.toUpdatePasswordError(): AuthError? = when (this) {
+    private fun handleUpdatePasswordError(exception: Exception): AuthError = when (exception) {
         // thrown if the password is not strong enough
         is FirebaseAuthWeakPasswordException -> WeakPasswordAuthError
         // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
         is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
         // thrown if the user's last sign-in time does not meet the security threshold.
         is FirebaseAuthRecentLoginRequiredException -> RecentLoginRequiredAuthError
-        else -> ServiceAuthError("Firebase: Password updating failed", this)
+        else -> ServiceAuthError("Firebase: Password updating failed", exception)
     }
 
-    private fun Exception.toUpdateEmailError(): AuthError? = when (this) {
+    private fun handleUpdateEmailError(exception: Exception): AuthError = when (exception) {
         // thrown if the email address is malformed
         is FirebaseAuthInvalidCredentialsException -> MalformedEmailAuthError
         // thrown if there already exists an account with the given email address
@@ -218,41 +266,25 @@ class FirebaseAuthRepository<UserProfileDataType>(
         // Use reauthenticate(AuthCredential) to resolve. This does not apply if the user is anonymous.
         is FirebaseAuthRecentLoginRequiredException -> RecentLoginRequiredAuthError
         // Unhandled case
-        else -> ServiceAuthError("Firebase: Email updating failed", this)
+        else -> ServiceAuthError("Firebase: Email updating failed", exception)
     }
 
     private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.postResult(
-        isSuccessful: Boolean,
-        error: AuthError?
+        task: Task<*>,
+        handleError: (Exception) -> AuthError
     ) {
-        postEvent(AuthResponse(
-            status = if (isSuccessful) SUCCESS else FAILED,
-            error = if (isSuccessful) null else error,
-            data = auth.currentUser?.let { userDataFactory.create(it) }
-        ))
+        postEvent(
+            AuthResponse(
+                status = if (task.isSuccessful) SUCCESS else FAILED,
+                error = if (task.isSuccessful) null else task.exception?.let { handleError(it) },
+                data = userProfile
+            )
+        )
     }
 
-    private fun getAuthCredential(socialNetwork: SocialNetworkType, response: SignInResponse): AuthCredential? =
-        with(response) {
-            val responseToken = token
-            if (responseToken == null) {
-                Log.e("getAuthCredential", "Undefined token. Provider $socialNetwork")
-                return null
-            }
-            when (socialNetwork) {
-                GOOGLE -> GoogleAuthProvider.getCredential(responseToken, null)
-                FACEBOOK -> FacebookAuthProvider.getCredential(responseToken)
-                TWITTER -> {
-                    val responseTokenSecret = tokenSecret
-                    if (responseTokenSecret == null) {
-                        Log.e("getAuthCredential", "Undefined tokenSecret. Provider $socialNetwork")
-                        return null
-                    }
-                    TwitterAuthProvider.getCredential(responseToken, responseTokenSecret)
-                }
-                else -> null
-            }
-        }
-
     private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
+
+    private val userProfile: UserProfileDataType?
+        get() = auth.currentUser?.let { userDataFactory.create(it) }
+
 }
