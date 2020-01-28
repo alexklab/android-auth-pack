@@ -1,7 +1,5 @@
 package com.android.arch.auth.core.data.entity
 
-import java.lang.Exception
-
 /**
  * Created by alexk on 11/21/18.
  * Project android-auth-pack
@@ -45,6 +43,7 @@ sealed class AuthError(
     object AccountsCollisionAuthError : ServiceAuthError("Accounts collision")
     object InvalidCredentialsAuthError : ServiceAuthError("Invalid credentials")
     object RecentLoginRequiredAuthError : ServiceAuthError("Recent login required")
+    object TooManyRequestsAuthError : ServiceAuthError("Too many unsuccessful request attempts")
 
     /**
      * Errors that occurred at validation stage

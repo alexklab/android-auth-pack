@@ -13,6 +13,7 @@ import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.NetworkAuthRepository
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.google.android.gms.tasks.Task
+import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 
 class FirebaseAuthRepository<UserProfileDataType>(
@@ -110,7 +111,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
     ) {
         getService(socialNetwork)
             ?.signIn { response.signInWithCredential(socialNetwork, it) }
-            ?: response.postError(AuthError.CanceledAuthError)
+            ?: response.postError(CanceledAuthError)
     }
 
     /**
@@ -216,10 +217,11 @@ class FirebaseAuthRepository<UserProfileDataType>(
     }
 
     private fun handleSignInWithEmailError(exception: Exception): AuthError = when (exception) {
+        is FirebaseTooManyRequestsException -> TooManyRequestsAuthError
         // thrown if the user account corresponding to email does not exist or has been disabled
         is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
         // thrown if the password is wrong
-        is FirebaseAuthInvalidCredentialsException -> AuthError.WrongPasswordAuthError
+        is FirebaseAuthInvalidCredentialsException -> WrongPasswordAuthError
         else -> ServiceAuthError("Firebase: Sign in with email failed", exception)
     }
 
