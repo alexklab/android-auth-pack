@@ -4,27 +4,25 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.FieldValidator
 import com.android.arch.auth.core.common.extensions.postEvent
-import com.android.arch.auth.core.domain.auth.SignUpUseCase
-import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
+import com.android.arch.auth.core.data.entity.AuthError
+import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthError
-import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
+import com.android.arch.auth.core.domain.auth.SignUpUseCase
+import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
-import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import org.amshove.kluent.any
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
 class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<UserProfile>>() {
@@ -58,7 +56,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
     private lateinit var passwordValidator: FieldValidator
 
     private var signUpError: AuthError? = null
-    private val customError = AuthError.ServiceAuthError("Custom Error")
+    private val customError = ServiceAuthError("Custom Error")
 
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 
@@ -102,7 +100,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(AuthError.LoginRequiredAuthError, result?.error)
+                assertTrue(result?.error is LoginRequiredAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -118,7 +116,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(AuthError.EmailRequiredAuthError, result?.error)
+                assertTrue(result?.error is EmailRequiredAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -134,7 +132,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(PasswordRequiredAuthError, result?.error)
+                assertTrue(result?.error is PasswordRequiredAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -150,7 +148,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(ConfirmPasswordRequiredAuthError, result?.error)
+                assertTrue(result?.error is ConfirmPasswordRequiredAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -166,7 +164,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(EnableTermsOfUseAuthError, result?.error)
+                assertTrue(result?.error is EnableTermsOfUseAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -182,7 +180,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(MalformedLoginAuthError, result?.error)
+                assertTrue(result?.error is MalformedLoginAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -198,7 +196,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(WeakPasswordAuthError, result?.error)
+                assertTrue(result?.error is WeakPasswordAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -214,7 +212,7 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
-                assertEquals(MalformedEmailAuthError, result?.error)
+                assertTrue(result?.error is MalformedEmailAuthError)
                 verifyZeroInteractions(repository, cache)
             }
     )
@@ -238,32 +236,6 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
             expected = { result ->
                 assertEquals(FAILED, result?.status)
                 assertEquals(customError, result?.error)
-                verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, authResponse)
-                verifyNoMoreInteractions(repository)
-                verifyZeroInteractions(cache)
-            }
-    )
-
-    @Test
-    fun `signUp() should handle error on service response ACCOUNT_ALREADY_EXIST`() = responseTestCase(
-            setup = { signUpError = EmailAlreadyExistAuthError },
-            action = { signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, VALID_PASSWORD, true) },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertEquals(EmailAlreadyExistAuthError, result?.error)
-                verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, authResponse)
-                verifyNoMoreInteractions(repository)
-                verifyZeroInteractions(cache)
-            }
-    )
-
-    @Test
-    fun `signUp() should handle error on service response AUTH_LOGIN_ALREADY_EXIST`() = responseTestCase(
-            setup = { signUpError = LoginAlreadyExistAuthError },
-            action = { signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, VALID_PASSWORD, true) },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertEquals(LoginAlreadyExistAuthError, result?.error)
                 verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, authResponse)
                 verifyNoMoreInteractions(repository)
                 verifyZeroInteractions(cache)

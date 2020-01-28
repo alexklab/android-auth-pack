@@ -8,8 +8,7 @@ package com.android.arch.auth.core.data.entity
  */
 sealed class AuthError(
     val message: String,
-    val exception: Exception? = null,
-    val errorCode: Int? = null
+    val exception: Exception? = null
 ) {
 
     val errorName: String by lazy {
@@ -20,7 +19,7 @@ sealed class AuthError(
     }
 
     override fun toString(): String {
-        return "$errorName[${errorCode?.let { "$it, " } ?: ""}$message]"
+        return "$errorName[$message]"
     }
 
     /**
@@ -28,9 +27,8 @@ sealed class AuthError(
      */
     open class ServiceAuthError(
         message: String,
-        exception: Exception? = null,
-        errorCode: Int? = null
-    ) : AuthError(message, exception, errorCode)
+        exception: Exception? = null
+    ) : AuthError(message, exception)
 
     class CanceledAuthError : ServiceAuthError("Request canceled")
 
@@ -40,7 +38,7 @@ sealed class AuthError(
     class EmailAlreadyExistAuthError(msg: String? = null) :
         ServiceAuthError(msg ?: "Email already exist")
 
-    class EmailVerificationAuthError(msg: String?) :
+    class EmailVerificationAuthError(msg: String? = null) :
         ServiceAuthError(msg ?: "Email verification required (Service side)")
 
     class AccountNotFoundAuthError(msg: String? = null) :
@@ -72,9 +70,8 @@ sealed class AuthError(
      */
     open class VerificationAuthError(
         message: String,
-        exception: Exception? = null,
-        errorCode: Int = 0
-    ) : AuthError(message, exception, errorCode)
+        exception: Exception? = null
+    ) : AuthError(message, exception)
 
     class EmailRequiredAuthError :
         VerificationAuthError("Email required")

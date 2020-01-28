@@ -16,16 +16,15 @@ import com.android.arch.auth.core.domain.auth.SendEditProfileRequestUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
-import com.nhaarman.mockito_kotlin.verifyZeroInteractions
+
 import org.amshove.kluent.any
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
 /**
@@ -118,7 +117,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         action = { updateProfile(login = EMPTY_VALUE, email = EMAIL) },
         expected = { result ->
             assertEquals(FAILED, result?.status)
-            assertEquals(LoginRequiredAuthError, result?.error)
+            assertTrue(result?.error is LoginRequiredAuthError)
             verifyZeroInteractions(repository, userProfileDataCache)
         })
 
@@ -127,7 +126,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         action = { updateProfile(login = LOGIN, email = EMPTY_VALUE) },
         expected = { result ->
             assertEquals(FAILED, result?.status)
-            assertEquals(EmailRequiredAuthError, result?.error)
+            assertTrue(result?.error is EmailRequiredAuthError)
             verifyZeroInteractions(repository, userProfileDataCache)
         })
 
@@ -136,7 +135,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         action = { updateProfile(login = LOGIN, email = INVALID_VALUE) },
         expected = { result ->
             assertEquals(FAILED, result?.status)
-            assertEquals(MalformedEmailAuthError, result?.error)
+            assertTrue(result?.error is MalformedEmailAuthError)
             verifyZeroInteractions(repository, userProfileDataCache)
         })
 
@@ -145,21 +144,9 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         action = { updateProfile(login = INVALID_VALUE, email = EMAIL) },
         expected = { result ->
             assertEquals(FAILED, result?.status)
-            assertEquals(MalformedLoginAuthError, result?.error)
+            assertTrue(result?.error is MalformedLoginAuthError)
             verifyZeroInteractions(repository, userProfileDataCache)
         })
-
-    @Test
-    fun `updateProfile() login should be auth already, on service response AUTH_LOGIN_ALREADY_EXIST`() =
-        responseTestCase(
-            setup = { editProfileError = LoginAlreadyExistAuthError },
-            action = { updateProfile(login = LOGIN, email = EMAIL) },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertEquals(LoginAlreadyExistAuthError, result?.error)
-                verify(repository).editProfile(any(), any())
-                verifyNoMoreInteractions(repository, userProfileDataCache)
-            })
 
     @Test
     fun `updateProfile() should handle success on service response SUCCESS`() = responseTestCase(

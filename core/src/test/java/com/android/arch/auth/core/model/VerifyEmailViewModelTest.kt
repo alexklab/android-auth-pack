@@ -3,23 +3,21 @@ package com.android.arch.auth.core.model
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.android.arch.auth.core.common.extensions.postEvent
-import com.android.arch.auth.core.domain.auth.SendVerifiedEmailKeyUseCase
+import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
+import com.android.arch.auth.core.domain.auth.SendVerifiedEmailKeyUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import org.amshove.kluent.any
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
 /**
