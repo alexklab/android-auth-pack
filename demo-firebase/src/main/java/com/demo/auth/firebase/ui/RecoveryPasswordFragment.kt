@@ -80,9 +80,9 @@ class RecoveryPasswordFragment : Fragment() {
     }
 
     private fun handleResponseError(errorType: AuthError?): Unit = when (errorType) {
-        EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
-        MalformedEmailAuthError -> emailLayout.error = getString(R.string.error_invalid_email)
-        AccountNotFoundAuthError -> emailLayout.error = getString(R.string.error_email_not_found)
+        is EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
+        is MalformedEmailAuthError -> emailLayout.error = getString(R.string.error_invalid_email)
+        is AccountNotFoundAuthError -> emailLayout.error = getString(R.string.error_email_not_found)
         else -> showFailRequestAlert(errorType, onRetry = ::sendRecoveryPasswordRequest)
     }
 

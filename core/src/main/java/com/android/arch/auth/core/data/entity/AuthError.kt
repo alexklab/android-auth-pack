@@ -32,18 +32,40 @@ sealed class AuthError(
         errorCode: Int? = null
     ) : AuthError(message, exception, errorCode)
 
-    object CanceledAuthError : ServiceAuthError("Request canceled")
-    object WrongPasswordAuthError : ServiceAuthError("Wrong password")
-    object EmailAlreadyExistAuthError : ServiceAuthError("Email already exist")
-    object EmailVerificationAuthError : ServiceAuthError("Email verification required (Service side)")
-    object AccountNotFoundAuthError : ServiceAuthError("Account not found")
-    object LoginAlreadyExistAuthError : ServiceAuthError("Login already exist")
-    object AccountNotActivatedAuthError : ServiceAuthError("Account not activated")
-    object InvalidVerifyEmailCodeAuthError : ServiceAuthError("Invalid verify email code")
-    object AccountsCollisionAuthError : ServiceAuthError("Accounts collision")
-    object InvalidCredentialsAuthError : ServiceAuthError("Invalid credentials")
-    object RecentLoginRequiredAuthError : ServiceAuthError("Recent login required")
-    object TooManyRequestsAuthError : ServiceAuthError("Too many unsuccessful request attempts")
+    class CanceledAuthError : ServiceAuthError("Request canceled")
+
+    class WrongPasswordAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Wrong password")
+
+    class EmailAlreadyExistAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Email already exist")
+
+    class EmailVerificationAuthError(msg: String?) :
+        ServiceAuthError(msg ?: "Email verification required (Service side)")
+
+    class AccountNotFoundAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Account not found")
+
+    class LoginAlreadyExistAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Login already exist")
+
+    class AccountNotActivatedAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Account not activated")
+
+    class InvalidVerifyEmailCodeAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Invalid verify email code")
+
+    class AccountsCollisionAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Accounts collision")
+
+    class InvalidCredentialsAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Invalid credentials")
+
+    class RecentLoginRequiredAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Recent login required")
+
+    class TooManyRequestsAuthError(msg: String? = null) :
+        ServiceAuthError(msg ?: "Too many unsuccessful request attempts")
 
     /**
      * Errors that occurred at validation stage
@@ -54,14 +76,33 @@ sealed class AuthError(
         errorCode: Int = 0
     ) : AuthError(message, exception, errorCode)
 
-    object EmailRequiredAuthError : VerificationAuthError("Email required")
-    object LoginRequiredAuthError : VerificationAuthError("Login required")
-    object PasswordRequiredAuthError : VerificationAuthError("Password required")
-    object OldPasswordRequiredAuthError : VerificationAuthError("Old password required")
-    object ConfirmPasswordRequiredAuthError : VerificationAuthError("Confirm password required")
-    object WeakPasswordAuthError : VerificationAuthError("Weak password")
-    object MalformedEmailAuthError : VerificationAuthError("Malformed email")
-    object MalformedLoginAuthError : VerificationAuthError("Malformed login")
-    object EnableTermsOfUseAuthError : VerificationAuthError("Enable terms of use required")
-    object NotMatchedConfirmPasswordAuthError : VerificationAuthError("Not matched confirm password")
+    class EmailRequiredAuthError :
+        VerificationAuthError("Email required")
+
+    class LoginRequiredAuthError :
+        VerificationAuthError("Login required")
+
+    class PasswordRequiredAuthError :
+        VerificationAuthError("Password required")
+
+    class OldPasswordRequiredAuthError :
+        VerificationAuthError("Old password required")
+
+    class ConfirmPasswordRequiredAuthError :
+        VerificationAuthError("Confirm password required")
+
+    class WeakPasswordAuthError(msg: String? = null) :
+        VerificationAuthError(msg ?: "Weak password")
+
+    class MalformedEmailAuthError(msg: String? = null) :
+        VerificationAuthError(msg ?: "Malformed email")
+
+    class MalformedLoginAuthError :
+        VerificationAuthError("Malformed login")
+
+    class EnableTermsOfUseAuthError :
+        VerificationAuthError("Enable terms of use required")
+
+    class NotMatchedConfirmPasswordAuthError :
+        VerificationAuthError("Not matched confirm password")
 }

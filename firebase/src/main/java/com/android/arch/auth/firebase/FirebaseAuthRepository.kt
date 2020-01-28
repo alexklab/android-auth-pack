@@ -59,7 +59,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
                     }
                 }
         } else {
-            response.postError(AccountNotFoundAuthError)
+            response.postError(AccountNotFoundAuthError())
         }
     }
 
@@ -87,7 +87,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
                         ?.addOnCompleteListener { task ->
                             auth.currentUser?.sendEmailVerification()
                             response.postResult(task, ::handleUpdateProfileError)
-                        } ?: response.postError(AccountNotFoundAuthError)
+                        } ?: response.postError(AccountNotFoundAuthError())
                 } else {
                     response.postResult(it, ::handleSignUpWithEmailError)
                 }
@@ -111,7 +111,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
     ) {
         getService(socialNetwork)
             ?.signIn { response.signInWithCredential(socialNetwork, it) }
-            ?: response.postError(CanceledAuthError)
+            ?: response.postError(CanceledAuthError())
     }
 
     /**
@@ -137,7 +137,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
             } else {
                 updateEmail(request, response)
             }
-        } ?: response.postError(AccountNotFoundAuthError)
+        } ?: response.postError(AccountNotFoundAuthError())
     }
 
     private fun FirebaseUser.updateEmail(
@@ -147,7 +147,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
         if (emailParam.isChanged) {
             val email = emailParam.value
             if (email.isNullOrEmpty()) {
-                response.postError(EmailRequiredAuthError)
+                response.postError(EmailRequiredAuthError())
             } else {
                 updateEmail(email)
                     .addOnCompleteListener {
@@ -176,7 +176,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
                 .addOnCompleteListener {
                     postResult(it, ::handleSignInWithCredentialsError)
                 }
-        } ?: postError(response.error ?: CanceledAuthError)
+        } ?: postError(response.error ?: CanceledAuthError())
 
     }
 
@@ -206,67 +206,67 @@ class FirebaseAuthRepository<UserProfileDataType>(
     private fun handleSignInWithCredentialsError(exception: Exception): AuthError = when (exception) {
         // thrown if the user account you are trying to sign in to has been disabled.
         // Also thrown if credential is an EmailAuthCredential with an email address that does not correspond to an existing user.
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
+        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
         // thrown if the credential is malformed or has expired.
         // If credential instanceof EmailAuthCredential it will be thrown if the password is incorrect.
-        is FirebaseAuthInvalidCredentialsException -> InvalidCredentialsAuthError
+        is FirebaseAuthInvalidCredentialsException -> InvalidCredentialsAuthError(exception.message)
         // thrown if there already exists an account with the email address asserted by the credential.
         // Resolve this case by calling fetchProvidersForEmail(String) and then asking the user to sign in using one of them.
-        is FirebaseAuthUserCollisionException -> AccountsCollisionAuthError
+        is FirebaseAuthUserCollisionException -> AccountsCollisionAuthError(exception.message)
         else -> ServiceAuthError("Firebase: Sign in with credentials failed", exception)
     }
 
     private fun handleSignInWithEmailError(exception: Exception): AuthError = when (exception) {
-        is FirebaseTooManyRequestsException -> TooManyRequestsAuthError
+        is FirebaseTooManyRequestsException -> TooManyRequestsAuthError(exception.message)
         // thrown if the user account corresponding to email does not exist or has been disabled
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
+        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
         // thrown if the password is wrong
-        is FirebaseAuthInvalidCredentialsException -> WrongPasswordAuthError
+        is FirebaseAuthInvalidCredentialsException -> WrongPasswordAuthError(exception.message)
         else -> ServiceAuthError("Firebase: Sign in with email failed", exception)
     }
 
     private fun handleSignUpWithEmailError(exception: Exception): AuthError = when (exception) {
         // thrown if the password is not strong enough
-        is FirebaseAuthWeakPasswordException -> WeakPasswordAuthError
+        is FirebaseAuthWeakPasswordException -> WeakPasswordAuthError(exception.message)
         // thrown if the email address is malformed
-        is FirebaseAuthInvalidCredentialsException -> MalformedEmailAuthError
+        is FirebaseAuthInvalidCredentialsException -> MalformedEmailAuthError(exception.message)
         // thrown if there already exists an account with the given email address
-        is FirebaseAuthUserCollisionException -> EmailAlreadyExistAuthError
+        is FirebaseAuthUserCollisionException -> EmailAlreadyExistAuthError(exception.message)
         else -> ServiceAuthError("Firebase: Sign up with email failed", exception)
     }
 
     private fun handleSendPasswordResetEmailError(exception: Exception): AuthError = when (exception) {
         // thrown if there is no user corresponding to the given email address
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
+        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
         else -> ServiceAuthError("Firebase: Sending reset email failed", exception)
     }
 
     private fun handleUpdateProfileError(exception: Exception): AuthError = when (exception) {
         // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
+        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
         else -> ServiceAuthError("Firebase: Profile updating failed", exception)
     }
 
     private fun handleUpdatePasswordError(exception: Exception): AuthError = when (exception) {
         // thrown if the password is not strong enough
-        is FirebaseAuthWeakPasswordException -> WeakPasswordAuthError
+        is FirebaseAuthWeakPasswordException -> WeakPasswordAuthError(exception.message)
         // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
+        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
         // thrown if the user's last sign-in time does not meet the security threshold.
-        is FirebaseAuthRecentLoginRequiredException -> RecentLoginRequiredAuthError
+        is FirebaseAuthRecentLoginRequiredException -> RecentLoginRequiredAuthError(exception.message)
         else -> ServiceAuthError("Firebase: Password updating failed", exception)
     }
 
     private fun handleUpdateEmailError(exception: Exception): AuthError = when (exception) {
         // thrown if the email address is malformed
-        is FirebaseAuthInvalidCredentialsException -> MalformedEmailAuthError
+        is FirebaseAuthInvalidCredentialsException -> MalformedEmailAuthError(exception.message)
         // thrown if there already exists an account with the given email address
-        is FirebaseAuthUserCollisionException -> EmailAlreadyExistAuthError
+        is FirebaseAuthUserCollisionException -> EmailAlreadyExistAuthError(exception.message)
         // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError
+        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
         // thrown if the user's last sign-in time does not meet the security threshold.
         // Use reauthenticate(AuthCredential) to resolve. This does not apply if the user is anonymous.
-        is FirebaseAuthRecentLoginRequiredException -> RecentLoginRequiredAuthError
+        is FirebaseAuthRecentLoginRequiredException -> RecentLoginRequiredAuthError(exception.message)
         // Unhandled case
         else -> ServiceAuthError("Firebase: Email updating failed", exception)
     }

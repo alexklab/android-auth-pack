@@ -93,12 +93,12 @@ class ChangePasswordFragment : Fragment() {
     }
 
     private fun handleResponseError(errorType: AuthError?): Unit = when (errorType) {
-        OldPasswordRequiredAuthError -> oldPasswordLayout.error = getString(R.string.error_field_required)
-        PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
-        WeakPasswordAuthError -> passwordLayout.error = weakPasswordErrorMessage
-        WrongPasswordAuthError -> oldPasswordLayout.error = getString(R.string.error_incorrect_password)
-        ConfirmPasswordRequiredAuthError -> confirmPasswordLayout.error = getString(R.string.error_field_required)
-        NotMatchedConfirmPasswordAuthError -> confirmPasswordLayout.error = getString(R.string.error_incorrect_password)
+        is OldPasswordRequiredAuthError -> oldPasswordLayout.error = getString(R.string.error_field_required)
+        is PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
+        is WeakPasswordAuthError -> passwordLayout.error = weakPasswordErrorMessage
+        is WrongPasswordAuthError -> oldPasswordLayout.error = getString(R.string.error_incorrect_password)
+        is ConfirmPasswordRequiredAuthError -> confirmPasswordLayout.error = getString(R.string.error_field_required)
+        is NotMatchedConfirmPasswordAuthError -> confirmPasswordLayout.error = getString(R.string.error_incorrect_password)
         else -> showFailRequestAlert(errorType, onRetry = ::sendChangePasswordRequest)
     }
 

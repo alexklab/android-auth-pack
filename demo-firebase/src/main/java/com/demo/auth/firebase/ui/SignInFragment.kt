@@ -81,12 +81,13 @@ class SignInFragment : Fragment() {
         Log.d("handleSignInResponse:", "$response")
 
         fun handleErrors(errorType: AuthError?) = when (errorType) {
-            EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
-            PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
-            CanceledAuthError -> setButtonsClickable(isClickable = true)
-            WrongPasswordAuthError -> passwordLayout.error = getString(R.string.error_incorrect_password)
-            AccountNotFoundAuthError -> emailLayout.error = getString(R.string.error_email_not_found)
-            AccountNotActivatedAuthError -> emailLayout.error = getString(R.string.error_email_not_activated)
+            is EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
+            is PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
+            is CanceledAuthError -> setButtonsClickable(isClickable = true)
+            is WrongPasswordAuthError -> passwordLayout.error = getString(R.string.error_incorrect_password)
+            is AccountNotFoundAuthError -> emailLayout.error = getString(R.string.error_email_not_found)
+            is AccountNotActivatedAuthError -> emailLayout.error = getString(R.string.error_email_not_activated)
+            is TooManyRequestsAuthError -> showTooManyRequestAlert(errorType)
             else -> showFailRequestAlert(errorType, onRetry = ::sendSignInWithEmailRequest)
         }
 

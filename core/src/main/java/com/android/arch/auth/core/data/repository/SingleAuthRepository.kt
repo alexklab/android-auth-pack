@@ -9,8 +9,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.arch.auth.core.common.extensions.postError
 import com.android.arch.auth.core.common.extensions.postEvent
-import com.android.arch.auth.core.data.entity.*
-import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
+import com.android.arch.auth.core.data.entity.AuthError.CanceledAuthError
+import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.AuthUserProfile
+import com.android.arch.auth.core.data.entity.Event
+import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.data.network.NetworkSignInService
 
 /**
@@ -61,8 +65,8 @@ class SingleAuthRepository<UserProfileDataType>(
         service?.signIn { (account, error) ->
             account
                 ?.let { postEvent(AuthResponse(SUCCESS, data = factory.create(it))) }
-                ?: postError(error ?: AuthError.CanceledAuthError)
-        } ?: postError(AuthError.CanceledAuthError)
+                ?: postError(error ?: CanceledAuthError())
+        } ?: postError(CanceledAuthError())
     }
 
     override fun signOut() {

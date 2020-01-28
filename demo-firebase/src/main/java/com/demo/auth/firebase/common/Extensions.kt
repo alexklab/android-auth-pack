@@ -63,6 +63,18 @@ fun Fragment.showFailRequestAlert(error: AuthError?, onRetry: () -> Unit) = appl
         .show()
 }
 
+fun Fragment.showTooManyRequestAlert(error: AuthError?) = applyContext {
+    Log.w("showTooManyRequestAlert", "Error: $error", error?.exception)
+    AlertDialog.Builder(this)
+        .setTitle(R.string.error_too_many_requests_title)
+        .setMessage(R.string.error_too_many_requests_message)
+        .setNegativeButton(R.string.back) { dialog, _ -> dialog.dismiss() }
+        .setCancelable(true)
+        .create()
+        .apply { setCanceledOnTouchOutside(true) }
+        .show()
+}
+
 fun FragmentManager.applyTransaction(transaction: FragmentTransaction.() -> FragmentTransaction) {
     beginTransaction()
         .transaction()

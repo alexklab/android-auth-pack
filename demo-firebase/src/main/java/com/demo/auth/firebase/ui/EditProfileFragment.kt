@@ -60,13 +60,13 @@ class EditProfileFragment : Fragment() {
         Log.d("handleEditProfile", "$response")
 
         fun handleResponseError(): Unit = when (error) {
-            LoginRequiredAuthError -> loginLayout.error = getString(R.string.error_field_required)
-            MalformedLoginAuthError -> loginLayout.error = getString(R.string.login_validation_error)
-            EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
-            MalformedEmailAuthError -> emailLayout.error = getString(R.string.error_invalid_email)
-            EmailAlreadyExistAuthError -> emailLayout.error = getString(R.string.error_email_in_use)
+            is LoginRequiredAuthError -> loginLayout.error = getString(R.string.error_field_required)
+            is MalformedLoginAuthError -> loginLayout.error = getString(R.string.login_validation_error)
+            is EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
+            is MalformedEmailAuthError -> emailLayout.error = getString(R.string.error_invalid_email)
+            is EmailAlreadyExistAuthError -> emailLayout.error = getString(R.string.error_email_in_use)
             // ask user to re-login and try send request again
-            RecentLoginRequiredAuthError ->  emailLayout.error = getString(R.string.error_recent_login_required)
+            is RecentLoginRequiredAuthError ->  emailLayout.error = getString(R.string.error_recent_login_required)
             else -> showFailRequestAlert(error, onRetry = ::sendEditProfileRequest)
         }
 

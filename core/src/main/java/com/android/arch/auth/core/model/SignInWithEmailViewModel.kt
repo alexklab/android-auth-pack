@@ -3,11 +3,12 @@ package com.android.arch.auth.core.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import com.android.arch.auth.core.common.extensions.applyOnSuccess
+import com.android.arch.auth.core.data.entity.AuthError.EmailRequiredAuthError
+import com.android.arch.auth.core.data.entity.AuthError.PasswordRequiredAuthError
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
-import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.AuthError.*
-import com.android.arch.auth.core.data.entity.Event
 
 /**
  * Created by alexk on 11/26/18.
@@ -23,8 +24,8 @@ class SignInWithEmailViewModel<UserProfileDataType>(
     }
 
     fun signInWithEmail(email: String, password: String): Unit = when {
-        email.isEmpty() -> setError(EmailRequiredAuthError)
-        password.isEmpty() -> setError(PasswordRequiredAuthError)
+        email.isEmpty() -> setError(EmailRequiredAuthError())
+        password.isEmpty() -> setError(PasswordRequiredAuthError())
         else -> launchAuthTask { signInWithEmailUseCase(email, password, it) }
     }
 }

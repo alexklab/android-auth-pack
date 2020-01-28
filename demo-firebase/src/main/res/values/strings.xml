@@ -61,4 +61,6 @@
     <string name="alert_edit_profile_title">Changes not saved!</string>
     <string name="alert_edit_profile_message">Are you sure you want to return? All unsaved changes will be lost</string>
     <string name="cancel">Cancel</string>
+    <string name="error_too_many_requests_message">Too many unsuccessful login attempts. Please try again later.</string>
+    <string name="error_too_many_requests_title">Error. Account blocked</string>
 </resources>

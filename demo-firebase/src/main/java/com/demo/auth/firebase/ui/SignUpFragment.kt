@@ -84,21 +84,21 @@ class SignUpFragment : Fragment() {
     }
 
     private fun handleErrors(errorType: AuthError?): Unit = when (errorType) {
-        LoginRequiredAuthError -> loginLayout.error = getString(R.string.error_field_required)
-        MalformedLoginAuthError -> loginLayout.error = getString(R.string.login_validation_error)
-        LoginAlreadyExistAuthError -> loginLayout.error = getString(R.string.login_conflict_error)
-        EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
-        MalformedEmailAuthError -> emailLayout.error = getString(R.string.error_invalid_email)
-        EmailAlreadyExistAuthError -> emailLayout.error = getString(R.string.error_email_in_use)
-        PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
-        WeakPasswordAuthError -> {
+        is LoginRequiredAuthError -> loginLayout.error = getString(R.string.error_field_required)
+        is MalformedLoginAuthError -> loginLayout.error = getString(R.string.login_validation_error)
+        is LoginAlreadyExistAuthError -> loginLayout.error = getString(R.string.login_conflict_error)
+        is EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
+        is MalformedEmailAuthError -> emailLayout.error = getString(R.string.error_invalid_email)
+        is EmailAlreadyExistAuthError -> emailLayout.error = getString(R.string.error_email_in_use)
+        is PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
+        is WeakPasswordAuthError -> {
             val symbolsValue = "$MIN_PASSWORD_SIZE ${resources.getQuantityString(R.plurals.symbols, MIN_PASSWORD_SIZE)}"
             passwordLayout.error = getString(R.string.weak_password_error, symbolsValue)
         }
-        WrongPasswordAuthError -> passwordLayout.error = getString(R.string.error_incorrect_password)
-        ConfirmPasswordRequiredAuthError -> confirmPasswordLayout.error = getString(R.string.error_field_required)
-        NotMatchedConfirmPasswordAuthError -> confirmPasswordLayout.error = getString(R.string.error_incorrect_password)
-        EnableTermsOfUseAuthError -> updateTermOfUseLayout("")
+        is WrongPasswordAuthError -> passwordLayout.error = getString(R.string.error_incorrect_password)
+        is ConfirmPasswordRequiredAuthError -> confirmPasswordLayout.error = getString(R.string.error_field_required)
+        is NotMatchedConfirmPasswordAuthError -> confirmPasswordLayout.error = getString(R.string.error_incorrect_password)
+        is EnableTermsOfUseAuthError -> updateTermOfUseLayout("")
         else -> showFailRequestAlert(errorType, onRetry = ::sendSignUpRequest)
     }
 

@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import com.android.arch.auth.core.data.entity.AuthError
+import com.android.arch.auth.core.data.entity.AuthError.CanceledAuthError
+import com.android.arch.auth.core.data.entity.AuthError.ServiceAuthError
 import com.android.arch.auth.core.data.entity.AuthUserProfile
 import com.android.arch.auth.core.data.entity.SignInResponse
 import com.android.arch.auth.core.data.entity.SocialNetworkType.FACEBOOK
@@ -41,7 +43,8 @@ class FacebookSignInService : NetworkSignInService() {
 
             override fun onError(exception: FacebookException) = handleSignInError(exception)
 
-            override fun onCancel() = handleSignInError(FacebookOperationCanceledException("canceled"))
+            override fun onCancel() =
+                handleSignInError(FacebookOperationCanceledException("canceled"))
 
         })
     }
@@ -69,8 +72,8 @@ class FacebookSignInService : NetworkSignInService() {
 
     override fun getErrorType(exception: Exception?): AuthError? = exception?.let {
         when (it) {
-            is FacebookOperationCanceledException -> AuthError.CanceledAuthError
-            else -> AuthError.ServiceAuthError("Facebook: SignIN failed. ${it.message}", it)
+            is FacebookOperationCanceledException -> CanceledAuthError()
+            else -> ServiceAuthError("Facebook: SignIN failed. ${it.message}", it)
         }
     }
 
@@ -112,7 +115,8 @@ class FacebookSignInService : NetworkSignInService() {
                 parameters = Bundle().apply { putString(PARAMS_KEY, PERMISSIONS) }
                 executeAsync()
             }
-        } ?: handleSignInError(FacebookAuthorizationException("Failed fetch profile. Token undefined"))
+        }
+            ?: handleSignInError(FacebookAuthorizationException("Failed fetch profile. Token undefined"))
     }
 
     private fun GraphResponse.toFacebookSignInResponse(token: String): SignInResponse {
@@ -151,7 +155,8 @@ class FacebookSignInService : NetworkSignInService() {
         private const val LAST_NAME = "last_name"
         private const val EMAIL = "email"
         private const val PICTURE = "picture"
-        private const val PERMISSIONS = "$ID,$NAME,$FIRST_NAME,$LAST_NAME,$EMAIL,$PICTURE.width(200)"
+        private const val PERMISSIONS =
+            "$ID,$NAME,$FIRST_NAME,$LAST_NAME,$EMAIL,$PICTURE.width(200)"
 
         private val READ_PERMISSIONS = listOf("email", "public_profile")
 

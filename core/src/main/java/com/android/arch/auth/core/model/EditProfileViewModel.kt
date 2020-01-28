@@ -33,10 +33,10 @@ class EditProfileViewModel<UserProfileDataType>(
         resetAll()
         editActions()
         when {
-            loginParam.isNotValidBy(String::isNullOrEmpty) -> setError(LoginRequiredAuthError)
-            loginParam.isNotValidBy(loginValidator) -> setError(MalformedLoginAuthError)
-            emailParam.isNotValidBy(String::isNullOrEmpty) -> setError(EmailRequiredAuthError)
-            emailParam.isNotValidBy(emailValidator) -> setError(MalformedEmailAuthError)
+            loginParam.isNotValidBy(String::isNullOrEmpty) -> setError(LoginRequiredAuthError())
+            loginParam.isNotValidBy(loginValidator) -> setError(MalformedLoginAuthError())
+            emailParam.isNotValidBy(String::isNullOrEmpty) -> setError(EmailRequiredAuthError())
+            emailParam.isNotValidBy(emailValidator) -> setError(MalformedEmailAuthError())
             else -> launchAuthTask {
                 sendEditProfileRequestUseCase(editProfileRequest, it)
             }
