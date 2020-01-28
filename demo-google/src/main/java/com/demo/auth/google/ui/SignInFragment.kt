@@ -7,8 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.android.arch.auth.core.data.entity.*
+import com.android.arch.auth.core.data.entity.AuthError.CanceledAuthError
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
+import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.data.entity.EventObserver
+import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
 import com.demo.auth.google.R
 import com.demo.auth.google.common.showFailRequestAlert
@@ -45,7 +48,7 @@ class SignInFragment : Fragment() {
             Toast.makeText(context, "Failed: ${error?.errorName}", Toast.LENGTH_LONG).show()
             progressBar.visibility = View.GONE
             signInButton.isClickable = true
-            if (error != AuthError.CanceledAuthError) {
+            if (error !is CanceledAuthError) {
                 showFailRequestAlert(error, onRetry = ::sendSignInWithGoogleRequest)
             }
         }

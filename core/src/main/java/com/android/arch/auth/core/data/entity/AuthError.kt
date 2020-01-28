@@ -30,7 +30,7 @@ sealed class AuthError(
         exception: Exception? = null
     ) : AuthError(message, exception)
 
-    class CanceledAuthError : ServiceAuthError("Request canceled")
+    class CanceledAuthError(msg: String? = null) : ServiceAuthError(msg ?: "Request canceled")
 
     class WrongPasswordAuthError(msg: String? = null) :
         ServiceAuthError(msg ?: "Wrong password")

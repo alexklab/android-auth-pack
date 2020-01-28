@@ -31,10 +31,10 @@ class MainActivity : AppCompatActivity() {
         firebaseAuthRepository.onCreate(
             this,
             FacebookSignInService(),
-            GoogleSignInService(webClientId = getString(R.string.google_web_client_id)),
+            GoogleSignInService(webClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID),
             TwitterSignInService(
-                consumerApiKey = getString(R.string.twitter_consumer_api_key),
-                consumerApiSecretKey = getString(R.string.twitter_consumer_api_secret_key)
+                consumerApiKey = BuildConfig.TWITTER_CONSUMER_API_KEY,
+                consumerApiSecretKey = BuildConfig.TWITTER_CONSUMER_API_SECRET_KEY
             )
         )
 

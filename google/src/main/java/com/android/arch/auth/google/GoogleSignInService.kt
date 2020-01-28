@@ -38,8 +38,8 @@ class GoogleSignInService(
 
     override fun getErrorType(exception: Exception?): AuthError? = exception?.let {
         when (it) {
-            is GoogleSignInCanceledException -> CanceledAuthError()
-            else -> ServiceAuthError("Google SignIn Error: ${exception.message}", exception = exception)
+            is GoogleSignInCanceledException -> CanceledAuthError(exception.message)
+            else -> ServiceAuthError("Google SignIn Error: ${exception.message}", exception)
         }
     }
 
@@ -64,9 +64,14 @@ class GoogleSignInService(
     }
 
     override fun signIn(activity: Activity) {
-        googleSignInClient
-            ?.let { activity.startActivityForResult(it.signInIntent, signInRequestCode) }
-            ?: Log.w("signIn", "not attached. googleSignInClient = null")
+        googleSignInClient?.let {
+            val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(activity)
+            if (lastSignedInAccount == null) {
+                activity.startActivityForResult(it.signInIntent, signInRequestCode)
+            } else {
+                postSignInResult(lastSignedInAccount)
+            }
+        } ?: Log.w("signIn", "not attached. googleSignInClient = null")
     }
 
     override fun signOut() {
@@ -83,32 +88,36 @@ class GoogleSignInService(
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                handleSignInResult(account)
-            } catch (e: ApiException) {
+                postSignInResult(account)
+            } catch (e: Exception) {
                 Log.w("onActivityResult", "Google sign in failed", e)
-                handleSignInResult(exception = e)
+                postSignInException(e)
             }
         } else {
-            handleSignInResult(exception = GoogleSignInCanceledException())
+            postSignInException(GoogleSignInCanceledException())
         }
     }
 
-    private fun handleSignInResult(account:GoogleSignInAccount? = null, exception: Exception? = null){
-        postResult(SignInResponse(
+    private fun postSignInResult(account: GoogleSignInAccount? = null) = postResult(
+        SignInResponse(
             token = account?.idToken,
-            error = getErrorType(exception),
-            profile = account?.let{
-                AuthUserProfile(
-                    id = it.id.orEmpty(),
-                    email = it.email,
-                    name = it.displayName.orEmpty(),
-                    firstName = it.givenName,
-                    lastName = it.familyName,
-                    picture = it.photoUrl?.toString()
-                )
-            }
-        ))
-    }
+            profile = account?.toAuthUserProfile()
+        )
+    )
+
+    private fun postSignInException(exception: Exception? = null) = postResult(
+        SignInResponse(error = getErrorType(exception))
+    )
+
+    private fun GoogleSignInAccount.toAuthUserProfile() =
+        AuthUserProfile(
+            id = id.orEmpty(),
+            email = email,
+            name = displayName.orEmpty(),
+            firstName = givenName,
+            lastName = familyName,
+            picture = photoUrl?.toString()
+        )
 
     class GoogleSignInCanceledException : ApiException(Status.RESULT_CANCELED)
 }

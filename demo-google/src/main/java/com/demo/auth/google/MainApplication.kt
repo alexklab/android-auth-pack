@@ -28,7 +28,7 @@ class MainApplication : Application() {
 
     private val mainModuleModule = module {
         single { DatabaseProvider() }
-        single { AuthRepository(GoogleSignInService(getString(R.string.google_web_client_id))) }
+        single { AuthRepository(GoogleSignInService(BuildConfig.GOOGLE_WEB_CLIENT_ID)) }
     }
 
     private val viewModelModule = module {

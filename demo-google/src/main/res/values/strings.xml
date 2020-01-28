@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">Demo Google SignIn</string>
-
-    <string name="google_web_client_id" translatable="false">TODO web client id</string>
-
     <string name="back">Back</string>
     <string name="retry">Retry</string>
     <string name="error_response_title">Connection error</string>

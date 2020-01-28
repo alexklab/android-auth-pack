@@ -16,6 +16,12 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
+        buildConfigField "String", "GOOGLE_WEB_CLIENT_ID", "\"${google_web_client_id}\""
+        buildConfigField "String", "TWITTER_CONSUMER_API_KEY", "\"${twitter_consumer_api_key}\""
+        buildConfigField "String", "TWITTER_CONSUMER_API_SECRET_KEY", "\"${twitter_consumer_api_secret_key}\""
+        resValue "string", "facebook_app_id", "\"${facebook_app_id}\""
+        resValue "string", "fb_login_protocol_scheme", "\"${fb_login_protocol_scheme}\""
     }
     buildTypes {
         release {
@@ -44,7 +50,7 @@ dependencies {
     // implementation "com.github.alexklab.android-auth-pack:firebase:$auth_pack_version"
 
     implementation "com.google.firebase:firebase-auth:$firebase_auth_version"
-
+    implementation "com.facebook.android:facebook-login:$facebook_login_version"
     //
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
