@@ -5,11 +5,14 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
-import com.demo.auth.google.GlideApp
 import com.demo.auth.google.R
+import com.demo.auth.google.di.GlideApp
 
 fun FragmentManager.applyTransaction(transaction: FragmentTransaction.() -> FragmentTransaction) {
     beginTransaction()
@@ -41,3 +44,36 @@ fun Fragment.loadIcon(url: String?, view: ImageView?) {
             .into(view)
     }
 }
+
+
+/**
+ * For Actvities, allows declarations like
+ * ```
+ * val myViewModel = viewModelProvider(myViewModelFactory)
+ * ```
+ */
+inline fun <reified VM : ViewModel> FragmentActivity.viewModelProvider(
+    provider: ViewModelProvider.Factory
+) =
+    ViewModelProvider(this, provider).get(VM::class.java)
+
+
+/**
+ * For Actvities, allows declarations like
+ * ```
+ * val myViewModel = viewModelProvider(myViewModelFactory)
+ * ```
+ */
+inline fun <reified VM : ViewModel> FragmentActivity.viewModelProvider() =
+    ViewModelProvider(this).get(VM::class.java)
+
+/**
+ * For Fragments, allows declarations like
+ * ```
+ * val myViewModel = viewModelProvider(myViewModelFactory)
+ * ```
+ */
+inline fun <reified VM : ViewModel> Fragment.viewModelProvider(
+    provider: ViewModelProvider.Factory
+) =
+    ViewModelProvider(this, provider).get(VM::class.java)

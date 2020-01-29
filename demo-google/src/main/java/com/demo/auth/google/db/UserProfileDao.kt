@@ -1,10 +1,8 @@
-package com.demo.auth.google.database
+package com.demo.auth.google.db
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.demo.auth.google.entity.UserProfile
-import com.demo.auth.google.entity.UserProfile.Companion.PROFILE_KEY
+import com.demo.auth.google.db.UserProfile.Companion.PROFILE_KEY
 import java.util.*
 
 @Dao

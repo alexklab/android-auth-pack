@@ -4,22 +4,34 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.demo.auth.google.R
 import com.demo.auth.google.common.loadIcon
-import com.demo.auth.google.entity.UserProfile
+import com.demo.auth.google.common.viewModelProvider
+import com.demo.auth.google.db.UserProfile
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_user_profile.*
-import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
-class UserProfileFragment : Fragment() {
+class UserProfileFragment : DaggerFragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.profile.observe(this, Observer(::updateUI))
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: UserProfileViewModel
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = viewModelProvider(viewModelFactory)
+        viewModel.profile.observe(this@UserProfileFragment, Observer(::updateUI))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_user_profile, container, false)
     }
 
@@ -36,8 +48,6 @@ class UserProfileFragment : Fragment() {
         familyNameTextView?.text = profile?.familyName ?: DEFAULT_VALUE
         loadIcon(profile?.photoUrl, iconImageView)
     }
-
-    private val viewModel: UserProfileViewModel by inject()
 
     private companion object {
         const val DEFAULT_VALUE = "NULL"

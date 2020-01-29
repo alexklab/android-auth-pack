@@ -6,27 +6,38 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError.CanceledAuthError
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
 import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.EventObserver
 import com.android.arch.auth.core.data.entity.SocialNetworkType
-import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
 import com.demo.auth.google.R
 import com.demo.auth.google.common.showFailRequestAlert
-import com.demo.auth.google.entity.UserProfile
+import com.demo.auth.google.common.viewModelProvider
+import com.demo.auth.google.db.UserProfile
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_sign_in.*
-import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
-class SignInFragment : Fragment() {
+class SignInFragment : DaggerFragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: SignInViewModel
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = viewModelProvider(viewModelFactory)
         viewModel.response.observe(this, EventObserver(::handleSignInResponse))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_sign_in, container, false)
     }
 
@@ -44,7 +55,11 @@ class SignInFragment : Fragment() {
         Log.d("handleSignInResponse:", "$response")
 
         fun dismissProgressAndHandleError() {
-            Log.w("Fail AuthResponse:", "${error?.errorName}: '${error?.message}'", error?.exception)
+            Log.w(
+                "Fail AuthResponse:",
+                "${error?.errorName}: '${error?.message}'",
+                error?.exception
+            )
             Toast.makeText(context, "Failed: ${error?.errorName}", Toast.LENGTH_LONG).show()
             progressBar.visibility = View.GONE
             signInButton.isClickable = true
@@ -64,6 +79,4 @@ class SignInFragment : Fragment() {
             ON_PROGRESS -> progressBar.visibility = View.VISIBLE
         }
     }
-
-    private val viewModel: SignInWithSocialNetworksViewModel<UserProfile> by inject()
 }

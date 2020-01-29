@@ -1,52 +1,16 @@
 package com.demo.auth.google
 
-import android.app.Application
-import com.android.arch.auth.core.domain.auth.NetworksSignOutUseCase
-import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
-import com.android.arch.auth.core.domain.profile.DeleteProfileUseCase
-import com.android.arch.auth.core.domain.profile.GetProfileUseCase
-import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
-import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
-import com.android.arch.auth.google.GoogleSignInService
-import com.demo.auth.google.database.DatabaseProvider
-import com.demo.auth.google.repo.AuthRepository
-import com.demo.auth.google.ui.UserProfileViewModel
-import org.koin.android.ext.android.startKoin
-import org.koin.androidx.viewmodel.ext.koin.viewModel
-import org.koin.dsl.module.module
+import com.demo.auth.google.di.DaggerAppComponent
+import dagger.android.AndroidInjector
+import dagger.android.support.DaggerApplication
 
 /**
  * Created by alexk on 12/17/18.
  * Project android-auth-pack
  */
-class MainApplication : Application() {
+class MainApplication : DaggerApplication() {
 
-    override fun onCreate() {
-        super.onCreate()
-        startKoin(this, listOf(mainModuleModule, viewModelModule))
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        return DaggerAppComponent.factory().create(this)
     }
-
-    private val mainModuleModule = module {
-        single { DatabaseProvider() }
-        single { AuthRepository(GoogleSignInService(BuildConfig.GOOGLE_WEB_CLIENT_ID)) }
-    }
-
-    private val viewModelModule = module {
-
-        viewModel {
-            SignInWithSocialNetworksViewModel(
-                SignInWithSocialNetworkUseCase(get<AuthRepository>()),
-                UpdateProfileUseCase(get<DatabaseProvider>())
-            )
-        }
-
-        viewModel {
-            UserProfileViewModel(
-                GetProfileUseCase(get<DatabaseProvider>()),
-                NetworksSignOutUseCase(get<AuthRepository>()),
-                DeleteProfileUseCase(get<DatabaseProvider>())
-            )
-        }
-    }
-
 }

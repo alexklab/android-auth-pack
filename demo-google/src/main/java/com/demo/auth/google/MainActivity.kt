@@ -2,26 +2,36 @@ package com.demo.auth.google
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.demo.auth.google.common.applyTransaction
-import com.demo.auth.google.database.DatabaseProvider
-import com.demo.auth.google.entity.UserProfile
+import com.demo.auth.google.common.viewModelProvider
+import com.demo.auth.google.db.UserProfile
 import com.demo.auth.google.repo.AuthRepository
 import com.demo.auth.google.ui.SignInFragment
 import com.demo.auth.google.ui.UserProfileFragment
 import com.demo.auth.google.ui.UserProfileViewModel
-import org.koin.android.ext.android.inject
+import dagger.android.support.DaggerAppCompatActivity
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : DaggerAppCompatActivity() {
+
+    @Inject
+    lateinit var repo: AuthRepository
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        dbProvider.onCreate(this)
         repo.onCreate(this)
-        viewModel.profile.observe(this, Observer(::updateUI))
+        viewModelProvider<UserProfileViewModel>(viewModelFactory).apply {
+            profile.observe(this@MainActivity, Observer(::updateUI))
+        }
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -38,10 +48,6 @@ class MainActivity : AppCompatActivity() {
             }, TAG
         )
     }
-
-    private val repo: AuthRepository by inject()
-    private val dbProvider: DatabaseProvider by inject()
-    private val viewModel: UserProfileViewModel by inject()
 
     companion object {
         const val TAG = "main_activity"

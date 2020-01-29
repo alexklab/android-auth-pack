@@ -1,4 +1,4 @@
-package com.demo.auth.google.entity
+package com.demo.auth.google.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
