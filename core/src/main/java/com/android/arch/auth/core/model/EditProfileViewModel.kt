@@ -21,27 +21,31 @@ class EditProfileViewModel<UserProfileDataType>(
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
 ) : AuthBaseViewModel<UserProfileDataType>() {
 
-    override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> = map(getRawResponseData()) {
-        it.applyOnSuccess(updateProfileUseCase::invoke)
-    }
+    override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
+        map(getRawResponseData()) {
+            it.applyOnSuccess { data ->
+                launchAsync { updateProfileUseCase(data) }
+            }
+        }
 
     val profile: LiveData<UserProfileDataType> by lazy { getProfileUseCase() }
 
     private val editProfileRequest = EditProfileRequest()
 
-    fun sendEditRequest(editActions:EditProfileRequest.()->Unit):Unit = with(editProfileRequest) {
-        resetAll()
-        editActions()
-        when {
-            loginParam.isNotValidBy(String::isNullOrEmpty) -> setError(LoginRequiredAuthError())
-            loginParam.isNotValidBy(loginValidator) -> setError(MalformedLoginAuthError())
-            emailParam.isNotValidBy(String::isNullOrEmpty) -> setError(EmailRequiredAuthError())
-            emailParam.isNotValidBy(emailValidator) -> setError(MalformedEmailAuthError())
-            else -> launchAuthTask {
-                sendEditProfileRequestUseCase(editProfileRequest, it)
+    fun sendEditRequest(editActions: EditProfileRequest.() -> Unit): Unit =
+        with(editProfileRequest) {
+            resetAll()
+            editActions()
+            when {
+                loginParam.isNotValidBy(String::isNullOrEmpty) -> setError(LoginRequiredAuthError())
+                loginParam.isNotValidBy(loginValidator) -> setError(MalformedLoginAuthError())
+                emailParam.isNotValidBy(String::isNullOrEmpty) -> setError(EmailRequiredAuthError())
+                emailParam.isNotValidBy(emailValidator) -> setError(MalformedEmailAuthError())
+                else -> launchAsyncRequest {
+                    sendEditProfileRequestUseCase(editProfileRequest, it)
+                }
             }
         }
-    }
 
     private fun RequestParam<String>.isNotValidBy(validate: String.() -> Boolean): Boolean {
         return isChanged && value.orEmpty().validate()

@@ -21,7 +21,7 @@ class ChangePasswordViewModel<UserProfileDataType>(
         !passwordValidator.validate(newPassword) -> setError(WeakPasswordAuthError())
         newConfirmPassword.isEmpty() -> setError(ConfirmPasswordRequiredAuthError())
         newPassword != newConfirmPassword -> setError(NotMatchedConfirmPasswordAuthError())
-        else -> launchAuthTask {
+        else -> launchAsyncRequest {
             getProfileUidUseCase()?.let { uid ->
                 changePasswordUseCase(uid, oldPassword, newPassword, it)
             }

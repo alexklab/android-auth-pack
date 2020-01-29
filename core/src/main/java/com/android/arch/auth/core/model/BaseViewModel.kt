@@ -2,8 +2,10 @@ package com.android.arch.auth.core.model
 
 import androidx.lifecycle.ViewModel
 import com.android.arch.auth.core.common.CoroutineContextProvider
+import com.android.arch.auth.core.common.extensions.withIOContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel() {
 
@@ -28,4 +30,10 @@ abstract class BaseViewModel : ViewModel() {
      * viewModelJob.cancel()
      */
     protected val uiScope = CoroutineScope(CoroutineContextProvider.Main + viewModelJob)
+
+    protected fun launchAsync(block: () -> Unit) {
+        uiScope.launch {
+            withIOContext(block)
+        }
+    }
 }

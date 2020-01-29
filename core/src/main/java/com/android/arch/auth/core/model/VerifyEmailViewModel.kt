@@ -10,6 +10,6 @@ class VerifyEmailViewModel<UserProfileDataType>(
 
     fun sendVerifyEmailRequest(verifyKey: String = verifyEmailKey) {
         verifyEmailKey = verifyKey
-        launchAuthTask { sendVerifiedEmailKeyUseCase(verifyKey, it) }
+        launchAsyncRequest { sendVerifiedEmailKeyUseCase(verifyKey, it) }
     }
 }

@@ -11,18 +11,27 @@ import com.android.arch.auth.core.domain.auth.SignUpUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
 class SignUpViewModel<UserProfileDataType>(
-        private val emailValidator: FieldValidator,
-        private val loginValidator: FieldValidator,
-        private val passwordValidator: FieldValidator,
-        private val signUpUseCase: SignUpUseCase<UserProfileDataType>,
-        private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
+    private val emailValidator: FieldValidator,
+    private val loginValidator: FieldValidator,
+    private val passwordValidator: FieldValidator,
+    private val signUpUseCase: SignUpUseCase<UserProfileDataType>,
+    private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
 ) : AuthBaseViewModel<UserProfileDataType>() {
 
-    override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> = map(getRawResponseData()) {
-        it.applyOnSuccess(updateProfileUseCase::invoke)
-    }
+    override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
+        map(getRawResponseData()) {
+            it.applyOnSuccess { data ->
+                launchAsync { updateProfileUseCase(data) }
+            }
+        }
 
-    fun signUp(login: String, email: String, password: String, confirmPassword: String, isEnabledTermsOfUse: Boolean) = when {
+    fun signUp(
+        login: String,
+        email: String,
+        password: String,
+        confirmPassword: String,
+        isEnabledTermsOfUse: Boolean
+    ) = when {
         login.isEmpty() -> setError(LoginRequiredAuthError())
         !loginValidator.validate(login) -> setError(MalformedLoginAuthError())
         email.isEmpty() -> setError(EmailRequiredAuthError())
@@ -32,6 +41,6 @@ class SignUpViewModel<UserProfileDataType>(
         confirmPassword.isEmpty() -> setError(ConfirmPasswordRequiredAuthError())
         confirmPassword != password -> setError(NotMatchedConfirmPasswordAuthError())
         !isEnabledTermsOfUse -> setError(EnableTermsOfUseAuthError())
-        else -> launchAuthTask { signUpUseCase(login, email, password, it) }
+        else -> launchAsyncRequest { signUpUseCase(login, email, password, it) }
     }
 }

@@ -4,11 +4,12 @@ import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.common.extensions.*
-import com.android.arch.auth.core.data.entity.AuthResponse
+import com.android.arch.auth.core.common.extensions.isOnProgress
+import com.android.arch.auth.core.common.extensions.setError
+import com.android.arch.auth.core.common.extensions.setOnProgress
 import com.android.arch.auth.core.data.entity.AuthError
+import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
-import kotlinx.coroutines.launch
 
 /**
  * Created by alexk on 11/26/18.
@@ -31,17 +32,13 @@ abstract class AuthBaseViewModel<UserProfileDataType> : BaseViewModel() {
     }
 
     @MainThread
-    protected fun launchAuthTask(task: (response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>) -> Unit) {
+    protected fun launchAsyncRequest(query: (response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>) -> Unit) {
         if (_response.isOnProgress()) {
             Log.w("LaunchAuthTask:", "Auth task skipped. Actually on progress")
             return
         }
 
         _response.setOnProgress()
-        uiScope.launch {
-            withIOContext {
-                task(_response)
-            }
-        }
+        launchAsync { query(_response) }
     }
 }

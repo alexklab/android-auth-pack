@@ -13,6 +13,6 @@ class RecoveryPasswordViewModel<UserProfileDataType>(
     fun sendRecoveryPasswordRequest(email: String) = when {
         email.isEmpty() -> setError(EmailRequiredAuthError())
         !emailValidator.validate(email) -> setError(MalformedEmailAuthError())
-        else -> launchAuthTask { recoveryPasswordUseCase(email, it) }
+        else -> launchAsyncRequest { recoveryPasswordUseCase(email, it) }
     }
 }
