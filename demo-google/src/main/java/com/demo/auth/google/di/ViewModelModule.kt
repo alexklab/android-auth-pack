@@ -16,13 +16,9 @@
 
 package com.demo.auth.google.di
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.demo.auth.google.ui.SignInViewModel
-import com.demo.auth.google.ui.UserProfileViewModel
 import dagger.Binds
 import dagger.Module
-import dagger.multibindings.IntoMap
 
 /**
  * Module used to define the connection between the framework's [ViewModelProvider.Factory] and
@@ -34,22 +30,4 @@ abstract class ViewModelModule {
 
     @Binds
     internal abstract fun bindViewModelFactory(factory: DaggerViewModelFactory): ViewModelProvider.Factory
-
-    /**
-     * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
-     * want to get a [SignInViewModel] class.
-     */
-    @Binds
-    @IntoMap
-    @ViewModelKey(SignInViewModel::class)
-    internal abstract fun bindSignInViewModel(viewModel: SignInViewModel): ViewModel
-
-    /**
-     * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
-     * want to get a [UserProfileViewModel] class.
-     */
-    @Binds
-    @IntoMap
-    @ViewModelKey(UserProfileViewModel::class)
-    internal abstract fun bindUserProfileViewModel(viewModel: UserProfileViewModel): ViewModel
 }
