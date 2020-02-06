@@ -42,6 +42,7 @@ class MainApplication : Application() {
     private val viewModelModule = module {
         viewModel {
             SignInWithEmailViewModel(
+                AuthResponseListenerUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 SignInWithEmailUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 UpdateProfileUseCase(get<DatabaseProvider>())
             )
@@ -49,6 +50,7 @@ class MainApplication : Application() {
 
         viewModel {
             SignInWithSocialNetworksViewModel(
+                AuthResponseListenerUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 SignInWithSocialNetworkUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 UpdateProfileUseCase(get<DatabaseProvider>())
             )
@@ -67,6 +69,7 @@ class MainApplication : Application() {
                 get<EmailFieldValidator>(),
                 get<LoginFieldValidator>(),
                 get<PasswordFieldValidator>(),
+                AuthResponseListenerUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 SignUpUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 UpdateProfileUseCase(get<DatabaseProvider>())
             )
@@ -75,6 +78,7 @@ class MainApplication : Application() {
         viewModel {
             RecoveryPasswordViewModel(
                 get<EmailFieldValidator>(),
+                AuthResponseListenerUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 RecoveryPasswordUseCase(get<FirebaseAuthRepository<UserProfile>>())
             )
         }
@@ -82,6 +86,7 @@ class MainApplication : Application() {
         viewModel {
             ChangePasswordViewModel(
                 get<PasswordFieldValidator>(),
+                AuthResponseListenerUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 ChangePasswordUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 GetProfileUidUseCase(get<DatabaseProvider>())
             )
@@ -91,6 +96,7 @@ class MainApplication : Application() {
             EditProfileViewModel(
                 get<EmailFieldValidator>(),
                 get<LoginFieldValidator>(),
+                AuthResponseListenerUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 SendEditProfileRequestUseCase(get<FirebaseAuthRepository<UserProfile>>()),
                 GetProfileUseCase(get<DatabaseProvider>()),
                 UpdateProfileUseCase(get<DatabaseProvider>())
