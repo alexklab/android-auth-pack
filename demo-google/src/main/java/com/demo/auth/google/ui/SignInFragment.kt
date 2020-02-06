@@ -30,7 +30,7 @@ class SignInFragment : DaggerFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = viewModelProvider(viewModelFactory)
-        viewModel.response.observe(this, EventObserver(::handleSignInResponse))
+        viewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignInResponse))
     }
 
     override fun onCreateView(

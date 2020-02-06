@@ -1,50 +1,22 @@
 package com.demo.auth.google.repo
 
-import android.content.Intent
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.common.extensions.postEvent
-import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
-import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
-import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.Event
-import com.android.arch.auth.core.data.entity.SocialNetworkType
-import com.android.arch.auth.core.data.network.OnActivityCreatedListener
+import com.android.arch.auth.core.data.repository.SingleAuthRepository
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.android.arch.auth.google.GoogleSignInService
 import com.demo.auth.google.db.UserProfile
+import timber.log.Timber
 
 class AuthRepository(private val signInService: GoogleSignInService) :
-    OnActivityCreatedListener(),
+    SingleAuthRepository<UserProfile>(::UserProfile),
     SocialNetworkAuthRepository<UserProfile> {
 
+    init {
+        Timber.d("init instance $this")
+    }
+
     override fun onCreate(activity: ComponentActivity) {
-        super.onCreate(activity)
-        signInService.onCreate(activity)
+        Timber.d("onCreate: activity=$activity, this=$this")
+        super.onCreate(activity, signInService)
     }
-
-    override fun signInWithSocialNetwork(
-        socialNetwork: SocialNetworkType,
-        response: MutableLiveData<Event<AuthResponse<UserProfile>>>
-    ) {
-        signInService.signIn { data ->
-            response.postEvent(
-                AuthResponse(
-                    status = if (data.profile != null) SUCCESS else FAILED,
-                    error = data.error,
-                    data = data.profile?.let {
-                        UserProfile(
-                            it
-                        )
-                    }
-                )
-            )
-        }
-    }
-
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        signInService.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun signOut() = signInService.signOut()
 }

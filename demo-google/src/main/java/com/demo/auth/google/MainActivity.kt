@@ -12,6 +12,7 @@ import com.demo.auth.google.ui.SignInFragment
 import com.demo.auth.google.ui.UserProfileFragment
 import com.demo.auth.google.ui.UserProfileViewModel
 import dagger.android.support.DaggerAppCompatActivity
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity() {
@@ -35,17 +36,15 @@ class MainActivity : DaggerAppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Timber.d("request=$requestCode, result=$resultCode, data=${data?.extras}")
         repo.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun updateUI(profile: UserProfile?): Unit = supportFragmentManager.applyTransaction {
         replace(
             R.id.fragments_container,
-            if (profile == null) {
-                SignInFragment()
-            } else {
-                UserProfileFragment()
-            }, TAG
+            if (profile == null) SignInFragment() else UserProfileFragment(),
+            TAG
         )
     }
 
