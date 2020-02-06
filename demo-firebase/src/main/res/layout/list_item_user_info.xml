@@ -1,158 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="vertical"
         android:layout_width="350dp"
-        android:paddingStart="16dp"
+        android:layout_height="wrap_content"
         android:background="@color/browser_actions_bg_grey"
-        android:layout_height="wrap_content">
-
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
     <ImageView
             android:id="@+id/iconImageView"
             android:layout_width="55dp"
             android:layout_height="55dp"
+            android:layout_marginStart="16dp"
             android:background="@android:color/darker_gray"
-            android:layout_marginTop="16dp"
-            android:contentDescription="@null"/>
+            android:contentDescription="@null"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
             android:id="@+id/uidLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:ignore="HardcodedText"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:text="Uid:"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:layout_toRightOf="@id/iconImageView"
-            android:text="Uid:"/>
+            app:layout_constraintBaseline_toBaselineOf="@id/uidTextView"
+            app:layout_constraintStart_toEndOf="@id/iconImageView"
+            tools:ignore="HardcodedText" />
 
     <TextView
             android:id="@+id/uidTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:layout_toRightOf="@id/uidLabel"
-            android:layout_alignBaseline="@id/uidLabel"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="16dp"
-            tools:text="Aas dfasdf asdf asdf adsfasdadasdf asdf s"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintEnd_toStartOf="@id/divider"
+            app:layout_constraintStart_toEndOf="@+id/uidLabel"
+            app:layout_constraintTop_toTopOf="@id/iconImageView"
+            tools:text="Aas dfasdf asdf asdf  asdf" />
 
     <TextView
             android:id="@+id/providerLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:ignore="HardcodedText"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
-            android:layout_below="@id/uidTextView"
+            android:text="Provider:"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:layout_toRightOf="@id/iconImageView"
-            android:text="Provider:"/>
+            app:layout_constraintStart_toEndOf="@id/iconImageView"
+            app:layout_constraintTop_toBottomOf="@id/uidTextView"
+            tools:ignore="HardcodedText" />
 
     <TextView
             android:id="@+id/providerTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:layout_toRightOf="@id/providerLabel"
-            android:layout_alignBaseline="@id/providerLabel"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="16dp"
-            tools:text="Google asdfasdfasdfasdf   "/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintBaseline_toBaselineOf="@id/providerLabel"
+            app:layout_constraintEnd_toStartOf="@id/divider"
+            app:layout_constraintStart_toEndOf="@id/providerLabel"
+            tools:text="Google sdfasdf asdf asdf as" />
 
     <TextView
             android:id="@+id/nameLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:ignore="HardcodedText"
             android:layout_marginTop="4dp"
-            android:layout_below="@id/iconImageView"
+            android:text="Name:"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:text="Name:"/>
+            app:layout_constraintStart_toStartOf="@id/providerLabel"
+            app:layout_constraintTop_toBottomOf="@id/providerTextView"
+            tools:ignore="HardcodedText" />
 
     <TextView
             android:id="@+id/nameTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/nameLabel"
-            android:layout_toRightOf="@id/nameLabel"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            tools:text="ASD ASDF asdfasdf adsfasdfdasfadsf "/>
+            app:layout_constraintBaseline_toBaselineOf="@id/nameLabel"
+            app:layout_constraintEnd_toStartOf="@id/divider"
+            app:layout_constraintStart_toEndOf="@id/nameLabel"
+            tools:text="ASD ASDF asdfasdf adsf adsf as " />
 
     <TextView
             android:id="@+id/emailLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:ignore="HardcodedText"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:layout_marginTop="4dp"
-            android:layout_below="@id/nameTextView"
-            android:text="Email:"/>
+            android:text="Email:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintStart_toStartOf="@id/nameLabel"
+            app:layout_constraintTop_toBottomOf="@id/nameTextView"
+            tools:ignore="HardcodedText" />
 
     <TextView
             android:id="@+id/emailTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:layout_toRightOf="@id/emailLabel"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="16dp"
-            android:layout_alignBaseline="@id/emailLabel"
-            tools:text="asdasd@adfadsf.comqwerqweradsafasqwe"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            app:layout_constraintBaseline_toBaselineOf="@id/emailLabel"
+            app:layout_constraintEnd_toStartOf="@id/divider"
+            app:layout_constraintStart_toEndOf="@id/emailLabel"
+            tools:text="asdasd@adfadsf.com" />
 
     <TextView
             android:id="@+id/verifyLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:ignore="HardcodedText"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:layout_marginTop="4dp"
-            android:layout_below="@id/emailTextView"
-            android:text="Email Verified:"/>
+            android:text="Email Verified:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintStart_toStartOf="@id/emailLabel"
+            app:layout_constraintTop_toBottomOf="@id/emailTextView"
+            tools:ignore="HardcodedText" />
 
     <TextView
             android:id="@+id/verifyEmailTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/verifyLabel"
             android:layout_marginStart="8dp"
-            android:layout_toRightOf="@id/verifyLabel"
             android:layout_marginEnd="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            tools:text="FALSE qqw eqw    e  qw  qw e    qw e   "/>
+            app:layout_constraintBaseline_toBaselineOf="@id/verifyLabel"
+            app:layout_constraintEnd_toStartOf="@id/divider"
+            app:layout_constraintStart_toEndOf="@id/verifyLabel"
+            tools:text="FALSE qqw eqw" />
 
     <TextView
             android:id="@+id/phoneLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:ignore="HardcodedText"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:layout_marginTop="4dp"
-            android:layout_below="@id/verifyEmailTextView"
-            android:text="Phone:"/>
+            android:text="Phone:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintStart_toStartOf="@id/verifyLabel"
+            app:layout_constraintTop_toBottomOf="@id/verifyEmailTextView"
+            tools:ignore="HardcodedText" />
 
     <TextView
             android:id="@+id/phoneTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/phoneLabel"
-            android:layout_toRightOf="@id/phoneLabel"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            tools:text="NULL qw rqwe rqwer qwer qwe werqwe "/>
+            app:layout_constraintBaseline_toBaselineOf="@id/phoneLabel"
+            app:layout_constraintEnd_toStartOf="@id/divider"
+            app:layout_constraintStart_toEndOf="@id/phoneLabel"
+            tools:text="NULL qw " />
 
     <View
             android:id="@+id/divider"
             android:layout_width="1dp"
-            android:layout_centerVertical="true"
-            android:layout_height="180dp"
-            android:layout_alignParentEnd="true"
-            android:background="@android:color/darker_gray"/>
+            android:layout_height="0dp"
+            android:background="@android:color/darker_gray"
+            android:minHeight="180dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

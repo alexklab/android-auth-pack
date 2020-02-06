@@ -1,6 +1,7 @@
 package com.demo.auth.firebase.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +26,11 @@ class UserProfileFragment : Fragment() {
         viewModel.profile.observe(this, Observer(::updateUI))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_user_profile, container, false)
     }
 
@@ -67,8 +72,11 @@ class UserProfileFragment : Fragment() {
         providersAdapter.updateAll(profile?.providersData.orEmpty())
     }
 
-    private fun Long.toDateValue(): String {
-        return SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(Date(this))
+    private fun Long.toDateValue(): String = try {
+        SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(Date(this))
+    } catch (e: Exception) {
+        Log.e("UserProfileFragment", "Failed format Long.toDateValue", e)
+        "Unformatted[$this]"
     }
 
     private val providersAdapter = UserInfoAdapter()
@@ -77,6 +85,6 @@ class UserProfileFragment : Fragment() {
 
     private companion object {
         const val DEFAULT_VALUE = "-NULL-"
-        const val DATE_FORMAT = "dd MMMM YYYY HH:mm:ss"
+        const val DATE_FORMAT = "dd MMMM yyyy HH:mm:ss"
     }
 }

@@ -1,11 +1,8 @@
 package com.demo.auth.firebase.data.database
 
+import android.content.Context
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.OnLifecycleEvent
 import com.android.arch.auth.core.common.CoroutineContextProvider
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
 import com.demo.auth.firebase.data.entity.UserProfile
@@ -17,30 +14,17 @@ import kotlinx.coroutines.launch
  * Created by alexk on 12/17/18.
  * Project android-auth-pack
  */
-class DatabaseProvider : UserProfileDataCache<UserProfile>, LifecycleObserver {
+class DatabaseProvider : UserProfileDataCache<UserProfile> {
 
     /**
      * Should be called on Activity.onCreate
      */
-    fun onCreate(activity: ComponentActivity) {
+    fun onCreate(context: Context) {
         if (db?.isOpen != true) {
-            db = UserProfileDb.create(activity)
+            db = UserProfileDb.create(context)
         } else {
             Log.w("openDb:", "Db is actually open")
         }
-
-        activity.lifecycle.apply {
-            removeObserver(this@DatabaseProvider)
-            addObserver(this@DatabaseProvider)
-        }
-    }
-
-    @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onDestroy() {
-        dbJob.cancel()
-        db?.close()
-        db = null
     }
 
     override fun getProfileUid(): String? =
