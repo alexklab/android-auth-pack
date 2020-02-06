@@ -38,7 +38,7 @@ class FacebookSignInService : NetworkSignInService() {
             override fun onSuccess(result: LoginResult) = with(result) {
                 signInAndFetchCallback
                     ?.let { fetchProfile(accessToken) }
-                    ?: postResult(SignInResponse(token = accessToken.token))
+                    ?: postSignInResponse(SignInResponse(token = accessToken.token))
             }
 
             override fun onError(exception: FacebookException) = handleSignInError(exception)
@@ -98,7 +98,7 @@ class FacebookSignInService : NetworkSignInService() {
         val response = SignInResponse(error = getErrorType(e))
         signInAndFetchCallback
             ?.let { postSignInAndFetchResult(response) }
-            ?: postResult(response)
+            ?: postSignInResponse(response)
     }
 
     private fun postSignInAndFetchResult(data: SignInResponse) {

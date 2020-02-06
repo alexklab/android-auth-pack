@@ -39,6 +39,7 @@ buildscript {
         play_services_auth_version = '17.0.0'
         room_version = '2.2.3'
         test_runner_version = '1.1.1'
+        timber_version = '4.7.1'
         twitter_sdk_version = '3.3.0'
     }
 

@@ -1,9 +1,6 @@
 package com.android.arch.auth.firebase
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.common.extensions.postError
-import com.android.arch.auth.core.common.extensions.postEvent
 import com.android.arch.auth.core.data.entity.*
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
@@ -20,11 +17,16 @@ class FirebaseAuthRepository<UserProfileDataType>(
     private val userDataFactory: Factory<UserProfileDataType>
 ) : EmailAuthRepository<UserProfileDataType>,
     SocialNetworkAuthRepository<UserProfileDataType>,
-    NetworkAuthRepository() {
+    NetworkAuthRepository<UserProfileDataType>() {
 
     interface Factory<UserProfileDataType> {
         fun create(user: FirebaseUser): UserProfileDataType
     }
+
+    private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
+
+    private val userProfile: UserProfileDataType?
+        get() = auth.currentUser?.let { userDataFactory.create(it) }
 
     override fun signOut() {
         auth.signOut()
@@ -34,12 +36,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
     /**
      * this is a security sensitive operation that requires the user to have recently signed in.
      */
-    override fun changePassword(
-        uid: String,
-        oldPassword: String,
-        newPassword: String,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
+    override fun changePassword(uid: String, oldPassword: String, newPassword: String) {
         val firebaseUser = auth.currentUser
         val email = firebaseUser?.providerData
             ?.first { it.providerId == EmailAuthProvider.PROVIDER_ID }
@@ -52,33 +49,25 @@ class FirebaseAuthRepository<UserProfileDataType>(
                         firebaseUser
                             .updatePassword(newPassword)
                             .addOnCompleteListener {
-                                response.postResult(it, ::handleUpdatePasswordError)
+                                postAuthResponse(it, ::handleUpdatePasswordError)
                             }
                     } else {
-                        response.postResult(authTask, ::handleSignInWithEmailError)
+                        postAuthResponse(authTask, ::handleSignInWithEmailError)
                     }
                 }
         } else {
-            response.postError(AccountNotFoundAuthError())
+            postAuthError(AccountNotFoundAuthError())
         }
     }
 
-    override fun recoverPassword(
-        email: String,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
+    override fun recoverPassword(email: String) {
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener {
-                response.postResult(it, ::handleSendPasswordResetEmailError)
+                postAuthResponse(it, ::handleSendPasswordResetEmailError)
             }
     }
 
-    override fun signUp(
-        login: String,
-        email: String,
-        password: String,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
+    override fun signUp(login: String, email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
@@ -86,41 +75,31 @@ class FirebaseAuthRepository<UserProfileDataType>(
                         ?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(login).build())
                         ?.addOnCompleteListener { task ->
                             auth.currentUser?.sendEmailVerification()
-                            response.postResult(task, ::handleUpdateProfileError)
-                        } ?: response.postError(AccountNotFoundAuthError())
+                            postAuthResponse(task, ::handleUpdateProfileError)
+                        } ?: postAuthError(AccountNotFoundAuthError())
                 } else {
-                    response.postResult(it, ::handleSignUpWithEmailError)
+                    postAuthResponse(it, ::handleSignUpWithEmailError)
                 }
             }
     }
 
-    override fun signInWithEmail(
-        email: String,
-        password: String,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
+    override fun signInWithEmail(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                response.postResult(it, ::handleSignInWithEmailError)
+                postAuthResponse(it, ::handleSignInWithEmailError)
             }
     }
 
-    override fun signInWithSocialNetwork(
-        socialNetwork: SocialNetworkType,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
+    override fun signInWithSocialNetwork(socialNetwork: SocialNetworkType) {
         getService(socialNetwork)
-            ?.signIn { response.signInWithCredential(socialNetwork, it) }
-            ?: response.postError(CanceledAuthError())
+            ?.signIn()
+            ?: postAuthError(CanceledAuthError())
     }
 
     /**
      * this is a security sensitive operation that requires the user to have recently signed in.
      */
-    override fun editProfile(
-        request: EditProfileRequest,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ): Unit = with(request) {
+    override fun editProfile(request: EditProfileRequest): Unit = with(request) {
         auth.currentUser?.apply {
             if (loginParam.isChanged || photoUriParam.isChanged) {
                 updateProfile(UserProfileChangeRequest.Builder()
@@ -129,55 +108,47 @@ class FirebaseAuthRepository<UserProfileDataType>(
                     .build())
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            updateEmail(request, response)
+                            updateEmail(request)
                         } else {
-                            response.postResult(task, ::handleUpdateProfileError)
+                            postAuthResponse(task, ::handleUpdateProfileError)
                         }
                     }
             } else {
-                updateEmail(request, response)
+                updateEmail(request)
             }
-        } ?: response.postError(AccountNotFoundAuthError())
+        } ?: postAuthError(AccountNotFoundAuthError())
     }
 
-    private fun FirebaseUser.updateEmail(
-        request: EditProfileRequest,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ): Unit = with(request) {
-        if (emailParam.isChanged) {
-            val email = emailParam.value
-            if (email.isNullOrEmpty()) {
-                response.postError(EmailRequiredAuthError())
-            } else {
-                updateEmail(email)
-                    .addOnCompleteListener {
-                        response.postResult(it, ::handleUpdateEmailError)
-                    }
-            }
+    override fun onSignInResponse(socialNetwork: SocialNetworkType, response: SignInResponse) {
+        val authCredential = response.getAuthCredential(socialNetwork)
+        if (authCredential != null) {
+            auth.signInWithCredential(authCredential)
+                .addOnCompleteListener {
+                    postAuthResponse(it, ::handleSignInWithCredentialsError)
+                }
         } else {
-            response.postEvent(AuthResponse(SUCCESS, null, userProfile))
+            postAuthError(response.error ?: CanceledAuthError())
         }
     }
 
-    override fun sendVerifiedEmailKeyUseCase(
-        verifyKey: String,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
+    override fun sendVerifiedEmailKeyUseCase(verifyKey: String) {
         // implemented on firebase back side
-        response.postError(ServiceAuthError("Unsupported method usage. Actually implemented on Firebase back side"))
+        postAuthError(ServiceAuthError("Unsupported method usage. Actually implemented on Firebase back side"))
     }
 
-    private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.signInWithCredential(
-        socialNetwork: SocialNetworkType,
-        response: SignInResponse
-    ) {
-        response.getAuthCredential(socialNetwork)?.let { credential ->
-            auth.signInWithCredential(credential)
-                .addOnCompleteListener {
-                    postResult(it, ::handleSignInWithCredentialsError)
+    private fun FirebaseUser.updateEmail(request: EditProfileRequest): Unit = with(request) {
+        if (emailParam.isChanged) {
+            val email = emailParam.value
+            if (email.isNullOrEmpty()) {
+                postAuthError(EmailRequiredAuthError())
+            } else {
+                updateEmail(email).addOnCompleteListener {
+                    postAuthResponse(it, ::handleUpdateEmailError)
                 }
-        } ?: postError(response.error ?: CanceledAuthError())
-
+            }
+        } else {
+            postAuthResponse(AuthResponse(SUCCESS, null, userProfile))
+        }
     }
 
     private fun SignInResponse.getAuthCredential(socialNetwork: SocialNetworkType): AuthCredential? {
@@ -202,19 +173,19 @@ class FirebaseAuthRepository<UserProfileDataType>(
         }
     }
 
-
-    private fun handleSignInWithCredentialsError(exception: Exception): AuthError = when (exception) {
-        // thrown if the user account you are trying to sign in to has been disabled.
-        // Also thrown if credential is an EmailAuthCredential with an email address that does not correspond to an existing user.
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
-        // thrown if the credential is malformed or has expired.
-        // If credential instanceof EmailAuthCredential it will be thrown if the password is incorrect.
-        is FirebaseAuthInvalidCredentialsException -> InvalidCredentialsAuthError(exception.message)
-        // thrown if there already exists an account with the email address asserted by the credential.
-        // Resolve this case by calling fetchProvidersForEmail(String) and then asking the user to sign in using one of them.
-        is FirebaseAuthUserCollisionException -> AccountsCollisionAuthError(exception.message)
-        else -> ServiceAuthError("Firebase: Sign in with credentials failed", exception)
-    }
+    private fun handleSignInWithCredentialsError(exception: Exception): AuthError =
+        when (exception) {
+            // thrown if the user account you are trying to sign in to has been disabled.
+            // Also thrown if credential is an EmailAuthCredential with an email address that does not correspond to an existing user.
+            is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
+            // thrown if the credential is malformed or has expired.
+            // If credential instanceof EmailAuthCredential it will be thrown if the password is incorrect.
+            is FirebaseAuthInvalidCredentialsException -> InvalidCredentialsAuthError(exception.message)
+            // thrown if there already exists an account with the email address asserted by the credential.
+            // Resolve this case by calling fetchProvidersForEmail(String) and then asking the user to sign in using one of them.
+            is FirebaseAuthUserCollisionException -> AccountsCollisionAuthError(exception.message)
+            else -> ServiceAuthError("Firebase: Sign in with credentials failed", exception)
+        }
 
     private fun handleSignInWithEmailError(exception: Exception): AuthError = when (exception) {
         is FirebaseTooManyRequestsException -> TooManyRequestsAuthError(exception.message)
@@ -235,11 +206,12 @@ class FirebaseAuthRepository<UserProfileDataType>(
         else -> ServiceAuthError("Firebase: Sign up with email failed", exception)
     }
 
-    private fun handleSendPasswordResetEmailError(exception: Exception): AuthError = when (exception) {
-        // thrown if there is no user corresponding to the given email address
-        is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
-        else -> ServiceAuthError("Firebase: Sending reset email failed", exception)
-    }
+    private fun handleSendPasswordResetEmailError(exception: Exception): AuthError =
+        when (exception) {
+            // thrown if there is no user corresponding to the given email address
+            is FirebaseAuthInvalidUserException -> AccountNotFoundAuthError(exception.message)
+            else -> ServiceAuthError("Firebase: Sending reset email failed", exception)
+        }
 
     private fun handleUpdateProfileError(exception: Exception): AuthError = when (exception) {
         // thrown if the current user's account has been disabled, deleted, or its credentials are no longer valid
@@ -271,22 +243,12 @@ class FirebaseAuthRepository<UserProfileDataType>(
         else -> ServiceAuthError("Firebase: Email updating failed", exception)
     }
 
-    private fun MutableLiveData<Event<AuthResponse<UserProfileDataType>>>.postResult(
-        task: Task<*>,
-        handleError: (Exception) -> AuthError
-    ) {
-        postEvent(
+    private fun postAuthResponse(task: Task<*>, handleError: (Exception) -> AuthError) =
+        postAuthResponse(
             AuthResponse(
                 status = if (task.isSuccessful) SUCCESS else FAILED,
                 error = if (task.isSuccessful) null else task.exception?.let { handleError(it) },
                 data = userProfile
             )
         )
-    }
-
-    private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
-
-    private val userProfile: UserProfileDataType?
-        get() = auth.currentUser?.let { userDataFactory.create(it) }
-
 }

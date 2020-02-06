@@ -12,7 +12,6 @@ import com.android.arch.auth.core.data.entity.SocialNetworkType.TWITTER
 import com.android.arch.auth.core.data.network.NetworkSignInService
 import com.twitter.sdk.android.core.*
 import com.twitter.sdk.android.core.identity.TwitterLoginButton
-import java.lang.Exception
 
 /**
  * Created by alexk on 12/20/18.
@@ -68,7 +67,8 @@ class TwitterSignInService(
     }
 
     private fun handleSignInResult(data: TwitterSession? = null, exception: Exception? = null) {
-        postResult(SignInResponse(
+        postSignInResponse(
+            SignInResponse(
             token = data?.authToken?.token,
             tokenSecret = data?.authToken?.secret,
             error = getErrorType(exception),

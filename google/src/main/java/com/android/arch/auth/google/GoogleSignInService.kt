@@ -69,7 +69,7 @@ class GoogleSignInService(
             if (lastSignedInAccount == null) {
                 activity.startActivityForResult(it.signInIntent, signInRequestCode)
             } else {
-                postSignInResult(lastSignedInAccount)
+                postSignInResponse(lastSignedInAccount)
             }
         } ?: Log.w("signIn", "not attached. googleSignInClient = null")
     }
@@ -88,7 +88,7 @@ class GoogleSignInService(
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                postSignInResult(account)
+                postSignInResponse(account)
             } catch (e: Exception) {
                 Log.w("onActivityResult", "Google sign in failed", e)
                 postSignInException(e)
@@ -98,14 +98,14 @@ class GoogleSignInService(
         }
     }
 
-    private fun postSignInResult(account: GoogleSignInAccount? = null) = postResult(
+    private fun postSignInResponse(account: GoogleSignInAccount? = null) = postSignInResponse(
         SignInResponse(
             token = account?.idToken,
             profile = account?.toAuthUserProfile()
         )
     )
 
-    private fun postSignInException(exception: Exception? = null) = postResult(
+    private fun postSignInException(exception: Exception? = null) = postSignInResponse(
         SignInResponse(error = getErrorType(exception))
     )
 
