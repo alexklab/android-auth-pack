@@ -37,7 +37,6 @@ class RepositoryModule {
     /**
      * Provider for view model delegate
      */
-    @Singleton
     @Provides
     fun provideSignInWithSocialNetworksViewModel(
         listenerUseCase: AuthResponseListenerUseCase<UserProfile>,
@@ -64,6 +63,6 @@ class RepositoryModule {
             : NetworksSignOutUseCase<UserProfile> = NetworksSignOutUseCase(repository)
 
     @Provides
-    fun provideAddAuthResponseListenerUseCase(repository: SocialNetworkAuthRepository<UserProfile>)
+    fun provideAuthResponseListenerUseCase(repository: SocialNetworkAuthRepository<UserProfile>)
             : AuthResponseListenerUseCase<UserProfile> = AuthResponseListenerUseCase(repository)
 }
