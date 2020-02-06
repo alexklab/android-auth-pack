@@ -30,40 +30,41 @@ sealed class AuthError(
         exception: Exception? = null
     ) : AuthError(message, exception)
 
-    class CanceledAuthError(msg: String? = null) : ServiceAuthError(msg ?: "Request canceled")
+    class CanceledAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Request canceled", e)
 
-    class WrongPasswordAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Wrong password")
+    class WrongPasswordAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Wrong password")
 
-    class EmailAlreadyExistAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Email already exist")
+    class EmailAlreadyExistAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Email already exist", e)
 
-    class EmailVerificationAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Email verification required (Service side)")
+    class EmailVerificationAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Email verification required (Service side)", e)
 
-    class AccountNotFoundAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Account not found")
+    class AccountNotFoundAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Account not found", e)
 
-    class LoginAlreadyExistAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Login already exist")
+    class LoginAlreadyExistAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Login already exist", e)
 
-    class AccountNotActivatedAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Account not activated")
+    class AccountNotActivatedAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Account not activated", e)
 
-    class InvalidVerifyEmailCodeAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Invalid verify email code")
+    class InvalidVerifyEmailCodeAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Invalid verify email code", e)
 
-    class AccountsCollisionAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Accounts collision")
+    class AccountsCollisionAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Accounts collision", e)
 
-    class InvalidCredentialsAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Invalid credentials")
+    class InvalidCredentialsAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Invalid credentials", e)
 
-    class RecentLoginRequiredAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Recent login required")
+    class RecentLoginRequiredAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Recent login required", e)
 
-    class TooManyRequestsAuthError(msg: String? = null) :
-        ServiceAuthError(msg ?: "Too many unsuccessful request attempts")
+    class TooManyRequestsAuthError(e: Exception? = null) :
+        ServiceAuthError(e?.message ?: "Too many unsuccessful request attempts", e)
 
     /**
      * Errors that occurred at validation stage
@@ -88,11 +89,11 @@ sealed class AuthError(
     class ConfirmPasswordRequiredAuthError :
         VerificationAuthError("Confirm password required")
 
-    class WeakPasswordAuthError(msg: String? = null) :
-        VerificationAuthError(msg ?: "Weak password")
+    class WeakPasswordAuthError(e: Exception? = null) :
+        VerificationAuthError(e?.message ?: "Weak password", e)
 
-    class MalformedEmailAuthError(msg: String? = null) :
-        VerificationAuthError(msg ?: "Malformed email")
+    class MalformedEmailAuthError(e: Exception? = null) :
+        VerificationAuthError(e?.message ?: "Malformed email", e)
 
     class MalformedLoginAuthError :
         VerificationAuthError("Malformed login")

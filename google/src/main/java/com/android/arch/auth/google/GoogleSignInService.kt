@@ -38,7 +38,7 @@ class GoogleSignInService(
 
     override fun getErrorType(exception: Exception?): AuthError? = exception?.let {
         when (it) {
-            is GoogleSignInCanceledException -> CanceledAuthError(exception.message)
+            is GoogleSignInCanceledException -> CanceledAuthError(exception)
             else -> ServiceAuthError("Google SignIn Error: ${exception.message}", exception)
         }
     }

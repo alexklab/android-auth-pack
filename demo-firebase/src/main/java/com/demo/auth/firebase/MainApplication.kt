@@ -12,7 +12,6 @@ import com.demo.auth.firebase.common.EmailFieldValidator
 import com.demo.auth.firebase.common.LoginFieldValidator
 import com.demo.auth.firebase.common.PasswordFieldValidator
 import com.demo.auth.firebase.data.database.DatabaseProvider
-import com.demo.auth.firebase.data.entity.FirebaseUserProfileFactory
 import com.demo.auth.firebase.data.entity.UserProfile
 import com.demo.auth.firebase.ui.UserProfileViewModel
 import org.koin.android.ext.android.startKoin
@@ -31,8 +30,7 @@ class MainApplication : Application() {
     }
 
     private val mainModuleModule = module {
-        single { FirebaseUserProfileFactory() }
-        single { FirebaseAuthRepository(get<FirebaseUserProfileFactory>()) }
+        single { FirebaseAuthRepository(::UserProfile) }
         single { DatabaseProvider() }
         single { EmailFieldValidator() }
         single { LoginFieldValidator() }
