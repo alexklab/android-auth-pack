@@ -13,6 +13,7 @@ import com.android.arch.auth.core.data.entity.SocialNetworkType.GOOGLE
 import com.android.arch.auth.core.data.entity.SocialNetworkType.INSTAGRAM
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
@@ -53,6 +54,7 @@ class SignInWithSocialNetworksViewModelTest :
 
     override val instance: SignInWithSocialNetworksViewModel<UserProfile>
         get() = SignInWithSocialNetworksViewModel(
+            AuthResponseListenerUseCase(repository),
             SignInWithSocialNetworkUseCase(repository),
             UpdateProfileUseCase(userProfileDataCache)
         ).apply { authResponse = getRawResponseData() }
@@ -61,35 +63,38 @@ class SignInWithSocialNetworksViewModelTest :
     @Suppress("UNCHECKED_CAST")
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        `when`(repository.signInWithSocialNetwork(any(), any())).thenAnswer {
-            (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                .postEvent(signInWithSocialNetworks.toAuthResponse(profile))
+        `when`(repository.signInWithSocialNetwork(any())).thenAnswer {
+            authResponse.postEvent(signInWithSocialNetworks.toAuthResponse(profile))
 
         }
     }
 
     @Test
-    fun `signInWithSocialNetwork() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-        setup = { signInWithSocialNetworks = customError },
-        action = { signInWithSocialNetwork(INSTAGRAM) },
-        expected = { response ->
-            assertEquals(FAILED, response?.status)
-            assertEquals(customError, response?.error)
-            verify(repository).signInWithSocialNetwork(INSTAGRAM, authResponse)
-            verifyNoMoreInteractions(repository)
-            verifyZeroInteractions(userProfileDataCache)
-        })
+    fun `signInWithSocialNetwork() should handle error on service response AUTH_SERVICE_ERROR`() =
+        responseTestCase(
+            setup = { signInWithSocialNetworks = customError },
+            action = { signInWithSocialNetwork(INSTAGRAM) },
+            expected = { response ->
+                assertEquals(FAILED, response?.status)
+                assertEquals(customError, response?.error)
+                verify(repository).addListener(any())
+                verify(repository).signInWithSocialNetwork(INSTAGRAM)
+                verifyNoMoreInteractions(repository)
+                verifyZeroInteractions(userProfileDataCache)
+            })
 
     @Test
-    fun `signInWithSocialNetwork() should handle success on service response SUCCESS`() = responseTestCase(
-        setup = { signInWithSocialNetworks = null /* success */ },
-        action = { signInWithSocialNetwork(GOOGLE) },
-        expected = { response ->
-            assertEquals(SUCCESS, response?.status)
-            verify(repository).signInWithSocialNetwork(GOOGLE, authResponse)
-            verify(userProfileDataCache).updateProfile(profile)
-            verifyNoMoreInteractions(repository, userProfileDataCache)
-        })
+    fun `signInWithSocialNetwork() should handle success on service response SUCCESS`() =
+        responseTestCase(
+            setup = { signInWithSocialNetworks = null /* success */ },
+            action = { signInWithSocialNetwork(GOOGLE) },
+            expected = { response ->
+                assertEquals(SUCCESS, response?.status)
+                verify(repository).addListener(any())
+                verify(repository).signInWithSocialNetwork(GOOGLE)
+                verify(userProfileDataCache).updateProfile(profile)
+                verifyNoMoreInteractions(repository, userProfileDataCache)
+            })
 
     private companion object {
         private val profile = UserProfile(

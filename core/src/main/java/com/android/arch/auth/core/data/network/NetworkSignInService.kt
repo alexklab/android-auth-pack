@@ -9,8 +9,6 @@ import com.android.arch.auth.core.data.entity.SocialNetworkType
 
 abstract class NetworkSignInService : OnActivityCreatedListener() {
 
-    private var signInCallback: NetworkSignInCallBack? = null
-
     abstract val socialNetworkType: SocialNetworkType
     abstract fun signIn(activity: Activity)
     abstract fun signOut()
@@ -18,24 +16,27 @@ abstract class NetworkSignInService : OnActivityCreatedListener() {
 
     open fun getErrorType(exception: Exception?): AuthError? = null
 
-    fun signIn(callback: NetworkSignInCallBack) {
+    private val listeners = hashSetOf<SignInServiceListener>()
+
+    fun addListener(listener: SignInServiceListener) {
+        listeners.add(listener)
+    }
+
+    fun removeListener(listener: SignInServiceListener) {
+        listeners.remove(listener)
+    }
+
+    fun signIn() {
         activity?.apply {
-            signInCallback = callback
             signIn(this)
         } ?: Log.w("signIn", "not attached. activity = null")
     }
 
-    /**
-     * Should be called in Activity.onDestroy method
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        signInCallback = null
-    }
-
-    protected fun postResult(response: SignInResponse) {
-        signInCallback
-            ?.let { callback -> callback(response) }
-            ?: Log.w("postResult", "Wrong state. signInCallback = null")
+    protected fun postSignInResponse(response: SignInResponse) {
+        if (listeners.isEmpty()) {
+            Log.w("$this\$postResult", "Wrong state. Not found SignInResponseListener")
+        } else {
+            listeners.forEach { it.onSignInResponse(socialNetworkType, response) }
+        }
     }
 }

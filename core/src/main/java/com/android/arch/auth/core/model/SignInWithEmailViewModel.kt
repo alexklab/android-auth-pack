@@ -7,6 +7,7 @@ import com.android.arch.auth.core.data.entity.AuthError.EmailRequiredAuthError
 import com.android.arch.auth.core.data.entity.AuthError.PasswordRequiredAuthError
 import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
@@ -15,9 +16,10 @@ import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
  * Project android-auth-pack
  */
 class SignInWithEmailViewModel<UserProfileDataType>(
+    authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val signInWithEmailUseCase: SignInWithEmailUseCase<UserProfileDataType>,
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
-) : AuthBaseViewModel<UserProfileDataType>() {
+) : AuthBaseViewModel<UserProfileDataType>(authResponseListenerUseCase) {
 
     override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
         map(getRawResponseData()) {
@@ -29,6 +31,6 @@ class SignInWithEmailViewModel<UserProfileDataType>(
     fun signInWithEmail(email: String, password: String): Unit = when {
         email.isEmpty() -> setError(EmailRequiredAuthError())
         password.isEmpty() -> setError(PasswordRequiredAuthError())
-        else -> launchAsyncRequest { signInWithEmailUseCase(email, password, it) }
+        else -> launchAsyncRequest { signInWithEmailUseCase(email, password) }
     }
 }

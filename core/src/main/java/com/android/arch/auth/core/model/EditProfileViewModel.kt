@@ -9,6 +9,7 @@ import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.EditProfileRequest
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.entity.RequestParam
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SendEditProfileRequestUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
@@ -16,10 +17,11 @@ import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 class EditProfileViewModel<UserProfileDataType>(
     private val emailValidator: FieldValidator,
     private val loginValidator: FieldValidator,
+    authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val sendEditProfileRequestUseCase: SendEditProfileRequestUseCase<UserProfileDataType>,
     private val getProfileUseCase: GetProfileUseCase<UserProfileDataType>,
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
-) : AuthBaseViewModel<UserProfileDataType>() {
+) : AuthBaseViewModel<UserProfileDataType>(authResponseListenerUseCase) {
 
     override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
         map(getRawResponseData()) {
@@ -42,7 +44,7 @@ class EditProfileViewModel<UserProfileDataType>(
                 emailParam.isNotValidBy(String::isNullOrEmpty) -> setError(EmailRequiredAuthError())
                 emailParam.isNotValidBy(emailValidator) -> setError(MalformedEmailAuthError())
                 else -> launchAsyncRequest {
-                    sendEditProfileRequestUseCase(editProfileRequest, it)
+                    sendEditProfileRequestUseCase(editProfileRequest)
                 }
             }
         }

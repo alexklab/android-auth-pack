@@ -12,6 +12,7 @@ import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SignUpUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
@@ -29,11 +30,12 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
 
     override val instance: SignUpViewModel<UserProfile>
         get() = SignUpViewModel(
-                emailValidator,
-                loginValidator,
-                passwordValidator,
-                SignUpUseCase(repository),
-                UpdateProfileUseCase(cache)
+            emailValidator,
+            loginValidator,
+            passwordValidator,
+            AuthResponseListenerUseCase(repository),
+            SignUpUseCase(repository),
+            UpdateProfileUseCase(cache)
         ).apply { authResponse = getRawResponseData() }
 
     // Executes tasks in the Architecture Components in the same thread
@@ -83,162 +85,187 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
         `when`(emailValidator.validate(any())).thenAnswer { it.arguments[0] == VALID_EMAIL }
         `when`(loginValidator.validate(any())).thenAnswer { it.arguments[0] == VALID_LOGIN }
         `when`(passwordValidator.validate(any())).thenAnswer { it.arguments[0] == VALID_PASSWORD }
-        `when`(repository.signUp(any(), any(), any(), any())).thenAnswer {
-            (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                    .postEvent(signUpError.toAuthResponse(profile))
+        `when`(repository.signUp(any(), any(), any())).thenAnswer {
+            authResponse.postEvent(signUpError.toAuthResponse(profile))
         }
     }
 
     @Test
     fun `signUp() login should be NOT empty`() = responseTestCase(
-            action = {
-                signUp(login = EMPTY,
-                        email = VALID_EMAIL,
-                        password = VALID_PASSWORD,
-                        confirmPassword = VALID_PASSWORD,
-                        isEnabledTermsOfUse = true)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is LoginRequiredAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = EMPTY,
+                email = VALID_EMAIL,
+                password = VALID_PASSWORD,
+                confirmPassword = VALID_PASSWORD,
+                isEnabledTermsOfUse = true
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is LoginRequiredAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() email should be NOT empty`() = responseTestCase(
-            action = {
-                signUp(login = VALID_LOGIN,
-                        email = EMPTY,
-                        password = VALID_PASSWORD,
-                        confirmPassword = VALID_PASSWORD,
-                        isEnabledTermsOfUse = true)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is EmailRequiredAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = VALID_LOGIN,
+                email = EMPTY,
+                password = VALID_PASSWORD,
+                confirmPassword = VALID_PASSWORD,
+                isEnabledTermsOfUse = true
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is EmailRequiredAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() password should be NOT empty`() = responseTestCase(
-            action = {
-                signUp(login = VALID_LOGIN,
-                        email = VALID_EMAIL,
-                        password = EMPTY,
-                        confirmPassword = VALID_PASSWORD,
-                        isEnabledTermsOfUse = true)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is PasswordRequiredAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = VALID_LOGIN,
+                email = VALID_EMAIL,
+                password = EMPTY,
+                confirmPassword = VALID_PASSWORD,
+                isEnabledTermsOfUse = true
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is PasswordRequiredAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() confirm password should be NOT empty`() = responseTestCase(
-            action = {
-                signUp(login = VALID_LOGIN,
-                        email = VALID_EMAIL,
-                        password = VALID_PASSWORD,
-                        confirmPassword = EMPTY,
-                        isEnabledTermsOfUse = true)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is ConfirmPasswordRequiredAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = VALID_LOGIN,
+                email = VALID_EMAIL,
+                password = VALID_PASSWORD,
+                confirmPassword = EMPTY,
+                isEnabledTermsOfUse = true
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is ConfirmPasswordRequiredAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() term of use should be ENABLED`() = responseTestCase(
-            action = {
-                signUp(login = VALID_LOGIN,
-                        email = VALID_EMAIL,
-                        password = VALID_PASSWORD,
-                        confirmPassword = VALID_PASSWORD,
-                        isEnabledTermsOfUse = false)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is EnableTermsOfUseAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = VALID_LOGIN,
+                email = VALID_EMAIL,
+                password = VALID_PASSWORD,
+                confirmPassword = VALID_PASSWORD,
+                isEnabledTermsOfUse = false
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is EnableTermsOfUseAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `updateProfile login should be valid`() = responseTestCase(
-            action = {
-                signUp(login = invalidLogin,
-                        email = VALID_EMAIL,
-                        password = VALID_PASSWORD,
-                        confirmPassword = VALID_PASSWORD,
-                        isEnabledTermsOfUse = true)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is MalformedLoginAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = invalidLogin,
+                email = VALID_EMAIL,
+                password = VALID_PASSWORD,
+                confirmPassword = VALID_PASSWORD,
+                isEnabledTermsOfUse = true
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is MalformedLoginAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() password should be valid`() = responseTestCase(
-            action = {
-                signUp(login = VALID_LOGIN,
-                        email = VALID_EMAIL,
-                        password = invalidPassword,
-                        confirmPassword = VALID_PASSWORD,
-                        isEnabledTermsOfUse = true)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is WeakPasswordAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = VALID_LOGIN,
+                email = VALID_EMAIL,
+                password = invalidPassword,
+                confirmPassword = VALID_PASSWORD,
+                isEnabledTermsOfUse = true
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is WeakPasswordAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() email should be valid`() = responseTestCase(
-            action = {
-                signUp(login = VALID_LOGIN,
-                        email = invalidEmail,
-                        password = VALID_PASSWORD,
-                        confirmPassword = VALID_PASSWORD,
-                        isEnabledTermsOfUse = true)
-            },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is MalformedEmailAuthError)
-                verifyZeroInteractions(repository, cache)
-            }
+        action = {
+            signUp(
+                login = VALID_LOGIN,
+                email = invalidEmail,
+                password = VALID_PASSWORD,
+                confirmPassword = VALID_PASSWORD,
+                isEnabledTermsOfUse = true
+            )
+        },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is MalformedEmailAuthError)
+            verify(repository).addListener(any())
+            verifyZeroInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() should handle success on service response SUCCESS`() = responseTestCase(
-            setup = { signUpError = null /* success */ },
-            action = { signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, VALID_PASSWORD, true) },
-            expected = {
-                assertEquals(SUCCESS, it?.status)
-                verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, authResponse)
-                verify(cache).updateProfile(profile)
-                verifyNoMoreInteractions(repository, cache)
-            }
+        setup = { signUpError = null /* success */ },
+        action = { signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, VALID_PASSWORD, true) },
+        expected = {
+            assertEquals(SUCCESS, it?.status)
+            verify(repository).addListener(any())
+            verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD)
+            verify(cache).updateProfile(profile)
+            verifyNoMoreInteractions(repository, cache)
+        }
     )
 
     @Test
     fun `signUp() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-            setup = { signUpError = customError },
-            action = { signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, VALID_PASSWORD, true) },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertEquals(customError, result?.error)
-                verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, authResponse)
-                verifyNoMoreInteractions(repository)
-                verifyZeroInteractions(cache)
-            }
+        setup = { signUpError = customError },
+        action = { signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD, VALID_PASSWORD, true) },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertEquals(customError, result?.error)
+            verify(repository).addListener(any())
+            verify(repository).signUp(VALID_LOGIN, VALID_EMAIL, VALID_PASSWORD)
+            verifyNoMoreInteractions(repository)
+            verifyZeroInteractions(cache)
+        }
     )
 }

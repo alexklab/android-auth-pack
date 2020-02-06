@@ -7,6 +7,7 @@ import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SignUpUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
@@ -14,9 +15,10 @@ class SignUpViewModel<UserProfileDataType>(
     private val emailValidator: FieldValidator,
     private val loginValidator: FieldValidator,
     private val passwordValidator: FieldValidator,
+    authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val signUpUseCase: SignUpUseCase<UserProfileDataType>,
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
-) : AuthBaseViewModel<UserProfileDataType>() {
+) : AuthBaseViewModel<UserProfileDataType>(authResponseListenerUseCase) {
 
     override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
         map(getRawResponseData()) {
@@ -41,6 +43,6 @@ class SignUpViewModel<UserProfileDataType>(
         confirmPassword.isEmpty() -> setError(ConfirmPasswordRequiredAuthError())
         confirmPassword != password -> setError(NotMatchedConfirmPasswordAuthError())
         !isEnabledTermsOfUse -> setError(EnableTermsOfUseAuthError())
-        else -> launchAsyncRequest { signUpUseCase(login, email, password, it) }
+        else -> launchAsyncRequest { signUpUseCase(login, email, password) }
     }
 }

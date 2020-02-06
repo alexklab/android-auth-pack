@@ -1,8 +1,5 @@
 package com.android.arch.auth.core.domain.auth
 
-import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.data.entity.AuthResponse
-import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 
@@ -12,10 +9,7 @@ import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
  */
 class SignInWithSocialNetworkUseCase<UserProfileDataType>(private val repository: SocialNetworkAuthRepository<UserProfileDataType>) {
 
-    operator fun invoke(
-        socialNetwork: SocialNetworkType,
-        response: MutableLiveData<Event<AuthResponse<UserProfileDataType>>>
-    ) {
-        repository.signInWithSocialNetwork(socialNetwork, response)
+    operator fun invoke(socialNetwork: SocialNetworkType) {
+        repository.signInWithSocialNetwork(socialNetwork)
     }
 }

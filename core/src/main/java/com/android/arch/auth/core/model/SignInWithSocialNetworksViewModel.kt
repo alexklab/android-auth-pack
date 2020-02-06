@@ -6,6 +6,7 @@ import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.entity.SocialNetworkType
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
@@ -15,9 +16,11 @@ interface SignInViewModel<UserProfileDataType> {
 }
 
 open class SignInWithSocialNetworksViewModel<UserProfileDataType>(
+    authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val signInWithSocialNetworkUseCase: SignInWithSocialNetworkUseCase<UserProfileDataType>,
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
-) : AuthBaseViewModel<UserProfileDataType>(), SignInViewModel<UserProfileDataType> {
+) : AuthBaseViewModel<UserProfileDataType>(authResponseListenerUseCase),
+    SignInViewModel<UserProfileDataType> {
 
     override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
         map(getRawResponseData()) {
@@ -27,7 +30,7 @@ open class SignInWithSocialNetworksViewModel<UserProfileDataType>(
         }
 
     override fun signInWithSocialNetwork(socialNetwork: SocialNetworkType) {
-        launchAsyncRequest { signInWithSocialNetworkUseCase(socialNetwork, it) }
+        launchAsyncRequest { signInWithSocialNetworkUseCase(socialNetwork) }
     }
 
 }

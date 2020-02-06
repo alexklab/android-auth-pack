@@ -12,6 +12,7 @@ import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SendEditProfileRequestUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
@@ -32,12 +33,14 @@ import org.mockito.MockitoAnnotations
  * Project android-auth-pack
  */
 
-class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileViewModel<UserProfile>>() {
+class EditProfileViewModelTest :
+    AuthBaseViewModelTest<UserProfile, EditProfileViewModel<UserProfile>>() {
 
     override val instance: EditProfileViewModel<UserProfile>
         get() = EditProfileViewModel(
             emailFieldValidator,
             loginFieldValidator,
+            AuthResponseListenerUseCase(repository),
             SendEditProfileRequestUseCase(repository),
             GetProfileUseCase(userProfileDataCache),
             UpdateProfileUseCase(userProfileDataCache)
@@ -83,9 +86,8 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         getProfileAnswer = null
         editProfileError = null
 
-        `when`(repository.editProfile(any(), any())).thenAnswer {
-            (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                .postEvent(editProfileError.toAuthResponse(getProfileAnswer))
+        `when`(repository.editProfile(any())).thenAnswer {
+            authResponse.postEvent(editProfileError.toAuthResponse(getProfileAnswer))
         }
 
         `when`(userProfileDataCache.getProfile()).thenAnswer {
@@ -105,7 +107,7 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         }
     }
 
-    private fun EditProfileViewModel<UserProfile>.updateProfile(login:String, email:String){
+    private fun EditProfileViewModel<UserProfile>.updateProfile(login: String, email: String) {
         sendEditRequest {
             editLogin(LOGIN_V2, login)
             editEmail(EMAIL_V2, email)
@@ -118,7 +120,8 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         expected = { result ->
             assertEquals(FAILED, result?.status)
             assertTrue(result?.error is LoginRequiredAuthError)
-            verifyZeroInteractions(repository, userProfileDataCache)
+            verify(repository).addListener(any())
+            verifyNoMoreInteractions(repository, userProfileDataCache)
         })
 
     @Test
@@ -127,7 +130,8 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         expected = { result ->
             assertEquals(FAILED, result?.status)
             assertTrue(result?.error is EmailRequiredAuthError)
-            verifyZeroInteractions(repository, userProfileDataCache)
+            verify(repository).addListener(any())
+            verifyNoMoreInteractions(repository, userProfileDataCache)
         })
 
     @Test
@@ -136,7 +140,8 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         expected = { result ->
             assertEquals(FAILED, result?.status)
             assertTrue(result?.error is MalformedEmailAuthError)
-            verifyZeroInteractions(repository, userProfileDataCache)
+            verify(repository).addListener(any())
+            verifyNoMoreInteractions(repository, userProfileDataCache)
         })
 
     @Test
@@ -145,7 +150,8 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         expected = { result ->
             assertEquals(FAILED, result?.status)
             assertTrue(result?.error is MalformedLoginAuthError)
-            verifyZeroInteractions(repository, userProfileDataCache)
+            verify(repository).addListener(any())
+            verifyNoMoreInteractions(repository, userProfileDataCache)
         })
 
     @Test
@@ -154,20 +160,23 @@ class EditProfileViewModelTest : AuthBaseViewModelTest<UserProfile, EditProfileV
         action = { updateProfile(login = LOGIN, email = EMAIL) },
         expected = { result ->
             assertEquals(SUCCESS, result?.status)
-            verify(repository).editProfile(any(), any())
+            verify(repository).addListener(any())
+            verify(repository).editProfile(any())
             verify(userProfileDataCache).updateProfile(any())
             verifyNoMoreInteractions(repository, userProfileDataCache)
         })
 
     @Test
-    fun `updateProfile() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
-        setup = { editProfileError = customError },
-        action = { updateProfile(login = LOGIN, email = EMAIL) },
-        expected = { result ->
-            assertEquals(FAILED, result?.status)
-            assertEquals(customError, result?.error)
-            verify(repository).editProfile(any(), any())
-            verifyNoMoreInteractions(repository, userProfileDataCache)
-        })
+    fun `updateProfile() should handle error on service response AUTH_SERVICE_ERROR`() =
+        responseTestCase(
+            setup = { editProfileError = customError },
+            action = { updateProfile(login = LOGIN, email = EMAIL) },
+            expected = { result ->
+                assertEquals(FAILED, result?.status)
+                assertEquals(customError, result?.error)
+                verify(repository).addListener(any())
+                verify(repository).editProfile(any())
+                verifyNoMoreInteractions(repository, userProfileDataCache)
+            })
 
 }

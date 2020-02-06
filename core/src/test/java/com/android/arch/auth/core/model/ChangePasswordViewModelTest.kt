@@ -12,6 +12,7 @@ import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.ChangePasswordUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
@@ -34,6 +35,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     override val instance: ChangePasswordViewModel<UserProfile>
         get() = ChangePasswordViewModel(
             passwordValidator,
+            AuthResponseListenerUseCase(repository),
             ChangePasswordUseCase(repository),
             GetProfileUidUseCase(profileDataCache)
         ).apply { authResponse = getRawResponseData() }
@@ -70,9 +72,8 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         changePasswordError = null
         `when`(profileDataCache.getProfileUid()).thenReturn(uid)
         `when`(passwordValidator.validate(any())).thenAnswer { it.arguments[0] == validPassword }
-        `when`(repository.changePassword(any(), any(), any(), any())).thenAnswer {
-            (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                .postEvent(changePasswordError.toAuthResponse())
+        `when`(repository.changePassword(any(), any(), any())).thenAnswer {
+            authResponse.postEvent(changePasswordError.toAuthResponse())
         }
     }
 
@@ -89,6 +90,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         expected = { response ->
             assertEquals(FAILED, response?.status)
             assertTrue(response?.error is OldPasswordRequiredAuthError)
+            verify(repository).addListener(any())
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -106,6 +108,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         expected = { response ->
             assertEquals(FAILED, response?.status)
             assertTrue(response?.error is PasswordRequiredAuthError)
+            verify(repository).addListener(any())
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -123,6 +126,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         expected = { response ->
             assertEquals(FAILED, response?.status)
             assertTrue(response?.error is WeakPasswordAuthError)
+            verify(repository).addListener(any())
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -140,6 +144,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         expected = { response ->
             assertEquals(FAILED, response?.status)
             assertTrue(response?.error is ConfirmPasswordRequiredAuthError)
+            verify(repository).addListener(any())
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -157,6 +162,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         expected = { response ->
             assertEquals(FAILED, response?.status)
             assertTrue(response?.error is NotMatchedConfirmPasswordAuthError)
+            verify(repository).addListener(any())
             verifyZeroInteractions(repository, profileDataCache)
         }
     )
@@ -174,8 +180,9 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         },
         expected = { response ->
             assertEquals(SUCCESS, response?.status)
+            verify(repository).addListener(any())
             verify(profileDataCache).getProfileUid()
-            verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
+            verify(repository).changePassword(uid, validPassword, validPassword)
             verifyNoMoreInteractions(repository, profileDataCache)
         }
     )
@@ -194,8 +201,9 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
         expected = { response ->
             assertEquals(FAILED, response?.status)
             assertEquals(customServiceError, response?.error)
+            verify(repository).addListener(any())
             verify(profileDataCache).getProfileUid()
-            verify(repository).changePassword(uid, validPassword, validPassword, authResponse)
+            verify(repository).changePassword(uid, validPassword, validPassword)
             verifyNoMoreInteractions(repository, profileDataCache)
         }
     )

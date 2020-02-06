@@ -11,6 +11,7 @@ import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.Event
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
+import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.RecoveryPasswordUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
 import org.amshove.kluent.any
@@ -23,7 +24,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 
-class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, RecoveryPasswordViewModel<UserProfile>>() {
+class RecoveryPasswordViewModelTest :
+    AuthBaseViewModelTest<UserProfile, RecoveryPasswordViewModel<UserProfile>>() {
 
     // Executes tasks in the Architecture Components in the same thread
     @get:Rule
@@ -45,8 +47,9 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
 
     override val instance: RecoveryPasswordViewModel<UserProfile>
         get() = RecoveryPasswordViewModel(
-                emailValidator,
-                RecoveryPasswordUseCase(repository)
+            emailValidator,
+            AuthResponseListenerUseCase(repository),
+            RecoveryPasswordUseCase(repository)
         ).apply { authResponse = getRawResponseData() }
 
     private val emptyEmail = ""
@@ -59,53 +62,58 @@ class RecoveryPasswordViewModelTest : AuthBaseViewModelTest<UserProfile, Recover
         MockitoAnnotations.initMocks(this)
         recoverPasswordError = null
         `when`(emailValidator.validate(any())).thenAnswer { it.arguments[0] == validEmail }
-        `when`(repository.recoverPassword(any(), any())).thenAnswer {
-            (it.arguments.last() as MutableLiveData<Event<AuthResponse<UserProfile>>>)
-                    .postEvent(recoverPasswordError.toAuthResponse())
+        `when`(repository.recoverPassword(any())).thenAnswer {
+            authResponse.postEvent(recoverPasswordError.toAuthResponse())
         }
     }
 
     @Test
     fun `sendRecoveryPasswordRequest() email should be NOT empty`() = responseTestCase(
-            action = { sendRecoveryPasswordRequest(emptyEmail) },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is EmailRequiredAuthError)
-                verifyZeroInteractions(repository)
-            }
+        action = { sendRecoveryPasswordRequest(emptyEmail) },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is EmailRequiredAuthError)
+            verify(repository).addListener(any())
+            verifyNoMoreInteractions(repository)
+        }
     )
 
     @Test
     fun `sendRecoveryPasswordRequest() email should be valid`() = responseTestCase(
-            action = { sendRecoveryPasswordRequest(invalidEmail) },
-            expected = { result ->
-                assertEquals(FAILED, result?.status)
-                assertTrue(result?.error is MalformedEmailAuthError)
-                verifyZeroInteractions(repository)
-            }
+        action = { sendRecoveryPasswordRequest(invalidEmail) },
+        expected = { result ->
+            assertEquals(FAILED, result?.status)
+            assertTrue(result?.error is MalformedEmailAuthError)
+            verify(repository).addListener(any())
+            verifyNoMoreInteractions(repository)
+        }
     )
 
     @Test
-    fun `sendRecoveryPasswordRequest() should handle error on service response AUTH_SERVICE_ERROR`() = responseTestCase(
+    fun `sendRecoveryPasswordRequest() should handle error on service response AUTH_SERVICE_ERROR`() =
+        responseTestCase(
             setup = { recoverPasswordError = customError },
             action = { sendRecoveryPasswordRequest(validEmail) },
             expected = { result ->
                 assertEquals(FAILED, result?.status)
                 assertEquals(customError, result?.error)
-                verify(repository).recoverPassword(validEmail, authResponse)
+                verify(repository).addListener(any())
+                verify(repository).recoverPassword(validEmail)
                 verifyNoMoreInteractions(repository)
             }
-    )
+        )
 
     @Test
-    fun `sendRecoveryPasswordRequest() should handle success on service response SUCCESS`() = responseTestCase(
+    fun `sendRecoveryPasswordRequest() should handle success on service response SUCCESS`() =
+        responseTestCase(
             setup = { recoverPasswordError = null /* success */ },
             action = { sendRecoveryPasswordRequest(validEmail) },
             expected = {
                 assertEquals(SUCCESS, it?.status)
-                verify(repository).recoverPassword(validEmail, authResponse)
+                verify(repository).addListener(any())
+                verify(repository).recoverPassword(validEmail)
                 verifyNoMoreInteractions(repository)
             }
-    )
+        )
 
 }
