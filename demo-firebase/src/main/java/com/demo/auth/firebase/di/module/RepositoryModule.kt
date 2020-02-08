@@ -8,6 +8,7 @@ import com.android.arch.auth.core.data.repository.UserProfileDataCache
 import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.NetworksSignOutUseCase
 import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
+import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
 import com.android.arch.auth.core.domain.profile.DeleteProfileUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
@@ -77,5 +78,11 @@ class RepositoryModule {
     @Provides
     fun provideSignInWithEmailUseCase(repository: EmailAuthRepository<UserProfile>)
             : SignInWithEmailUseCase<UserProfile> = SignInWithEmailUseCase(repository)
+
+    @Singleton
+    @Provides
+    fun provideSignInWithSocialNetworkUseCase(repository: SocialNetworkAuthRepository<UserProfile>)
+            : SignInWithSocialNetworkUseCase<UserProfile> =
+        SignInWithSocialNetworkUseCase(repository)
 
 }

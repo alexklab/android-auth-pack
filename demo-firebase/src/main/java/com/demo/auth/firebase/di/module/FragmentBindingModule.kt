@@ -6,6 +6,7 @@ import com.demo.auth.firebase.di.ViewModelKey
 import com.demo.auth.firebase.ui.*
 import com.demo.auth.firebase.ui.signin.SignInFragment
 import com.demo.auth.firebase.ui.signin.SignInWithEmailViewModel
+import com.demo.auth.firebase.ui.signin.SignInWithSocialNetworksViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjector
@@ -63,7 +64,16 @@ abstract class FragmentBindingModule {
     @Binds
     @IntoMap
     @ViewModelKey(SignInWithEmailViewModel::class)
-    internal abstract fun bindSignInViewModel(viewModel: SignInWithEmailViewModel): ViewModel
+    internal abstract fun bindSignInWithEmailViewModel(viewModel: SignInWithEmailViewModel): ViewModel
+
+    /**
+     * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
+     * want to get a [SignInWithSocialNetworksViewModel] class.
+     */
+    @Binds
+    @IntoMap
+    @ViewModelKey(SignInWithSocialNetworksViewModel::class)
+    internal abstract fun bindSignInWithSocialNetworksViewModel(viewModel: SignInWithSocialNetworksViewModel): ViewModel
 
 
     /**
