@@ -10,9 +10,9 @@ import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
-interface SignInViewModel<UserProfileDataType> {
+interface NetworkSignInViewModel<UserProfileDataType> {
     val response: LiveData<Event<AuthResponse<UserProfileDataType>>>
-    fun signInWithSocialNetwork(socialNetwork: SocialNetworkType) {}
+    fun signInWithSocialNetwork(socialNetwork: SocialNetworkType)
 }
 
 open class SignInWithSocialNetworksViewModel<UserProfileDataType>(
@@ -20,7 +20,7 @@ open class SignInWithSocialNetworksViewModel<UserProfileDataType>(
     private val signInWithSocialNetworkUseCase: SignInWithSocialNetworkUseCase<UserProfileDataType>,
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
 ) : AuthBaseViewModel<UserProfileDataType>(authResponseListenerUseCase),
-    SignInViewModel<UserProfileDataType> {
+    NetworkSignInViewModel<UserProfileDataType> {
 
     override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
         map(getRawResponseData()) {

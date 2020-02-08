@@ -15,11 +15,17 @@ import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
  * Created by alexk on 11/26/18.
  * Project android-auth-pack
  */
-class SignInWithEmailViewModel<UserProfileDataType>(
+interface EmailSignInViewModel<UserProfileDataType> {
+    val response: LiveData<Event<AuthResponse<UserProfileDataType>>>
+    fun signInWithEmail(email: String, password: String)
+}
+
+open class SignInWithEmailViewModel<UserProfileDataType>(
     authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val signInWithEmailUseCase: SignInWithEmailUseCase<UserProfileDataType>,
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>
-) : AuthBaseViewModel<UserProfileDataType>(authResponseListenerUseCase) {
+) : AuthBaseViewModel<UserProfileDataType>(authResponseListenerUseCase),
+    EmailSignInViewModel<UserProfileDataType> {
 
     override val response: LiveData<Event<AuthResponse<UserProfileDataType>>> =
         map(getRawResponseData()) {
@@ -28,7 +34,7 @@ class SignInWithEmailViewModel<UserProfileDataType>(
             }
         }
 
-    fun signInWithEmail(email: String, password: String): Unit = when {
+    override fun signInWithEmail(email: String, password: String): Unit = when {
         email.isEmpty() -> setError(EmailRequiredAuthError())
         password.isEmpty() -> setError(PasswordRequiredAuthError())
         else -> launchAsyncRequest { signInWithEmailUseCase(email, password) }

@@ -6,6 +6,7 @@ import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.FAILED
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.SUCCESS
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
+import com.android.arch.auth.core.data.network.NetworkSignInService
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.NetworkAuthRepository
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
@@ -14,10 +15,11 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 
 class FirebaseAuthRepository<UserProfileDataType>(
-    private val transform: (FirebaseUser) -> UserProfileDataType
+    private val transform: (FirebaseUser) -> UserProfileDataType,
+    vararg services: NetworkSignInService
 ) : EmailAuthRepository<UserProfileDataType>,
     SocialNetworkAuthRepository<UserProfileDataType>,
-    NetworkAuthRepository<UserProfileDataType>() {
+    NetworkAuthRepository<UserProfileDataType>(*services) {
 
     private val auth: FirebaseAuth get() = FirebaseAuth.getInstance()
 
@@ -88,7 +90,7 @@ class FirebaseAuthRepository<UserProfileDataType>(
     override fun signInWithSocialNetwork(socialNetwork: SocialNetworkType) {
         getService(socialNetwork)
             ?.signIn()
-            ?: postAuthError(CanceledAuthError())
+            ?: postAuthError(ServiceAuthError("NetworkService[$socialNetwork] not found"))
     }
 
     /**
