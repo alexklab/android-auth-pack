@@ -7,22 +7,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.demo.auth.firebase.MainActivity
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.loadIcon
 import com.demo.auth.firebase.common.setVisibleOrGone
-import com.demo.auth.firebase.data.entity.UserProfile
+import com.demo.auth.firebase.common.viewModelProvider
+import com.demo.auth.firebase.db.entity.UserProfile
 import com.google.firebase.auth.EmailAuthProvider
 import kotlinx.android.synthetic.main.fragment_user_profile.*
-import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 class UserProfileFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val mainActivity: MainActivity? get() = activity as? MainActivity
+
+    private lateinit var viewModel: UserProfileViewModel
+    private val providersAdapter = UserInfoAdapter()
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = viewModelProvider(viewModelFactory)
         viewModel.profile.observe(this, Observer(::updateUI))
     }
 
@@ -79,9 +90,6 @@ class UserProfileFragment : Fragment() {
         "Unformatted[$this]"
     }
 
-    private val providersAdapter = UserInfoAdapter()
-    private val viewModel: UserProfileViewModel by inject()
-    private val mainActivity: MainActivity? get() = activity as? MainActivity
 
     private companion object {
         const val DEFAULT_VALUE = "-NULL-"

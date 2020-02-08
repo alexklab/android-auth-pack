@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.entity
+package com.demo.auth.firebase.db.entity
 
 import android.net.Uri
 import androidx.room.Entity
@@ -8,7 +8,6 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import java.io.Serializable
 import java.util.*
-import com.google.firebase.auth.UserInfo as FirebaseUserInfo
 
 /**
  * Created by alexk on 12/17/18.

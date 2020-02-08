@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.entity
+package com.demo.auth.firebase.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

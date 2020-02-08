@@ -1,9 +1,9 @@
-package com.demo.auth.firebase.data.database
+package com.demo.auth.firebase.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.demo.auth.firebase.data.entity.UserProfile
-import com.demo.auth.firebase.data.entity.UserProfile.Companion.PROFILE_KEY
+import com.demo.auth.firebase.db.entity.UserProfile
+import com.demo.auth.firebase.db.entity.UserProfile.Companion.PROFILE_KEY
 import java.util.*
 
 @Dao

@@ -11,8 +11,11 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.android.arch.auth.core.data.entity.AuthError
 import com.demo.auth.firebase.GlideApp
@@ -33,6 +36,39 @@ fun clearAllErrors(vararg layouts: TextInputLayout?) {
 fun TextView.setTextColorRes(@ColorRes colorRes: Int) {
     setTextColor(ContextCompat.getColor(context, colorRes))
 }
+
+
+/**
+ * For Actvities, allows declarations like
+ * ```
+ * val myViewModel = viewModelProvider(myViewModelFactory)
+ * ```
+ */
+inline fun <reified VM : ViewModel> FragmentActivity.viewModelProvider(
+    provider: ViewModelProvider.Factory
+) =
+    ViewModelProvider(this, provider).get(VM::class.java)
+
+
+/**
+ * For Actvities, allows declarations like
+ * ```
+ * val myViewModel = viewModelProvider(myViewModelFactory)
+ * ```
+ */
+inline fun <reified VM : ViewModel> FragmentActivity.viewModelProvider() =
+    ViewModelProvider(this).get(VM::class.java)
+
+/**
+ * For Fragments, allows declarations like
+ * ```
+ * val myViewModel = viewModelProvider(myViewModelFactory)
+ * ```
+ */
+inline fun <reified VM : ViewModel> Fragment.viewModelProvider(
+    provider: ViewModelProvider.Factory
+) =
+    ViewModelProvider(this, provider).get(VM::class.java)
 
 fun View.setVisibleOrGone(isVisible: Boolean) {
     visibility = if (isVisible) View.VISIBLE else View.GONE

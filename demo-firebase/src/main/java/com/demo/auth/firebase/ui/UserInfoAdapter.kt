@@ -2,7 +2,7 @@ package com.demo.auth.firebase.ui
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.demo.auth.firebase.data.entity.UserInfo
+import com.demo.auth.firebase.db.entity.UserInfo
 
 class UserInfoAdapter : RecyclerView.Adapter<UserInfoViewHolder>() {
 

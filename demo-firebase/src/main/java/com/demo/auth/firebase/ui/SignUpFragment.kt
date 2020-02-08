@@ -15,7 +15,7 @@ import com.android.arch.auth.core.model.SignUpViewModel
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.common.PasswordFieldValidator.Companion.MIN_PASSWORD_SIZE
-import com.demo.auth.firebase.data.entity.UserProfile
+import com.demo.auth.firebase.db.entity.UserProfile
 import kotlinx.android.synthetic.main.fragment_sign_up.*
 import org.koin.android.ext.android.inject
 

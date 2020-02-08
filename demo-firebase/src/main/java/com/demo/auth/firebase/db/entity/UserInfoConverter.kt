@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.data.entity
+package com.demo.auth.firebase.db.entity
 
 import android.util.Log
 import androidx.room.TypeConverter

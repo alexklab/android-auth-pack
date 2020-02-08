@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.ui
+package com.demo.auth.firebase.ui.signin
 
 import android.os.Bundle
 import android.util.Log
@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
@@ -14,28 +14,50 @@ import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.EventObserver
 import com.android.arch.auth.core.data.entity.SocialNetworkType
 import com.android.arch.auth.core.data.entity.SocialNetworkType.*
-import com.android.arch.auth.core.model.SignInWithEmailViewModel
-import com.android.arch.auth.core.model.SignInWithSocialNetworksViewModel
 import com.demo.auth.firebase.MainActivity
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
-import com.demo.auth.firebase.data.entity.UserProfile
+import com.demo.auth.firebase.db.entity.UserProfile
+import com.demo.auth.firebase.ui.RecoveryPasswordFragment
+import com.demo.auth.firebase.ui.SignUpFragment
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_sign_in.*
-import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
 /**
  * Created by alexk on 11/26/18.
  * Project sportuaappandroid
  */
-class SignInFragment : Fragment() {
+class SignInFragment : DaggerFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val mainActivity: MainActivity? get() = activity as? MainActivity
+
+    private lateinit var signInWithEmailViewModel: SignInWithEmailViewModel
+    private lateinit var signInWithSocialNetworksViewModel: SignInWithSocialNetworksViewModel
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_sign_in, container, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        signInWithEmailViewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignInResponse))
-        signInWithSocialNetworksViewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignInResponse))
+        signInWithEmailViewModel = viewModelProvider(viewModelFactory)
+        signInWithSocialNetworksViewModel = viewModelProvider(viewModelFactory)
+
+        signInWithEmailViewModel.response.observe(
+            viewLifecycleOwner,
+            EventObserver(::handleSignInResponse)
+        )
+        signInWithSocialNetworksViewModel.response.observe(
+            viewLifecycleOwner,
+            EventObserver(::handleSignInResponse)
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,12 +103,17 @@ class SignInFragment : Fragment() {
         Log.d("handleSignInResponse:", "$response")
 
         fun handleErrors(errorType: AuthError?) = when (errorType) {
-            is EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
-            is PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
+            is EmailRequiredAuthError -> emailLayout.error =
+                getString(R.string.error_field_required)
+            is PasswordRequiredAuthError -> passwordLayout.error =
+                getString(R.string.error_field_required)
             is CanceledAuthError -> setButtonsClickable(isClickable = true)
-            is WrongPasswordAuthError -> passwordLayout.error = getString(R.string.error_incorrect_password)
-            is AccountNotFoundAuthError -> emailLayout.error = getString(R.string.error_email_not_found)
-            is AccountNotActivatedAuthError -> emailLayout.error = getString(R.string.error_email_not_activated)
+            is WrongPasswordAuthError -> passwordLayout.error =
+                getString(R.string.error_incorrect_password)
+            is AccountNotFoundAuthError -> emailLayout.error =
+                getString(R.string.error_email_not_found)
+            is AccountNotActivatedAuthError -> emailLayout.error =
+                getString(R.string.error_email_not_activated)
             is TooManyRequestsAuthError -> showTooManyRequestAlert(errorType)
             else -> showFailRequestAlert(errorType, onRetry = ::sendSignInWithEmailRequest)
         }
@@ -107,7 +134,4 @@ class SignInFragment : Fragment() {
         }
     }
 
-    private val mainActivity: MainActivity? get() = activity as? MainActivity
-    private val signInWithEmailViewModel: SignInWithEmailViewModel<UserProfile> by inject()
-    private val signInWithSocialNetworksViewModel: SignInWithSocialNetworksViewModel<UserProfile> by inject()
 }

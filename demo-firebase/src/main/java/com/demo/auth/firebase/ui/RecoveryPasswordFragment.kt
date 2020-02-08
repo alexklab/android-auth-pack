@@ -15,7 +15,7 @@ import com.android.arch.auth.core.data.entity.EventObserver
 import com.android.arch.auth.core.model.RecoveryPasswordViewModel
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
-import com.demo.auth.firebase.data.entity.UserProfile
+import com.demo.auth.firebase.db.entity.UserProfile
 import kotlinx.android.synthetic.main.fragment_recovery_password.*
 import org.koin.android.ext.android.inject
 

@@ -17,7 +17,7 @@ import com.android.arch.auth.core.model.ChangePasswordViewModel
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.common.PasswordFieldValidator.Companion.MIN_PASSWORD_SIZE
-import com.demo.auth.firebase.data.entity.UserProfile
+import com.demo.auth.firebase.db.entity.UserProfile
 import kotlinx.android.synthetic.main.fragment_change_password.*
 import org.koin.android.ext.android.inject
 

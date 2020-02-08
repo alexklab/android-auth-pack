@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.loadIcon
-import com.demo.auth.firebase.data.entity.UserInfo
+import com.demo.auth.firebase.db.entity.UserInfo
 import kotlinx.android.synthetic.main.list_item_user_info.view.*
 
 class UserInfoViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(parent.let {
