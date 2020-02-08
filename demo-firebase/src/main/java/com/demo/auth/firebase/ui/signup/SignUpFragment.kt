@@ -1,11 +1,11 @@
-package com.demo.auth.firebase.ui
+package com.demo.auth.firebase.ui.signup
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
@@ -14,19 +14,29 @@ import com.android.arch.auth.core.data.entity.EventObserver
 import com.android.arch.auth.core.model.SignUpViewModel
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
-import com.demo.auth.firebase.common.PasswordFieldValidator.Companion.MIN_PASSWORD_SIZE
+import com.demo.auth.firebase.common.PasswordFieldValidatorImpl.Companion.MIN_PASSWORD_SIZE
 import com.demo.auth.firebase.db.entity.UserProfile
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_sign_up.*
-import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
-class SignUpFragment : Fragment() {
+class SignUpFragment : DaggerFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: SignUpViewModel<UserProfile>
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_sign_up, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        viewModel = viewModelProvider(viewModelFactory)
         viewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignUpResponse))
     }
 
@@ -86,18 +96,26 @@ class SignUpFragment : Fragment() {
     private fun handleErrors(errorType: AuthError?): Unit = when (errorType) {
         is LoginRequiredAuthError -> loginLayout.error = getString(R.string.error_field_required)
         is MalformedLoginAuthError -> loginLayout.error = getString(R.string.login_validation_error)
-        is LoginAlreadyExistAuthError -> loginLayout.error = getString(R.string.login_conflict_error)
+        is LoginAlreadyExistAuthError -> loginLayout.error =
+            getString(R.string.login_conflict_error)
         is EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)
         is MalformedEmailAuthError -> emailLayout.error = getString(R.string.error_invalid_email)
         is EmailAlreadyExistAuthError -> emailLayout.error = getString(R.string.error_email_in_use)
-        is PasswordRequiredAuthError -> passwordLayout.error = getString(R.string.error_field_required)
+        is PasswordRequiredAuthError -> passwordLayout.error =
+            getString(R.string.error_field_required)
         is WeakPasswordAuthError -> {
-            val symbolsValue = "$MIN_PASSWORD_SIZE ${resources.getQuantityString(R.plurals.symbols, MIN_PASSWORD_SIZE)}"
+            val symbolsValue = "$MIN_PASSWORD_SIZE ${resources.getQuantityString(
+                R.plurals.symbols,
+                MIN_PASSWORD_SIZE
+            )}"
             passwordLayout.error = getString(R.string.weak_password_error, symbolsValue)
         }
-        is WrongPasswordAuthError -> passwordLayout.error = getString(R.string.error_incorrect_password)
-        is ConfirmPasswordRequiredAuthError -> confirmPasswordLayout.error = getString(R.string.error_field_required)
-        is NotMatchedConfirmPasswordAuthError -> confirmPasswordLayout.error = getString(R.string.error_incorrect_password)
+        is WrongPasswordAuthError -> passwordLayout.error =
+            getString(R.string.error_incorrect_password)
+        is ConfirmPasswordRequiredAuthError -> confirmPasswordLayout.error =
+            getString(R.string.error_field_required)
+        is NotMatchedConfirmPasswordAuthError -> confirmPasswordLayout.error =
+            getString(R.string.error_incorrect_password)
         is EnableTermsOfUseAuthError -> updateTermOfUseLayout("")
         else -> showFailRequestAlert(errorType, onRetry = ::sendSignUpRequest)
     }
@@ -111,6 +129,4 @@ class SignUpFragment : Fragment() {
         )
     }
 
-
-    private val viewModel: SignUpViewModel<UserProfile> by inject()
 }

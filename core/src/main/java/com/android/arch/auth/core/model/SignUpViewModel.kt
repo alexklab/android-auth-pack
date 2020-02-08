@@ -2,7 +2,9 @@ package com.android.arch.auth.core.model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.EmailFieldValidator
+import com.android.arch.auth.core.common.LoginFieldValidator
+import com.android.arch.auth.core.common.PasswordFieldValidator
 import com.android.arch.auth.core.common.extensions.applyOnSuccess
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthResponse
@@ -11,10 +13,10 @@ import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.SignUpUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
-class SignUpViewModel<UserProfileDataType>(
-    private val emailValidator: FieldValidator,
-    private val loginValidator: FieldValidator,
-    private val passwordValidator: FieldValidator,
+open class SignUpViewModel<UserProfileDataType>(
+    private val emailValidator: EmailFieldValidator,
+    private val loginValidator: LoginFieldValidator,
+    private val passwordValidator: PasswordFieldValidator,
     authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val signUpUseCase: SignUpUseCase<UserProfileDataType>,
     private val updateProfileUseCase: UpdateProfileUseCase<UserProfileDataType>

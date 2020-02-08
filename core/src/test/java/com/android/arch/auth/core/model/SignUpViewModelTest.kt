@@ -2,7 +2,9 @@ package com.android.arch.auth.core.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.EmailFieldValidator
+import com.android.arch.auth.core.common.LoginFieldValidator
+import com.android.arch.auth.core.common.PasswordFieldValidator
 import com.android.arch.auth.core.common.extensions.postEvent
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -51,11 +53,11 @@ class SignUpViewModelTest : AuthBaseViewModelTest<UserProfile, SignUpViewModel<U
     @Mock
     private lateinit var cache: UserProfileDataCache<UserProfile>
     @Mock
-    private lateinit var emailValidator: FieldValidator
+    private lateinit var emailValidator: EmailFieldValidator
     @Mock
-    private lateinit var loginValidator: FieldValidator
+    private lateinit var loginValidator: LoginFieldValidator
     @Mock
-    private lateinit var passwordValidator: FieldValidator
+    private lateinit var passwordValidator: PasswordFieldValidator
 
     private var signUpError: AuthError? = null
     private val customError = ServiceAuthError("Custom Error")

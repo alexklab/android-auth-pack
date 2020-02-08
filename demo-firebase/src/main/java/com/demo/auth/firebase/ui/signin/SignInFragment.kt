@@ -19,7 +19,7 @@ import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.db.entity.UserProfile
 import com.demo.auth.firebase.ui.RecoveryPasswordFragment
-import com.demo.auth.firebase.ui.SignUpFragment
+import com.demo.auth.firebase.ui.signup.SignUpFragment
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_sign_in.*
 import javax.inject.Inject

@@ -2,7 +2,7 @@ package com.android.arch.auth.core.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.EmailFieldValidator
 import com.android.arch.auth.core.common.extensions.postEvent
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -38,7 +38,7 @@ class RecoveryPasswordViewModelTest :
     @Mock
     private lateinit var repository: EmailAuthRepository<UserProfile>
     @Mock
-    private lateinit var emailValidator: FieldValidator
+    private lateinit var emailValidator: EmailFieldValidator
 
     private lateinit var authResponse: MutableLiveData<Event<AuthResponse<UserProfile>>>
 

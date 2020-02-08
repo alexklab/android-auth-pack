@@ -1,8 +1,8 @@
 package com.demo.auth.firebase.common
 
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.PasswordFieldValidator
 
-class PasswordFieldValidator : FieldValidator {
+class PasswordFieldValidatorImpl : PasswordFieldValidator {
 
     override fun validate(value: String): Boolean =
         value.length >= MIN_PASSWORD_SIZE

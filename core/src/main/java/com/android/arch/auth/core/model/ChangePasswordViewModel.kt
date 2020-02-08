@@ -1,6 +1,6 @@
 package com.android.arch.auth.core.model
 
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.PasswordFieldValidator
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.ChangePasswordUseCase
@@ -11,7 +11,7 @@ import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
  * Project android-auth-pack
  */
 class ChangePasswordViewModel<UserProfileDataType>(
-    private val passwordValidator: FieldValidator,
+    private val passwordValidator: PasswordFieldValidator,
     authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val changePasswordUseCase: ChangePasswordUseCase<UserProfileDataType>,
     private val getProfileUidUseCase: GetProfileUidUseCase<UserProfileDataType>

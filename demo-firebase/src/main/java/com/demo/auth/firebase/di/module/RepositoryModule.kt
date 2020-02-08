@@ -1,18 +1,21 @@
 package com.demo.auth.firebase.di.module
 
 
+import com.android.arch.auth.core.common.EmailFieldValidator
+import com.android.arch.auth.core.common.LoginFieldValidator
+import com.android.arch.auth.core.common.PasswordFieldValidator
 import com.android.arch.auth.core.data.repository.BaseAuthRepository
 import com.android.arch.auth.core.data.repository.EmailAuthRepository
 import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
-import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
-import com.android.arch.auth.core.domain.auth.NetworksSignOutUseCase
-import com.android.arch.auth.core.domain.auth.SignInWithEmailUseCase
-import com.android.arch.auth.core.domain.auth.SignInWithSocialNetworkUseCase
+import com.android.arch.auth.core.domain.auth.*
 import com.android.arch.auth.core.domain.profile.DeleteProfileUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.firebase.FirebaseAuthRepository
+import com.demo.auth.firebase.common.EmailFieldValidatorImpl
+import com.demo.auth.firebase.common.LoginFieldValidatorImpl
+import com.demo.auth.firebase.common.PasswordFieldValidatorImpl
 import com.demo.auth.firebase.db.AppDatabase
 import com.demo.auth.firebase.db.UserProfileRepository
 import com.demo.auth.firebase.db.entity.UserProfile
@@ -46,6 +49,16 @@ class RepositoryModule {
     fun provideSocialNetworkAuthRepository(repository: FirebaseAuthRepository<UserProfile>): SocialNetworkAuthRepository<UserProfile> {
         return repository
     }
+
+    // FieldValidators
+    @Provides
+    fun provideEmailFieldValidator(): EmailFieldValidator = EmailFieldValidatorImpl()
+
+    @Provides
+    fun provideLoginFieldValidator(): LoginFieldValidator = LoginFieldValidatorImpl()
+
+    @Provides
+    fun providePasswordFieldValidator(): PasswordFieldValidator = PasswordFieldValidatorImpl()
 
     // UseCases
 
@@ -85,4 +98,8 @@ class RepositoryModule {
             : SignInWithSocialNetworkUseCase<UserProfile> =
         SignInWithSocialNetworkUseCase(repository)
 
+    @Singleton
+    @Provides
+    fun provideSignUpUseCase(repository: EmailAuthRepository<UserProfile>)
+            : SignUpUseCase<UserProfile> = SignUpUseCase(repository)
 }

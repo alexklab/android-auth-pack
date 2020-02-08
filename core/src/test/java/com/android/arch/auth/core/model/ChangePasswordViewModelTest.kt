@@ -2,7 +2,7 @@ package com.android.arch.auth.core.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.PasswordFieldValidator
 import com.android.arch.auth.core.common.extensions.postEvent
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -53,7 +53,7 @@ class ChangePasswordViewModelTest : AuthBaseViewModelTest<UserProfile, ChangePas
     @Mock
     private lateinit var profileDataCache: UserProfileDataCache<UserProfile>
     @Mock
-    private lateinit var passwordValidator: FieldValidator
+    private lateinit var passwordValidator: PasswordFieldValidator
 
     private var changePasswordError: AuthError? = null
     private val customServiceError = ServiceAuthError("Custom cause")

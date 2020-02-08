@@ -2,7 +2,8 @@ package com.android.arch.auth.core.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.EmailFieldValidator
+import com.android.arch.auth.core.common.LoginFieldValidator
 import com.android.arch.auth.core.common.extensions.postEvent
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -17,7 +18,6 @@ import com.android.arch.auth.core.domain.auth.SendEditProfileRequestUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.core.testutils.CoroutineContextProviderRule
-
 import org.amshove.kluent.any
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -59,9 +59,9 @@ class EditProfileViewModelTest :
     @Mock
     private lateinit var userProfileDataCache: UserProfileDataCache<UserProfile>
     @Mock
-    private lateinit var emailFieldValidator: FieldValidator
+    private lateinit var emailFieldValidator: EmailFieldValidator
     @Mock
-    private lateinit var loginFieldValidator: FieldValidator
+    private lateinit var loginFieldValidator: LoginFieldValidator
 
     private companion object {
         const val LOGIN = "User"

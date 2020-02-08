@@ -1,9 +1,9 @@
 package com.demo.auth.firebase.common
 
-import com.android.arch.auth.core.common.FieldValidator
+import com.android.arch.auth.core.common.EmailFieldValidator
 import java.util.regex.Pattern
 
-class EmailFieldValidator : FieldValidator {
+class EmailFieldValidatorImpl : EmailFieldValidator {
 
     override fun validate(value: String): Boolean =
         value.length >= MIN_EMAIL_LENGTH &&
