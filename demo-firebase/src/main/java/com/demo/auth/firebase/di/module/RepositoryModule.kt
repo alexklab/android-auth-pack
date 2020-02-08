@@ -118,4 +118,9 @@ class RepositoryModule {
     @Provides
     fun provideChangePasswordUseCase(repository: EmailAuthRepository<UserProfile>)
             : ChangePasswordUseCase<UserProfile> = ChangePasswordUseCase(repository)
+
+    @Singleton
+    @Provides
+    fun provideRecoveryPasswordUseCase(repository: EmailAuthRepository<UserProfile>)
+            : RecoveryPasswordUseCase<UserProfile> = RecoveryPasswordUseCase(repository)
 }

@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.ui
+package com.demo.auth.firebase.ui.profile
 
 import android.os.Bundle
 import android.util.Log
@@ -6,33 +6,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
 import com.android.arch.auth.core.data.entity.AuthResponse
 import com.android.arch.auth.core.data.entity.EventObserver
-import com.android.arch.auth.core.model.RecoveryPasswordViewModel
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.db.entity.UserProfile
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_recovery_password.*
-import org.koin.android.ext.android.inject
 import javax.inject.Inject
 
-class RecoveryPasswordFragment : Fragment() {
+class RecoveryPasswordFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private val viewModel: RecoveryPasswordViewModel<UserProfile> by inject()
+    private lateinit var viewModel: RecoveryPasswordViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_recovery_password, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        viewModel = viewModelProvider(viewModelFactory)
         viewModel.apply {
             response.observe(viewLifecycleOwner, EventObserver(::handleSendNewPasswordResponse))
         }
@@ -55,35 +58,36 @@ class RecoveryPasswordFragment : Fragment() {
         viewModel.sendRecoveryPasswordRequest(emailText.textValue())
     }
 
-    private fun handleSendNewPasswordResponse(response: AuthResponse<UserProfile>): Unit = with(response) {
-        Log.d("handleSendNewPassword", "$response")
+    private fun handleSendNewPasswordResponse(response: AuthResponse<UserProfile>): Unit =
+        with(response) {
+            Log.d("handleSendNewPassword", "$response")
 
-        fun dismissProgressAndFinishScreen() = applyContext {
-            recoverProgressBar.visibility = View.GONE
-            AlertDialog.Builder(this)
-                .setTitle(R.string.recovery_password)
-                .setMessage(R.string.message_recover_password)
-                .setPositiveButton(android.R.string.ok) { _, _ -> activity?.onBackPressed() }
-                .setOnCancelListener { activity?.onBackPressed() }
-                .setCancelable(true)
-                .create()
-                .apply { setCanceledOnTouchOutside(true) }
-                .show()
-        }
+            fun dismissProgressAndFinishScreen() = applyContext {
+                recoverProgressBar.visibility = View.GONE
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.recovery_password)
+                    .setMessage(R.string.message_recover_password)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> activity?.onBackPressed() }
+                    .setOnCancelListener { activity?.onBackPressed() }
+                    .setCancelable(true)
+                    .create()
+                    .apply { setCanceledOnTouchOutside(true) }
+                    .show()
+            }
 
-        fun dismissProgressAndHandleError() {
-            recoverProgressBar.visibility = View.GONE
-            sendButton.isClickable = true
-            handleResponseError(errorType = error)
-            Log.w("Fail AuthResponse", "$error", error?.exception)
-        }
+            fun dismissProgressAndHandleError() {
+                recoverProgressBar.visibility = View.GONE
+                sendButton.isClickable = true
+                handleResponseError(errorType = error)
+                Log.w("Fail AuthResponse", "$error", error?.exception)
+            }
 
-        when (status) {
-            SUCCESS -> dismissProgressAndFinishScreen()
-            FAILED -> dismissProgressAndHandleError()
-            ON_PROGRESS -> recoverProgressBar.visibility = View.VISIBLE
+            when (status) {
+                SUCCESS -> dismissProgressAndFinishScreen()
+                FAILED -> dismissProgressAndHandleError()
+                ON_PROGRESS -> recoverProgressBar.visibility = View.VISIBLE
+            }
         }
-    }
 
     private fun handleResponseError(errorType: AuthError?): Unit = when (errorType) {
         is EmailRequiredAuthError -> emailLayout.error = getString(R.string.error_field_required)

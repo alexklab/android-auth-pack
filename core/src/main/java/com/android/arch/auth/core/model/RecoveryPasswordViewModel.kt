@@ -6,7 +6,7 @@ import com.android.arch.auth.core.data.entity.AuthError.MalformedEmailAuthError
 import com.android.arch.auth.core.domain.auth.AuthResponseListenerUseCase
 import com.android.arch.auth.core.domain.auth.RecoveryPasswordUseCase
 
-class RecoveryPasswordViewModel<UserProfileDataType>(
+open class RecoveryPasswordViewModel<UserProfileDataType>(
     private val emailValidator: EmailFieldValidator,
     authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val recoveryPasswordUseCase: RecoveryPasswordUseCase<UserProfileDataType>

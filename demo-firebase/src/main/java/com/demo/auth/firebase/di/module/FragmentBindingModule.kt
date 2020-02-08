@@ -3,7 +3,6 @@ package com.demo.auth.firebase.di.module
 import androidx.lifecycle.ViewModel
 import com.demo.auth.firebase.di.FragmentScoped
 import com.demo.auth.firebase.di.ViewModelKey
-import com.demo.auth.firebase.ui.RecoveryPasswordFragment
 import com.demo.auth.firebase.ui.profile.*
 import com.demo.auth.firebase.ui.signin.SignInFragment
 import com.demo.auth.firebase.ui.signin.SignInWithEmailViewModel
@@ -123,5 +122,15 @@ abstract class FragmentBindingModule {
     @IntoMap
     @ViewModelKey(ChangePasswordViewModel::class)
     internal abstract fun bindChangePasswordViewModel(viewModel: ChangePasswordViewModel): ViewModel
+
+
+    /**
+     * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
+     * want to get a [RecoveryPasswordViewModel] class.
+     */
+    @Binds
+    @IntoMap
+    @ViewModelKey(RecoveryPasswordViewModel::class)
+    internal abstract fun bindRecoveryPasswordViewModel(viewModel: RecoveryPasswordViewModel): ViewModel
 }
 
