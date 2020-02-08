@@ -29,8 +29,7 @@ class UserProfileFragment : DaggerFragment() {
     private val mainActivity: MainActivity? get() = activity as? MainActivity
 
     private lateinit var viewModel: UserProfileViewModel
-    private val providersAdapter =
-        UserInfoAdapter()
+    private val providersAdapter = UserInfoAdapter()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
