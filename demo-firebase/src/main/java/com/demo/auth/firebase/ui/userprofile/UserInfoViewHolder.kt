@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.ui
+package com.demo.auth.firebase.ui.userprofile
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

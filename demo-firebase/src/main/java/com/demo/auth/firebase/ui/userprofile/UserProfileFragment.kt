@@ -1,11 +1,10 @@
-package com.demo.auth.firebase.ui
+package com.demo.auth.firebase.ui.userprofile
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,13 +14,16 @@ import com.demo.auth.firebase.common.loadIcon
 import com.demo.auth.firebase.common.setVisibleOrGone
 import com.demo.auth.firebase.common.viewModelProvider
 import com.demo.auth.firebase.db.entity.UserProfile
+import com.demo.auth.firebase.ui.ChangePasswordFragment
+import com.demo.auth.firebase.ui.EditProfileFragment
 import com.google.firebase.auth.EmailAuthProvider
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class UserProfileFragment : Fragment() {
+class UserProfileFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -29,7 +31,8 @@ class UserProfileFragment : Fragment() {
     private val mainActivity: MainActivity? get() = activity as? MainActivity
 
     private lateinit var viewModel: UserProfileViewModel
-    private val providersAdapter = UserInfoAdapter()
+    private val providersAdapter =
+        UserInfoAdapter()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

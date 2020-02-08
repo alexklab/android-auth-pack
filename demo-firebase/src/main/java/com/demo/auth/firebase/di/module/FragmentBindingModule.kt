@@ -5,13 +5,13 @@ import com.demo.auth.firebase.di.FragmentScoped
 import com.demo.auth.firebase.di.ViewModelKey
 import com.demo.auth.firebase.ui.ChangePasswordFragment
 import com.demo.auth.firebase.ui.RecoveryPasswordFragment
-import com.demo.auth.firebase.ui.UserProfileFragment
-import com.demo.auth.firebase.ui.UserProfileViewModel
 import com.demo.auth.firebase.ui.signin.SignInFragment
 import com.demo.auth.firebase.ui.signin.SignInWithEmailViewModel
 import com.demo.auth.firebase.ui.signin.SignInWithSocialNetworksViewModel
 import com.demo.auth.firebase.ui.signup.SignUpFragment
 import com.demo.auth.firebase.ui.signup.SignUpViewModel
+import com.demo.auth.firebase.ui.userprofile.UserProfileFragment
+import com.demo.auth.firebase.ui.userprofile.UserProfileViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjector
