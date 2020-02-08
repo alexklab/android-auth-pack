@@ -10,7 +10,7 @@ import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
  * Created by alexk on 11/21/18.
  * Project android-auth-pack
  */
-class ChangePasswordViewModel<UserProfileDataType>(
+open class ChangePasswordViewModel<UserProfileDataType>(
     private val passwordValidator: PasswordFieldValidator,
     authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,
     private val changePasswordUseCase: ChangePasswordUseCase<UserProfileDataType>,

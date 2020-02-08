@@ -14,7 +14,6 @@ import com.demo.auth.firebase.common.loadIcon
 import com.demo.auth.firebase.common.setVisibleOrGone
 import com.demo.auth.firebase.common.viewModelProvider
 import com.demo.auth.firebase.db.entity.UserProfile
-import com.demo.auth.firebase.ui.ChangePasswordFragment
 import com.google.firebase.auth.EmailAuthProvider
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_user_profile.*

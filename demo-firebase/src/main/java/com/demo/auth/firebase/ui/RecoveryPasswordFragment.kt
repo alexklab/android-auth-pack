@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
 import com.android.arch.auth.core.data.entity.AuthRequestStatus.*
@@ -18,8 +19,13 @@ import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.db.entity.UserProfile
 import kotlinx.android.synthetic.main.fragment_recovery_password.*
 import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
 class RecoveryPasswordFragment : Fragment() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel: RecoveryPasswordViewModel<UserProfile> by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_recovery_password, container, false)
@@ -85,6 +91,4 @@ class RecoveryPasswordFragment : Fragment() {
         is AccountNotFoundAuthError -> emailLayout.error = getString(R.string.error_email_not_found)
         else -> showFailRequestAlert(errorType, onRetry = ::sendRecoveryPasswordRequest)
     }
-
-    private val viewModel: RecoveryPasswordViewModel<UserProfile> by inject()
 }

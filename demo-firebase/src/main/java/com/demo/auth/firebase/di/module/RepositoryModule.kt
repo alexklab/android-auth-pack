@@ -10,6 +10,7 @@ import com.android.arch.auth.core.data.repository.SocialNetworkAuthRepository
 import com.android.arch.auth.core.data.repository.UserProfileDataCache
 import com.android.arch.auth.core.domain.auth.*
 import com.android.arch.auth.core.domain.profile.DeleteProfileUseCase
+import com.android.arch.auth.core.domain.profile.GetProfileUidUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 import com.android.arch.auth.firebase.FirebaseAuthRepository
@@ -69,6 +70,11 @@ class RepositoryModule {
 
     @Singleton
     @Provides
+    fun provideGetProfileUidUseCase(dataCache: UserProfileDataCache<UserProfile>):
+            GetProfileUidUseCase<UserProfile> = GetProfileUidUseCase(dataCache)
+
+    @Singleton
+    @Provides
     fun provideUpdateProfileUseCase(dataCache: UserProfileDataCache<UserProfile>):
             UpdateProfileUseCase<UserProfile> = UpdateProfileUseCase(dataCache)
 
@@ -107,4 +113,9 @@ class RepositoryModule {
     @Provides
     fun provideSendEditProfileRequestUseCase(repository: EmailAuthRepository<UserProfile>)
             : SendEditProfileRequestUseCase<UserProfile> = SendEditProfileRequestUseCase(repository)
+
+    @Singleton
+    @Provides
+    fun provideChangePasswordUseCase(repository: EmailAuthRepository<UserProfile>)
+            : ChangePasswordUseCase<UserProfile> = ChangePasswordUseCase(repository)
 }
