@@ -102,4 +102,9 @@ class RepositoryModule {
     @Provides
     fun provideSignUpUseCase(repository: EmailAuthRepository<UserProfile>)
             : SignUpUseCase<UserProfile> = SignUpUseCase(repository)
+
+    @Singleton
+    @Provides
+    fun provideSendEditProfileRequestUseCase(repository: EmailAuthRepository<UserProfile>)
+            : SendEditProfileRequestUseCase<UserProfile> = SendEditProfileRequestUseCase(repository)
 }

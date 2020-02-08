@@ -16,7 +16,7 @@ import com.android.arch.auth.core.domain.auth.SendEditProfileRequestUseCase
 import com.android.arch.auth.core.domain.profile.GetProfileUseCase
 import com.android.arch.auth.core.domain.profile.UpdateProfileUseCase
 
-class EditProfileViewModel<UserProfileDataType>(
+open class EditProfileViewModel<UserProfileDataType>(
     private val emailValidator: EmailFieldValidator,
     private val loginValidator: LoginFieldValidator,
     authResponseListenerUseCase: AuthResponseListenerUseCase<UserProfileDataType>,

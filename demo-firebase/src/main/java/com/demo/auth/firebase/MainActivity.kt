@@ -9,9 +9,9 @@ import com.android.arch.auth.firebase.FirebaseAuthRepository
 import com.demo.auth.firebase.common.applyTransaction
 import com.demo.auth.firebase.common.viewModelProvider
 import com.demo.auth.firebase.db.entity.UserProfile
+import com.demo.auth.firebase.ui.profile.UserProfileFragment
+import com.demo.auth.firebase.ui.profile.UserProfileViewModel
 import com.demo.auth.firebase.ui.signin.SignInFragment
-import com.demo.auth.firebase.ui.userprofile.UserProfileFragment
-import com.demo.auth.firebase.ui.userprofile.UserProfileViewModel
 import dagger.android.support.DaggerAppCompatActivity
 import timber.log.Timber
 import javax.inject.Inject

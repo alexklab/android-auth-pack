@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.ui.userprofile
+package com.demo.auth.firebase.ui.profile
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView

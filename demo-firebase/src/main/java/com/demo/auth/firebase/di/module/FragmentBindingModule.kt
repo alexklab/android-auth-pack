@@ -5,13 +5,15 @@ import com.demo.auth.firebase.di.FragmentScoped
 import com.demo.auth.firebase.di.ViewModelKey
 import com.demo.auth.firebase.ui.ChangePasswordFragment
 import com.demo.auth.firebase.ui.RecoveryPasswordFragment
+import com.demo.auth.firebase.ui.profile.EditProfileFragment
+import com.demo.auth.firebase.ui.profile.EditProfileViewModel
+import com.demo.auth.firebase.ui.profile.UserProfileFragment
+import com.demo.auth.firebase.ui.profile.UserProfileViewModel
 import com.demo.auth.firebase.ui.signin.SignInFragment
 import com.demo.auth.firebase.ui.signin.SignInWithEmailViewModel
 import com.demo.auth.firebase.ui.signin.SignInWithSocialNetworksViewModel
 import com.demo.auth.firebase.ui.signup.SignUpFragment
 import com.demo.auth.firebase.ui.signup.SignUpViewModel
-import com.demo.auth.firebase.ui.userprofile.UserProfileFragment
-import com.demo.auth.firebase.ui.userprofile.UserProfileViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjector
@@ -63,6 +65,13 @@ abstract class FragmentBindingModule {
     internal abstract fun contributeUserProfileFragment(): UserProfileFragment
 
     /**
+     * Generates an [AndroidInjector] for the [EditProfileFragment].
+     */
+    @FragmentScoped
+    @ContributesAndroidInjector
+    internal abstract fun contributeEditProfileFragment(): EditProfileFragment
+
+    /**
      * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
      * want to get a [SignInWithEmailViewModel] class.
      */
@@ -99,5 +108,15 @@ abstract class FragmentBindingModule {
     @IntoMap
     @ViewModelKey(SignUpViewModel::class)
     internal abstract fun bindSignUpViewModel(viewModel: SignUpViewModel): ViewModel
+
+
+    /**
+     * The ViewModels are created by Dagger in a map. Via the @ViewModelKey, we define that we
+     * want to get a [EditProfileViewModel] class.
+     */
+    @Binds
+    @IntoMap
+    @ViewModelKey(EditProfileViewModel::class)
+    internal abstract fun bindEditProfileViewModel(viewModel: EditProfileViewModel): ViewModel
 }
 

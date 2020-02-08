@@ -1,4 +1,4 @@
-package com.demo.auth.firebase.ui.userprofile
+package com.demo.auth.firebase.ui.profile
 
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +15,6 @@ import com.demo.auth.firebase.common.setVisibleOrGone
 import com.demo.auth.firebase.common.viewModelProvider
 import com.demo.auth.firebase.db.entity.UserProfile
 import com.demo.auth.firebase.ui.ChangePasswordFragment
-import com.demo.auth.firebase.ui.EditProfileFragment
 import com.google.firebase.auth.EmailAuthProvider
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_user_profile.*
