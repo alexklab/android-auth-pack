@@ -1,10 +1,10 @@
 package com.demo.auth.firebase.ui.profile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,11 +12,11 @@ import com.demo.auth.firebase.MainActivity
 import com.demo.auth.firebase.R
 import com.demo.auth.firebase.common.loadIcon
 import com.demo.auth.firebase.common.setVisibleOrGone
-import com.demo.auth.firebase.common.viewModelProvider
 import com.demo.auth.firebase.db.entity.UserProfile
 import com.google.firebase.auth.EmailAuthProvider
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_user_profile.*
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -28,13 +28,13 @@ class UserProfileFragment : DaggerFragment() {
 
     private val mainActivity: MainActivity? get() = activity as? MainActivity
 
-    private lateinit var viewModel: UserProfileViewModel
+    private val viewModel: UserProfileViewModel by activityViewModels { viewModelFactory }
+
     private val providersAdapter = UserInfoAdapter()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = viewModelProvider(viewModelFactory)
-        viewModel.profile.observe(this, Observer(::updateUI))
+        viewModel.profile.observe(viewLifecycleOwner, Observer(::updateUI))
     }
 
     override fun onCreateView(
@@ -86,7 +86,7 @@ class UserProfileFragment : DaggerFragment() {
     private fun Long.toDateValue(): String = try {
         SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(Date(this))
     } catch (e: Exception) {
-        Log.e("UserProfileFragment", "Failed format Long.toDateValue", e)
+        Timber.e(e, "UserProfileFragment: Failed format Long.toDateValue")
         "Unformatted[$this]"
     }
 

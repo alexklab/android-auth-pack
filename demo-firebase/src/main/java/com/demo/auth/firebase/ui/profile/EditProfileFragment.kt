@@ -1,10 +1,10 @@
 package com.demo.auth.firebase.ui.profile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -16,13 +16,14 @@ import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.db.entity.UserProfile
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class EditProfileFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var editProfileViewModel: EditProfileViewModel
+    private val editProfileViewModel: EditProfileViewModel by activityViewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,7 +35,6 @@ class EditProfileFragment : DaggerFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        editProfileViewModel = viewModelProvider(viewModelFactory)
         editProfileViewModel.apply {
             profile.observe(viewLifecycleOwner, Observer(::updateProfileLayout))
             response.observe(viewLifecycleOwner, EventObserver(::handleEditProfileResponse))
@@ -67,7 +67,7 @@ class EditProfileFragment : DaggerFragment() {
 
     private fun handleEditProfileResponse(response: AuthResponse<UserProfile>): Unit =
         with(response) {
-            Log.d("handleEditProfile", "$response")
+            Timber.d("handleEditProfile: $response")
 
             fun handleResponseError(): Unit = when (error) {
                 is LoginRequiredAuthError -> loginLayout.error =
@@ -90,7 +90,7 @@ class EditProfileFragment : DaggerFragment() {
                 progressBar.setGone()
                 updateButton.isEnabled = true
                 handleResponseError()
-                Log.w("Fail AuthResponse", "$error", error?.exception)
+                Timber.w(error?.exception, "Fail AuthResponse: $error")
             }
 
             when (status) {
@@ -101,7 +101,7 @@ class EditProfileFragment : DaggerFragment() {
         }
 
     private fun updateProfileLayout(profile: UserProfile?) {
-        Log.d("profileObserver", "$profile")
+        Timber.d("profileObserver: $profile")
         loginText.setText(profile?.displayName)
         emailText.setText(profile?.email)
         loadIcon(profile?.photoUrl, iconImageButton)

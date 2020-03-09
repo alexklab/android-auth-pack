@@ -1,11 +1,11 @@
 package com.demo.auth.firebase.ui.signin
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -22,6 +22,7 @@ import com.demo.auth.firebase.ui.profile.RecoveryPasswordFragment
 import com.demo.auth.firebase.ui.signup.SignUpFragment
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_sign_in.*
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -35,8 +36,8 @@ class SignInFragment : DaggerFragment() {
 
     private val mainActivity: MainActivity? get() = activity as? MainActivity
 
-    private lateinit var signInWithEmailViewModel: SignInWithEmailViewModel
-    private lateinit var signInWithSocialNetworksViewModel: SignInWithSocialNetworksViewModel
+    private val signInWithEmailViewModel: SignInWithEmailViewModel by activityViewModels { viewModelFactory }
+    private val signInWithSocialNetworksViewModel: SignInWithSocialNetworksViewModel by activityViewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,8 +48,6 @@ class SignInFragment : DaggerFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        signInWithEmailViewModel = viewModelProvider(viewModelFactory)
-        signInWithSocialNetworksViewModel = viewModelProvider(viewModelFactory)
 
         signInWithEmailViewModel.response.observe(
             viewLifecycleOwner,
@@ -100,7 +99,7 @@ class SignInFragment : DaggerFragment() {
     }
 
     private fun handleSignInResponse(response: AuthResponse<UserProfile>): Unit = with(response) {
-        Log.d("handleSignInResponse:", "$response")
+        Timber.d("handleSignInResponse: $response")
 
         fun handleErrors(errorType: AuthError?) = when (errorType) {
             is EmailRequiredAuthError -> emailLayout.error =
@@ -119,7 +118,7 @@ class SignInFragment : DaggerFragment() {
         }
 
         fun dismissProgressAndHandleError() {
-            Log.w("Fail AuthResponse:", "$error", error?.exception)
+            Timber.w(error?.exception, "Fail AuthResponse: $error")
             Toast.makeText(context, "${error?.errorName}", Toast.LENGTH_LONG).show()
             progressBar.visibility = View.GONE
             setButtonsClickable(isClickable = true)

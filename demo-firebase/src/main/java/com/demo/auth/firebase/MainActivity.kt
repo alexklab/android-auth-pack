@@ -2,12 +2,12 @@ package com.demo.auth.firebase
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.firebase.FirebaseAuthRepository
 import com.demo.auth.firebase.common.applyTransaction
-import com.demo.auth.firebase.common.viewModelProvider
 import com.demo.auth.firebase.db.entity.UserProfile
 import com.demo.auth.firebase.ui.profile.UserProfileFragment
 import com.demo.auth.firebase.ui.profile.UserProfileViewModel
@@ -33,9 +33,8 @@ class MainActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         firebaseAuthRepository.onCreate(this)
-        viewModelProvider<UserProfileViewModel>(viewModelFactory).apply {
-            profile.observe(this@MainActivity, Observer(::updateUI))
-        }
+        val viewModel by viewModels<UserProfileViewModel> { viewModelFactory }
+        viewModel.profile.observe(this@MainActivity, Observer(::updateUI))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

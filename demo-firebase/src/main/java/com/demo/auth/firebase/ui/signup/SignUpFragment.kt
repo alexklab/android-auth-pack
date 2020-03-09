@@ -1,10 +1,10 @@
 package com.demo.auth.firebase.ui.signup
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -18,13 +18,14 @@ import com.demo.auth.firebase.common.PasswordFieldValidatorImpl.Companion.MIN_PA
 import com.demo.auth.firebase.db.entity.UserProfile
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_sign_up.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class SignUpFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: SignUpViewModel<UserProfile>
+    private val viewModel: SignUpViewModel<UserProfile> by activityViewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +37,6 @@ class SignUpFragment : DaggerFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = viewModelProvider(viewModelFactory)
         viewModel.response.observe(viewLifecycleOwner, EventObserver(::handleSignUpResponse))
     }
 
@@ -76,10 +76,10 @@ class SignUpFragment : DaggerFragment() {
     }
 
     private fun handleSignUpResponse(response: AuthResponse<UserProfile>): Unit = with(response) {
-        Log.d("handleSignUpResponse", "$response")
+        Timber.d("handleSignUpResponse: $response")
 
         fun dismissProgressAndHandleError() {
-            Log.w("Fail AuthResponse", "$error", error?.exception)
+            Timber.w(error?.exception, "Fail AuthResponse: $error")
             progressBar.visibility = View.GONE
             signUpButton.isClickable = true
             handleErrors(error)

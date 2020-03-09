@@ -1,11 +1,11 @@
 package com.demo.auth.firebase.ui.profile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -17,13 +17,14 @@ import com.demo.auth.firebase.common.*
 import com.demo.auth.firebase.db.entity.UserProfile
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_recovery_password.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class RecoveryPasswordFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: RecoveryPasswordViewModel
+    private val viewModel: RecoveryPasswordViewModel by activityViewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,10 +36,10 @@ class RecoveryPasswordFragment : DaggerFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = viewModelProvider(viewModelFactory)
-        viewModel.apply {
-            response.observe(viewLifecycleOwner, EventObserver(::handleSendNewPasswordResponse))
-        }
+        viewModel.response.observe(
+            viewLifecycleOwner,
+            EventObserver(::handleSendNewPasswordResponse)
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,7 +61,7 @@ class RecoveryPasswordFragment : DaggerFragment() {
 
     private fun handleSendNewPasswordResponse(response: AuthResponse<UserProfile>): Unit =
         with(response) {
-            Log.d("handleSendNewPassword", "$response")
+            Timber.d("handleSendNewPassword: $response")
 
             fun dismissProgressAndFinishScreen() = applyContext {
                 recoverProgressBar.visibility = View.GONE
@@ -79,7 +80,7 @@ class RecoveryPasswordFragment : DaggerFragment() {
                 recoverProgressBar.visibility = View.GONE
                 sendButton.isClickable = true
                 handleResponseError(errorType = error)
-                Log.w("Fail AuthResponse", "$error", error?.exception)
+                Timber.w(error?.exception, "Fail AuthResponse: $error")
             }
 
             when (status) {

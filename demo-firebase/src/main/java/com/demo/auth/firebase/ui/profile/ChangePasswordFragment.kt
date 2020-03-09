@@ -1,12 +1,12 @@
 package com.demo.auth.firebase.ui.profile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.android.arch.auth.core.data.entity.AuthError
 import com.android.arch.auth.core.data.entity.AuthError.*
@@ -19,6 +19,7 @@ import com.demo.auth.firebase.common.PasswordFieldValidatorImpl.Companion.MIN_PA
 import com.demo.auth.firebase.db.entity.UserProfile
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_change_password.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class ChangePasswordFragment : DaggerFragment() {
@@ -26,7 +27,7 @@ class ChangePasswordFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var viewModel: ChangePasswordViewModel
+    private val viewModel: ChangePasswordViewModel by activityViewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,10 +39,10 @@ class ChangePasswordFragment : DaggerFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = viewModelProvider(viewModelFactory)
-        viewModel.apply {
-            response.observe(viewLifecycleOwner, EventObserver(::handleChangePasswordResponse))
-        }
+        viewModel.response.observe(
+            viewLifecycleOwner,
+            EventObserver(::handleChangePasswordResponse)
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,7 +70,7 @@ class ChangePasswordFragment : DaggerFragment() {
 
     private fun handleChangePasswordResponse(response: AuthResponse<UserProfile>): Unit =
         with(response) {
-            Log.d("handleChangePassword", "$response")
+            Timber.d("handleChangePassword: $response")
 
             fun dismissProgressAndFinishScreen() = applyContext {
                 recoverProgressBar.visibility = View.GONE
@@ -89,11 +90,11 @@ class ChangePasswordFragment : DaggerFragment() {
                 sendButton.isClickable = true
                 handleResponseError(errorType = error)
                 Toast.makeText(
-                    context!!,
+                    requireContext(),
                     "Error: ${error?.errorName}: ${error?.exception?.message ?: error?.message}",
                     Toast.LENGTH_LONG
                 ).show()
-                Log.w("Fail AuthResponse", "$error", error?.exception)
+                Timber.w(error?.exception, "Fail AuthResponse: $error")
             }
 
             when (status) {
